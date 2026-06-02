@@ -30,3 +30,13 @@ class WebhookIngestResponse(BaseModel):
     message_id: int
     customer_id: int
     duplicate: bool = False
+
+
+class InquiryPatch(BaseModel):
+    grade: str | None = None
+    status: str | None = None
+
+
+class MessageCreate(BaseModel):
+    content: str
+    language: str | None = None
