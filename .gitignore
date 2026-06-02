@@ -1,5 +1,6 @@
 npm-cache/
 node_modules/
+*.egg-info/
 dist/
 build/
 .next/

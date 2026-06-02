@@ -1,0 +1,2 @@
+"""Closer backend package."""
+
