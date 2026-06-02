@@ -120,6 +120,25 @@ def send_message(
     )
 
 
+def create_followup(
+    ctx: RunContext[CloserAgentDeps],
+    inquiry_id: int | None = None,
+    conversation_id: int | None = None,
+    delay_hours: int = 24,
+    message: str | None = None,
+    max_attempts: int = 3,
+) -> dict:
+    return agent_tools.create_followup(
+        ctx.deps.session,
+        ctx.deps.seller_id,
+        _resolve_inquiry_id(ctx, inquiry_id),
+        conversation_id=conversation_id or ctx.deps.conversation_id,
+        delay_hours=delay_hours,
+        message=message,
+        max_attempts=max_attempts,
+    )
+
+
 def build_closer_agent(model: str | None = None) -> Agent[CloserAgentDeps, CloserAgentOutput]:
     return Agent(
         model,
@@ -140,6 +159,7 @@ def build_closer_agent(model: str | None = None) -> Agent[CloserAgentDeps, Close
             search_knowledge,
             match_product,
             send_message,
+            create_followup,
         ],
     )
 

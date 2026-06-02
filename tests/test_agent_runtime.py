@@ -50,4 +50,5 @@ def test_closer_agent_exposes_core_tools_to_model(db_session):
         "search_knowledge",
         "match_product",
         "send_message",
+        "create_followup",
     }.issubset(tool_names)

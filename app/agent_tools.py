@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 
 from app import models
 from app.services.crm import get_customer_profile
+from app.services.followups import create_followup as create_followup_service
 from app.services.knowledge import search_knowledge as search_knowledge_service
 from app.services.outbound import send_message as send_message_service
 from app.services.product_matching import match_product as match_product_service
@@ -191,4 +192,24 @@ def send_message(
         conversation_id=conversation_id,
         content=content,
         language=language,
+    )
+
+
+def create_followup(
+    session: Session,
+    seller_id: int,
+    inquiry_id: int,
+    conversation_id: int | None = None,
+    delay_hours: int = 24,
+    message: str | None = None,
+    max_attempts: int = 3,
+) -> dict:
+    return create_followup_service(
+        session,
+        seller_id,
+        inquiry_id=inquiry_id,
+        conversation_id=conversation_id,
+        delay_hours=delay_hours,
+        message=message,
+        max_attempts=max_attempts,
     )
