@@ -40,3 +40,9 @@ class InquiryPatch(BaseModel):
 class MessageCreate(BaseModel):
     content: str
     language: str | None = None
+
+
+class KnowledgeCreate(BaseModel):
+    source_type: str = Field(default="faq", min_length=1, max_length=20)
+    source_ref: str | None = Field(default=None, max_length=120)
+    content: str = Field(min_length=1)

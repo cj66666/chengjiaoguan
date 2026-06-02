@@ -6,8 +6,9 @@ from app import models
 from app.database import Base, engine, get_session, utcnow
 from app.dependencies import get_seller_id
 from app.errors import add_error_handlers, api_error
-from app.schemas import InboundMessage, InquiryPatch, MessageCreate, WebhookIngestResponse
+from app.schemas import InboundMessage, InquiryPatch, KnowledgeCreate, MessageCreate, WebhookIngestResponse
 from app.services.channel_gateway import ingest_inbound_message
+from app.services.knowledge import ingest_knowledge, search_knowledge
 from app.services.whatsapp_adapter import WhatsAppAdapter
 
 
@@ -206,6 +207,33 @@ def create_app(create_db_on_startup: bool = True) -> FastAPI:
         session.commit()
         return {"id": conversation.id, "is_human_takeover": False}
 
+    @app.post("/api/v1/knowledge", status_code=201)
+    def create_knowledge(
+        payload: KnowledgeCreate,
+        seller_id: int = Depends(get_seller_id),
+        session: Session = Depends(get_session),
+    ) -> dict:
+        chunks = ingest_knowledge(
+            session,
+            seller_id,
+            source_type=payload.source_type,
+            source_ref=payload.source_ref,
+            content=payload.content,
+        )
+        session.commit()
+        return {"items": [_knowledge_item(chunk, None) for chunk in chunks], "total": len(chunks)}
+
+    @app.get("/api/v1/knowledge")
+    def list_knowledge(
+        q: str,
+        source_type: str | None = None,
+        limit: int = 5,
+        seller_id: int = Depends(get_seller_id),
+        session: Session = Depends(get_session),
+    ) -> dict:
+        results = search_knowledge(session, seller_id, query=q, source_type=source_type, limit=limit)
+        return {"items": results, "total": len(results)}
+
     return app
 
 
@@ -283,4 +311,14 @@ def _message_item(message: models.Message) -> dict:
         "content": message.content,
         "language": message.language,
         "sent_at": message.sent_at,
+    }
+
+
+def _knowledge_item(chunk: models.KnowledgeChunk, score: float | None) -> dict:
+    return {
+        "chunk_id": chunk.id,
+        "source_type": chunk.source_type,
+        "source_ref": chunk.source_ref,
+        "content": chunk.content,
+        "score": score,
     }

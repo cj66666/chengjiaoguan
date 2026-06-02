@@ -23,7 +23,10 @@ class CloserAgentOutput(BaseModel):
         default_factory=list,
         description="Operational actions the seller or system should take.",
     )
-    requires_human_review: bool = Field(default=False, description="Whether the next action must wait for human approval.")
+    requires_human_review: bool = Field(
+        default=False,
+        description="Whether the next action must wait for human approval.",
+    )
 
 
 def get_inquiry(ctx: RunContext[CloserAgentDeps], inquiry_id: int | None = None) -> dict:
@@ -71,6 +74,21 @@ def generate_pi(ctx: RunContext[CloserAgentDeps], quotation_id: int) -> dict:
     return agent_tools.generate_pi(ctx.deps.session, ctx.deps.seller_id, quotation_id)
 
 
+def search_knowledge(
+    ctx: RunContext[CloserAgentDeps],
+    query: str,
+    source_type: str | None = None,
+    limit: int = 5,
+) -> list[dict]:
+    return agent_tools.search_knowledge(
+        ctx.deps.session,
+        ctx.deps.seller_id,
+        query,
+        source_type=source_type,
+        limit=limit,
+    )
+
+
 def build_closer_agent(model: str | None = None) -> Agent[CloserAgentDeps, CloserAgentOutput]:
     return Agent(
         model,
@@ -82,7 +100,7 @@ def build_closer_agent(model: str | None = None) -> Agent[CloserAgentDeps, Close
             "Never promise discounts, payment terms, delivery guarantees, or legal commitments "
             "unless a tool result explicitly supports them. Return structured output only."
         ),
-        tools=[get_inquiry, score_inquiry, get_customer, calc_quote, generate_pi],
+        tools=[get_inquiry, score_inquiry, get_customer, calc_quote, generate_pi, search_knowledge],
     )
 
 

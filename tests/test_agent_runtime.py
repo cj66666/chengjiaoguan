@@ -47,4 +47,5 @@ def test_closer_agent_exposes_core_tools_to_model(db_session):
         "get_customer",
         "calc_quote",
         "generate_pi",
+        "search_knowledge",
     }.issubset(tool_names)
