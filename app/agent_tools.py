@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app import models
 from app.services.crm import get_customer_profile
 from app.services.knowledge import search_knowledge as search_knowledge_service
+from app.services.product_matching import match_product as match_product_service
 from app.services.quote_engine import QuoteItemInput, calculate_quote
 from app.services.quote_language import render_quote_message
 from app.services.scoring import score_inquiry as score_inquiry_service
@@ -165,3 +166,12 @@ def search_knowledge(
         source_type=source_type,
         limit=limit,
     )
+
+
+def match_product(
+    session: Session,
+    seller_id: int,
+    requirement: str | dict,
+    limit: int = 5,
+) -> list[dict]:
+    return match_product_service(session, seller_id, requirement, limit=limit)

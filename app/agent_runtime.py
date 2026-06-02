@@ -89,6 +89,19 @@ def search_knowledge(
     )
 
 
+def match_product(
+    ctx: RunContext[CloserAgentDeps],
+    requirement: str | dict[str, Any],
+    limit: int = 5,
+) -> list[dict]:
+    return agent_tools.match_product(
+        ctx.deps.session,
+        ctx.deps.seller_id,
+        requirement,
+        limit=limit,
+    )
+
+
 def build_closer_agent(model: str | None = None) -> Agent[CloserAgentDeps, CloserAgentOutput]:
     return Agent(
         model,
@@ -100,7 +113,15 @@ def build_closer_agent(model: str | None = None) -> Agent[CloserAgentDeps, Close
             "Never promise discounts, payment terms, delivery guarantees, or legal commitments "
             "unless a tool result explicitly supports them. Return structured output only."
         ),
-        tools=[get_inquiry, score_inquiry, get_customer, calc_quote, generate_pi, search_knowledge],
+        tools=[
+            get_inquiry,
+            score_inquiry,
+            get_customer,
+            calc_quote,
+            generate_pi,
+            search_knowledge,
+            match_product,
+        ],
     )
 
 
