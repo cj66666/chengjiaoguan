@@ -25,7 +25,7 @@ def db_session():
 
 @pytest.fixture
 def client(db_session):
-    app = create_app()
+    app = create_app(create_db_on_startup=False)
 
     def override_session():
         yield db_session

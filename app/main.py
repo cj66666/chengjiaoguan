@@ -8,13 +8,14 @@ from app.schemas import InboundMessage, WebhookIngestResponse
 from app.services.channel_gateway import ingest_inbound_message
 
 
-def create_app() -> FastAPI:
+def create_app(create_db_on_startup: bool = True) -> FastAPI:
     app = FastAPI(title="Closer API", version="0.1.0")
     add_error_handlers(app)
 
     @app.on_event("startup")
     def create_tables() -> None:
-        Base.metadata.create_all(engine)
+        if create_db_on_startup:
+            Base.metadata.create_all(engine)
 
     @app.get("/api/v1/health")
     def health() -> dict[str, str]:
@@ -45,4 +46,3 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
-

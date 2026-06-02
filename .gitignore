@@ -10,6 +10,7 @@ build/
 .turbo/
 .cache/
 coverage/
+*.db
 .env
 .env.*
 *.log
