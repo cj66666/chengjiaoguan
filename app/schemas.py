@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import date, datetime
+from decimal import Decimal
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -46,3 +47,29 @@ class KnowledgeCreate(BaseModel):
     source_type: str = Field(default="faq", min_length=1, max_length=20)
     source_ref: str | None = Field(default=None, max_length=120)
     content: str = Field(min_length=1)
+
+
+class ApprovalPatch(BaseModel):
+    payload: dict[str, Any] | None = None
+    suggestion: str | None = None
+    summary: str | None = None
+
+
+class ApprovalReject(BaseModel):
+    reason: str | None = None
+
+
+class QuotationItemPatch(BaseModel):
+    product_id: int
+    quantity: int = Field(gt=0)
+    unit_price: Decimal
+    amount: Decimal | None = None
+
+
+class QuotationPatch(BaseModel):
+    terms: dict[str, Any] | None = None
+    valid_until: date | None = None
+    status: str | None = None
+    total_amount: Decimal | None = None
+    hits_floor: bool | None = None
+    items: list[QuotationItemPatch] | None = None

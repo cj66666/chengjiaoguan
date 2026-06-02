@@ -6,9 +6,20 @@ from app import models
 from app.database import Base, engine, get_session, utcnow
 from app.dependencies import get_seller_id
 from app.errors import add_error_handlers, api_error
-from app.schemas import InboundMessage, InquiryPatch, KnowledgeCreate, MessageCreate, WebhookIngestResponse
+from app.schemas import (
+    ApprovalPatch,
+    ApprovalReject,
+    InboundMessage,
+    InquiryPatch,
+    KnowledgeCreate,
+    MessageCreate,
+    QuotationPatch,
+    WebhookIngestResponse,
+)
+from app.services.approvals import approve_approval, list_approvals, patch_approval, reject_approval
 from app.services.channel_gateway import ingest_inbound_message
 from app.services.knowledge import ingest_knowledge, search_knowledge
+from app.services.quotations import get_quotation, patch_quotation, send_quotation
 from app.services.whatsapp_adapter import WhatsAppAdapter
 
 
@@ -234,6 +245,120 @@ def create_app(create_db_on_startup: bool = True) -> FastAPI:
         results = search_knowledge(session, seller_id, query=q, source_type=source_type, limit=limit)
         return {"items": results, "total": len(results)}
 
+    @app.get("/api/v1/approvals")
+    def get_approvals(
+        status: str | None = "pending",
+        seller_id: int = Depends(get_seller_id),
+        session: Session = Depends(get_session),
+    ) -> dict:
+        approvals = list_approvals(session, seller_id, status=status)
+        return {"items": [_approval_item(approval) for approval in approvals], "total": len(approvals)}
+
+    @app.patch("/api/v1/approvals/{approval_id}")
+    def update_approval(
+        approval_id: int,
+        payload: ApprovalPatch,
+        seller_id: int = Depends(get_seller_id),
+        session: Session = Depends(get_session),
+    ) -> dict:
+        try:
+            approval = patch_approval(
+                session,
+                seller_id,
+                approval_id,
+                payload=payload.payload,
+                suggestion=payload.suggestion,
+                summary=payload.summary,
+            )
+        except LookupError as exc:
+            raise api_error(404, "approval_not_found", "Approval not found") from exc
+        except ValueError as exc:
+            raise api_error(409, "approval_not_pending", str(exc)) from exc
+        session.commit()
+        return _approval_item(approval)
+
+    @app.post("/api/v1/approvals/{approval_id}/approve")
+    def approve_pending_approval(
+        approval_id: int,
+        seller_id: int = Depends(get_seller_id),
+        session: Session = Depends(get_session),
+    ) -> dict:
+        try:
+            result = approve_approval(session, seller_id, approval_id)
+        except LookupError as exc:
+            raise api_error(404, "approval_not_found", "Approval not found") from exc
+        except ValueError as exc:
+            raise api_error(409, "approval_not_executable", str(exc)) from exc
+        session.commit()
+        return result
+
+    @app.post("/api/v1/approvals/{approval_id}/reject")
+    def reject_pending_approval(
+        approval_id: int,
+        payload: ApprovalReject | None = None,
+        seller_id: int = Depends(get_seller_id),
+        session: Session = Depends(get_session),
+    ) -> dict:
+        try:
+            result = reject_approval(session, seller_id, approval_id, reason=payload.reason if payload else None)
+        except LookupError as exc:
+            raise api_error(404, "approval_not_found", "Approval not found") from exc
+        except ValueError as exc:
+            raise api_error(409, "approval_not_pending", str(exc)) from exc
+        session.commit()
+        return result
+
+    @app.get("/api/v1/quotations/{quotation_id}")
+    def get_quotation_detail(
+        quotation_id: int,
+        seller_id: int = Depends(get_seller_id),
+        session: Session = Depends(get_session),
+    ) -> dict:
+        try:
+            quotation = get_quotation(session, seller_id, quotation_id)
+        except LookupError as exc:
+            raise api_error(404, "quotation_not_found", "Quotation not found") from exc
+        return _quotation_detail(quotation)
+
+    @app.patch("/api/v1/quotations/{quotation_id}")
+    def update_quotation(
+        quotation_id: int,
+        payload: QuotationPatch,
+        seller_id: int = Depends(get_seller_id),
+        session: Session = Depends(get_session),
+    ) -> dict:
+        try:
+            quotation = patch_quotation(
+                session,
+                seller_id,
+                quotation_id,
+                terms=payload.terms,
+                valid_until=payload.valid_until,
+                status=payload.status,
+                total_amount=payload.total_amount,
+                hits_floor=payload.hits_floor,
+                items=[item.model_dump() for item in payload.items] if payload.items is not None else None,
+            )
+        except LookupError as exc:
+            raise api_error(404, "quotation_not_found", "Quotation not found") from exc
+        session.commit()
+        return _quotation_detail(quotation)
+
+    @app.post("/api/v1/quotations/{quotation_id}/send")
+    def send_quotation_endpoint(
+        quotation_id: int,
+        seller_id: int = Depends(get_seller_id),
+        session: Session = Depends(get_session),
+    ) -> dict:
+        try:
+            result = send_quotation(session, seller_id, quotation_id)
+        except LookupError as exc:
+            raise api_error(404, "quotation_not_found", str(exc)) from exc
+        except PermissionError as exc:
+            raise api_error(409, "below_floor_price", "Quotation below floor price requires approval") from exc
+        session.commit()
+        return result
+
     return app
 
 
@@ -321,4 +446,46 @@ def _knowledge_item(chunk: models.KnowledgeChunk, score: float | None) -> dict:
         "source_ref": chunk.source_ref,
         "content": chunk.content,
         "score": score,
+    }
+
+
+def _approval_item(approval: models.Approval) -> dict:
+    return {
+        "id": approval.id,
+        "conversation_id": approval.conversation_id,
+        "inquiry_id": approval.inquiry_id,
+        "type": approval.type,
+        "reason": approval.reason,
+        "summary": approval.summary,
+        "suggestion": approval.suggestion,
+        "payload": approval.payload or {},
+        "status": approval.status,
+        "executed": approval.executed,
+        "created_at": approval.created_at,
+    }
+
+
+def _quotation_detail(quotation: models.Quotation) -> dict:
+    return {
+        "id": quotation.id,
+        "inquiry_id": quotation.inquiry_id,
+        "customer_id": quotation.customer_id,
+        "currency": quotation.currency,
+        "total_amount": float(quotation.total_amount) if quotation.total_amount is not None else None,
+        "valid_until": quotation.valid_until,
+        "is_pi": quotation.is_pi,
+        "status": quotation.status,
+        "created_by": quotation.created_by,
+        "hits_floor": quotation.hits_floor,
+        "terms": quotation.terms or {},
+        "items": [
+            {
+                "id": item.id,
+                "product_id": item.product_id,
+                "quantity": item.quantity,
+                "unit_price": float(item.unit_price),
+                "amount": float(item.amount),
+            }
+            for item in quotation.items
+        ],
     }
