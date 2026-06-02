@@ -1,0 +1,14 @@
+npm-cache/
+node_modules/
+dist/
+build/
+.next/
+.nuxt/
+.turbo/
+.cache/
+coverage/
+.env
+.env.*
+*.log
+tmp/
+temp/
