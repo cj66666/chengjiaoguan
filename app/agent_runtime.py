@@ -102,6 +102,24 @@ def match_product(
     )
 
 
+def send_message(
+    ctx: RunContext[CloserAgentDeps],
+    content: str,
+    conversation_id: int | None = None,
+    language: str | None = None,
+) -> dict:
+    target_id = conversation_id or ctx.deps.conversation_id
+    if target_id is None:
+        raise ValueError("conversation_id is required")
+    return agent_tools.send_message(
+        ctx.deps.session,
+        ctx.deps.seller_id,
+        target_id,
+        content,
+        language=language,
+    )
+
+
 def build_closer_agent(model: str | None = None) -> Agent[CloserAgentDeps, CloserAgentOutput]:
     return Agent(
         model,
@@ -121,6 +139,7 @@ def build_closer_agent(model: str | None = None) -> Agent[CloserAgentDeps, Close
             generate_pi,
             search_knowledge,
             match_product,
+            send_message,
         ],
     )
 

@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app import models
 from app.services.crm import get_customer_profile
 from app.services.knowledge import search_knowledge as search_knowledge_service
+from app.services.outbound import send_message as send_message_service
 from app.services.product_matching import match_product as match_product_service
 from app.services.quote_engine import QuoteItemInput, calculate_quote
 from app.services.quote_language import render_quote_message
@@ -175,3 +176,19 @@ def match_product(
     limit: int = 5,
 ) -> list[dict]:
     return match_product_service(session, seller_id, requirement, limit=limit)
+
+
+def send_message(
+    session: Session,
+    seller_id: int,
+    conversation_id: int,
+    content: str,
+    language: str | None = None,
+) -> dict:
+    return send_message_service(
+        session,
+        seller_id,
+        conversation_id=conversation_id,
+        content=content,
+        language=language,
+    )
