@@ -44,6 +44,7 @@ from app.services.catalog import (
     update_product,
     update_pricing_rule,
 )
+from app.services.credentials import CredentialsError
 
 
 router = APIRouter(prefix="/api/v1")
@@ -250,7 +251,10 @@ def list_channels_endpoint(
     session: Session = Depends(get_session),
 ) -> dict:
     channels = list_channels(session, seller_id)
-    return {"items": [channel_item(channel) for channel in channels], "total": len(channels)}
+    try:
+        return {"items": [channel_item(channel) for channel in channels], "total": len(channels)}
+    except CredentialsError as exc:
+        raise api_error(503, "credentials_secret_required", str(exc)) from exc
 
 
 @router.post("/channels", status_code=201)
@@ -259,7 +263,10 @@ def create_channel_endpoint(
     seller_id: int = Depends(get_seller_id),
     session: Session = Depends(get_session),
 ) -> dict:
-    channel = create_channel(session, seller_id, payload.model_dump())
+    try:
+        channel = create_channel(session, seller_id, payload.model_dump())
+    except CredentialsError as exc:
+        raise api_error(503, "credentials_secret_required", str(exc)) from exc
     session.commit()
     return channel_item(channel)
 
@@ -274,6 +281,8 @@ def rotate_channel_credentials_endpoint(
         channel, rotated = rotate_channel_credentials(session, seller_id, channel_account_id)
     except LookupError as exc:
         raise api_error(404, "channel_not_found", "Channel not found") from exc
+    except CredentialsError as exc:
+        raise api_error(503, "credentials_secret_required", str(exc)) from exc
     session.commit()
     return channel_item(channel) | {"rotated": rotated}
 

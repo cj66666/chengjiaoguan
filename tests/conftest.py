@@ -23,6 +23,8 @@ import app.models  # noqa: F401
 
 @pytest.fixture(autouse=True)
 def deterministic_external_boundaries(monkeypatch):
+    monkeypatch.setenv("CLOSER_ALLOW_DEV_AUTH", "1")
+    monkeypatch.setenv("CLOSER_ALLOW_DEV_CREDENTIALS", "1")
     monkeypatch.delenv("CLOSER_DELIVERY_MODE", raising=False)
     monkeypatch.delenv("CLOSER_KNOWLEDGE_INDEX_PROVIDER", raising=False)
     monkeypatch.delenv("CLOSER_KNOWLEDGE_INDEX_ENDPOINT", raising=False)

@@ -24,6 +24,7 @@ from typing import Any, Mapping
 
 SEAL_VERSION = "closer.credentials.v1"
 PREVIOUS_SECRETS_ENV = "CLOSER_CREDENTIALS_PREVIOUS_SECRETS"
+DEV_CREDENTIALS_ENV = "CLOSER_ALLOW_DEV_CREDENTIALS"
 _DEV_SECRET = "closer-local-dev-credentials-secret"
 
 
@@ -133,7 +134,11 @@ def _verified_key_material(
 
 
 def _current_key_material() -> KeyMaterial:
-    secret = os.getenv("CLOSER_CREDENTIALS_SECRET") or _DEV_SECRET
+    secret = os.getenv("CLOSER_CREDENTIALS_SECRET")
+    if not secret:
+        if not _dev_credentials_enabled():
+            raise CredentialsError("CLOSER_CREDENTIALS_SECRET is required")
+        secret = _DEV_SECRET
     return _material(secret)
 
 
@@ -156,6 +161,10 @@ def _material(secret: str) -> KeyMaterial:
     key = hashlib.sha256(secret.encode()).digest()
     key_id = hashlib.sha256((SEAL_VERSION + ":" + secret).encode()).hexdigest()[:16]
     return KeyMaterial(secret=secret, key=key, key_id=key_id)
+
+
+def _dev_credentials_enabled() -> bool:
+    return (os.getenv(DEV_CREDENTIALS_ENV) or "").strip().lower() in {"1", "true", "yes", "on"}
 
 
 def _keystream(key: bytes, nonce: bytes, size: int) -> bytes:
