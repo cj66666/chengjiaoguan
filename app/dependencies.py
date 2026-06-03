@@ -10,11 +10,16 @@
  */
 """
 
+import os
+
 from fastapi import Depends, Header, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_session
 from app.services.auth_keys import TOKEN_PREFIX, authenticate_api_key
+
+
+DEV_AUTH_ENV = "CLOSER_ALLOW_DEV_AUTH"
 
 
 def get_seller_id(
@@ -24,7 +29,9 @@ def get_seller_id(
 ) -> int:
     if authorization:
         return parse_authorization(authorization, session)
-    return x_seller_id or 1
+    if _dev_auth_enabled():
+        return x_seller_id or 1
+    raise _auth_error()
 
 
 def parse_authorization(authorization: str, session: Session) -> int:
@@ -38,6 +45,8 @@ def parse_authorization(authorization: str, session: Session) -> int:
             raise _auth_error() from exc
         session.commit()
         return seller_id
+    if not _dev_auth_enabled():
+        raise _auth_error()
     return parse_seller_token(authorization)
 
 
@@ -52,7 +61,20 @@ def parse_seller_token(authorization: str) -> int:
 
 
 def _auth_error() -> HTTPException:
+    message = (
+        "Authorization must be Bearer seller:<id> or Bearer cak_<token>"
+        if _dev_auth_enabled()
+        else "Authorization must be Bearer cak_<token>"
+    )
     return HTTPException(
         status_code=401,
-        detail={"code": "invalid_token", "message": "Authorization must be Bearer seller:<id> or Bearer cak_<token>"},
+        detail={"code": "invalid_token", "message": message},
     )
+
+
+def _dev_auth_enabled() -> bool:
+    return _truthy(os.getenv(DEV_AUTH_ENV))
+
+
+def _truthy(value: str | None) -> bool:
+    return (value or "").strip().lower() in {"1", "true", "yes", "on"}

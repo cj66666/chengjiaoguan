@@ -43,6 +43,29 @@ def test_invalid_bearer_token_uses_contract_error_shape(client):
     }
 
 
+def test_missing_authorization_is_rejected_when_dev_auth_disabled(client, db_session, monkeypatch):
+    monkeypatch.delenv("CLOSER_ALLOW_DEV_AUTH", raising=False)
+    db_session.add_all(
+        [
+            models.Seller(id=1, name="Seller One", email="one@example.com"),
+            models.Customer(seller_id=1, email="secret@example.com", company="Secret Buyer"),
+        ]
+    )
+    db_session.commit()
+
+    customers = client.get("/api/v1/customers")
+    export = client.get("/api/v1/exports/customers.csv")
+    api_keys = client.get("/api/v1/auth/api-keys")
+
+    assert customers.status_code == 401
+    assert export.status_code == 401
+    assert api_keys.status_code == 401
+    assert customers.json()["error"] == {
+        "code": "invalid_token",
+        "message": "Authorization must be Bearer cak_<token>",
+    }
+
+
 def test_x_seller_id_shortcut_still_works_for_mvp_tests(client, db_session):
     db_session.add_all(
         [

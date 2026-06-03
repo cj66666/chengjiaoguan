@@ -258,6 +258,19 @@ def test_channel_credentials_can_be_resealed_after_secret_rotation(client, db_se
     assert reveal_credentials(stored_channel.credentials) == {"host": "imap.example.com"}
 
 
+def test_channel_credentials_require_secret_outside_dev_mode(client, monkeypatch):
+    monkeypatch.delenv("CLOSER_ALLOW_DEV_CREDENTIALS", raising=False)
+    monkeypatch.delenv("CLOSER_CREDENTIALS_SECRET", raising=False)
+
+    response = client.post(
+        "/api/v1/channels",
+        json={"channel_type": "email", "name": "Sales inbox", "credentials": {"host": "imap.example.com"}},
+    )
+
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "credentials_secret_required"
+
+
 def test_pricing_rule_versions_are_tenant_scoped(client, db_session):
     db_session.add_all(
         [
