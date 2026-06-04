@@ -70,6 +70,7 @@ test("workbench customer approval flow", async ({ page }, testInfo) => {
   await expect(page.getByRole("heading", { name: "报价详情" })).toBeVisible();
 
   await page.getByRole("button", { name: "产品", exact: true }).click();
+  await expect(page.getByText("6 个 SKU")).toBeVisible();
   await expect(page.getByRole("heading", { name: "价格规则列表" })).toBeVisible();
   await expect(page.locator(".profile")).not.toBeVisible();
   await expect(page.locator(".banner")).not.toBeVisible();

@@ -25,6 +25,56 @@ from app.services.knowledge import ingest_knowledge
 
 
 DEMO_PRODUCT_SKU = "DEMO-LAMP-10W"
+DEMO_PRODUCT_FIXTURES = [
+    {
+        "sku": DEMO_PRODUCT_SKU,
+        "name": "LED Desk Lamp 10W",
+        "cost": "2.10",
+        "moq": 500,
+        "specs": {"power": "10W", "certification": "CE", "material": "aluminum"},
+        "description": "Adjustable LED desk lamp for B2B bulk orders.",
+    },
+    {
+        "sku": "DEMO-PATIO-BISTRO-3PC",
+        "name": "3-Piece Patio Bistro Set",
+        "cost": "42.00",
+        "moq": 80,
+        "specs": {"material": "powder coated steel", "packing": "1 set/carton", "use": "balcony and cafe"},
+        "description": "Compact outdoor table and two chair set for small patios and hospitality buyers.",
+    },
+    {
+        "sku": "DEMO-RATTAN-SOFA-5S",
+        "name": "5-Seater PE Rattan Corner Sofa Set",
+        "cost": "128.00",
+        "moq": 30,
+        "specs": {"material": "PE rattan", "cushion": "water-resistant fabric", "frame": "aluminum"},
+        "description": "Modular outdoor sofa set with washable cushion covers for garden retailers.",
+    },
+    {
+        "sku": "DEMO-CANTILEVER-PARASOL-3M",
+        "name": "3m Cantilever Garden Parasol",
+        "cost": "62.00",
+        "moq": 60,
+        "specs": {"canopy": "UV50 polyester", "pole": "aluminum", "base": "cross base included"},
+        "description": "Offset outdoor umbrella for patio, poolside, and restaurant terrace programs.",
+    },
+    {
+        "sku": "DEMO-FOLDING-CAMP-CHAIR",
+        "name": "Folding Outdoor Camping Chair",
+        "cost": "9.80",
+        "moq": 300,
+        "specs": {"fabric": "600D oxford", "frame": "steel tube", "capacity": "120kg"},
+        "description": "Portable folding chair with carry bag for promotional and retail channels.",
+    },
+    {
+        "sku": "DEMO-GARDEN-STORAGE-BOX",
+        "name": "Waterproof Garden Storage Box 350L",
+        "cost": "35.00",
+        "moq": 100,
+        "specs": {"capacity": "350L", "material": "PP resin", "feature": "lockable lid"},
+        "description": "Outdoor storage box for cushions, tools, and pool accessories.",
+    },
+]
 DEMO_KNOWLEDGE_REF = "demo-lamp-faq"
 DEMO_CHANNEL_MESSAGE_ID = "demo-site-form-001"
 DEMO_INQUIRY_CONTENT = "Hi, we need 5000 LED desk lamps shipped to US. Please quote CIF and payment terms."
@@ -34,7 +84,8 @@ DEMO_RISKY_REPLY = "We can offer USD 2.80 per unit and guarantee delivery with n
 def seed_demo_scenario(session: Session, seller_id: int) -> dict[str, Any]:
     seller = _ensure_demo_seller(session, seller_id)
     seller.settings = dict(seller.settings or {}) | {"large_order_approval_threshold": "10000"}
-    product = _ensure_demo_product(session, seller_id)
+    products = _ensure_demo_products(session, seller_id)
+    product = products[0]
     pricing_rule = _ensure_demo_pricing_rule(session, seller_id, product.id)
     knowledge_chunks = _ensure_demo_knowledge(session, seller_id)
     inquiry, conversation, message, duplicate = _ingest_demo_inquiry(session, seller_id)
@@ -48,6 +99,7 @@ def seed_demo_scenario(session: Session, seller_id: int) -> dict[str, Any]:
         "seller_id": seller_id,
         "scenario": "site_form_quote_guardrail",
         "product_id": product.id,
+        "product_ids": [demo_product.id for demo_product in products],
         "pricing_rule_id": pricing_rule.id,
         "knowledge_chunk_ids": [chunk.id for chunk in knowledge_chunks],
         "customer_id": inquiry.customer_id,
@@ -83,20 +135,29 @@ def _ensure_demo_seller(session: Session, seller_id: int) -> models.Seller:
 
 
 def _ensure_demo_product(session: Session, seller_id: int) -> models.Product:
+    return _ensure_demo_products(session, seller_id)[0]
+
+
+def _ensure_demo_products(session: Session, seller_id: int) -> list[models.Product]:
+    return [_upsert_demo_product(session, seller_id, fixture) for fixture in DEMO_PRODUCT_FIXTURES]
+
+
+def _upsert_demo_product(session: Session, seller_id: int, fixture: dict[str, Any]) -> models.Product:
     product = session.scalar(
         select(models.Product)
         .where(models.Product.seller_id == seller_id)
-        .where(models.Product.sku == DEMO_PRODUCT_SKU)
+        .where(models.Product.sku == fixture["sku"])
     )
     if product is None:
-        product = models.Product(seller_id=seller_id, name="LED Desk Lamp 10W", sku=DEMO_PRODUCT_SKU)
+        product = models.Product(seller_id=seller_id, sku=fixture["sku"])
         session.add(product)
+    product.name = fixture["name"]
     product.status = "active"
-    product.cost = Decimal("2.10")
+    product.cost = Decimal(fixture["cost"])
     product.currency = "USD"
-    product.moq = 500
-    product.specs = {"power": "10W", "certification": "CE", "material": "aluminum"}
-    product.description = "Adjustable LED desk lamp for B2B bulk orders."
+    product.moq = fixture["moq"]
+    product.specs = fixture["specs"]
+    product.description = fixture["description"]
     session.flush()
     return product
 

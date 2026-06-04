@@ -11,7 +11,7 @@
 """
 
 from app import models
-from app.services.demo import DEMO_PRODUCT_SKU
+from app.services.demo import DEMO_PRODUCT_FIXTURES, DEMO_PRODUCT_SKU
 
 
 def test_demo_seed_creates_main_flow_and_is_idempotent(client, db_session):
@@ -33,7 +33,9 @@ def test_demo_seed_creates_main_flow_and_is_idempotent(client, db_session):
     assert repeat["duplicate_inbound"] is True
     assert repeat["inquiry_id"] == payload["inquiry_id"]
     assert repeat["approval"]["approval_id"] == payload["approval"]["approval_id"]
+    assert len(payload["product_ids"]) == len(DEMO_PRODUCT_FIXTURES)
     assert db_session.query(models.Product).filter_by(sku=DEMO_PRODUCT_SKU).count() == 1
+    assert db_session.query(models.Product).count() == len(DEMO_PRODUCT_FIXTURES)
     assert db_session.query(models.Inquiry).count() == 1
     assert db_session.query(models.Quotation).count() == 1
     assert db_session.query(models.Approval).count() == 1
@@ -51,3 +53,5 @@ def test_demo_seed_is_tenant_scoped(client, db_session):
     assert seller_one.json()["inquiry_id"] != seller_two.json()["inquiry_id"]
     assert db_session.query(models.Product).filter_by(seller_id=1, sku=DEMO_PRODUCT_SKU).count() == 1
     assert db_session.query(models.Product).filter_by(seller_id=2, sku=DEMO_PRODUCT_SKU).count() == 1
+    assert db_session.query(models.Product).filter_by(seller_id=1).count() == len(DEMO_PRODUCT_FIXTURES)
+    assert db_session.query(models.Product).filter_by(seller_id=2).count() == len(DEMO_PRODUCT_FIXTURES)
