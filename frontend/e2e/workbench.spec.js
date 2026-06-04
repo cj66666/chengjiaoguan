@@ -86,6 +86,12 @@ test("workbench settings notification flow", async ({ page }, testInfo) => {
   await page.getByRole("button", { name: "Demo Seed" }).click();
   await expect(page.getByText("已生成 Demo 主链路数据")).toBeVisible();
 
+  await page.getByRole("button", { name: "语言与区域", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "设置", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "看板", exact: true }).click();
+  await page.getByRole("button", { name: "通知", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "设置", exact: true })).toBeVisible();
+
   await page.getByRole("button", { name: "设置", exact: true }).click();
   await expect(page.getByRole("heading", { name: "生产就绪" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "通知与调度" })).toBeVisible();

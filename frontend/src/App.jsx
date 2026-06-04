@@ -310,9 +310,9 @@ export default function App() {
               <IconButton label="审批" onClick={() => setActiveTab("approvals")} icon={ShieldCheck} />
               {pendingApprovalCount > 0 && <b>{pendingApprovalCount}</b>}
             </span>
-            <IconButton label="语言与区域" icon={Globe2} />
+            <IconButton label="语言与区域" onClick={() => setActiveTab("settings")} icon={Globe2} />
             <span className="notification-dot">
-              <IconButton label="通知" icon={Bell} />
+              <IconButton label="通知" onClick={() => setActiveTab("settings")} icon={Bell} />
               {unreadNotificationCount > 0 && <b>{unreadNotificationCount}</b>}
             </span>
             <span className="user-badge">H</span>
