@@ -76,6 +76,29 @@ def test_site_form_webhook_is_idempotent_by_channel_message_id(client, db_sessio
     assert len(inquiries) == 1
 
 
+def test_site_form_webhook_creates_unique_default_seller_email_per_tenant(client, db_session):
+    payload_one = {
+        "channel": "site_form",
+        "channel_message_id": "site-tenant-1",
+        "from": {"email": "one@example.com"},
+        "content": "Need 1000 lamps.",
+    }
+    payload_two = {
+        "channel": "site_form",
+        "channel_message_id": "site-tenant-2",
+        "from": {"email": "two@example.com"},
+        "content": "Need 2000 lamps.",
+    }
+
+    first = client.post("/api/v1/webhooks/site_form", headers={"Authorization": "Bearer seller:101"}, json=payload_one)
+    second = client.post("/api/v1/webhooks/site_form", headers={"Authorization": "Bearer seller:102"}, json=payload_two)
+
+    assert first.status_code == 201
+    assert second.status_code == 201
+    assert db_session.get(models.Seller, 101).email == "owner+seller-101@example.com"
+    assert db_session.get(models.Seller, 102).email == "owner+seller-102@example.com"
+
+
 def test_site_form_rejects_path_payload_channel_mismatch(client):
     payload = {
         "channel": "site_form",

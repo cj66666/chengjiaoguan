@@ -31,7 +31,7 @@ def _seed_inquiry(db_session, message_id="api-001", content="Need 5000 LED desk 
 
 
 def test_inquiries_list_detail_and_patch(client, db_session):
-    inquiry, _, _ = _seed_inquiry(db_session)
+    inquiry, conversation, _ = _seed_inquiry(db_session)
 
     list_response = client.get("/api/v1/inquiries", params={"grade": "A", "q": "desk", "page_size": 10})
     detail_response = client.get(f"/api/v1/inquiries/{inquiry.id}")
@@ -40,9 +40,13 @@ def test_inquiries_list_detail_and_patch(client, db_session):
     assert list_response.status_code == 200
     assert list_response.json()["total"] == 1
     assert list_response.json()["items"][0]["customer"]["company"] == "ACME Trading"
+    assert list_response.json()["items"][0]["conversation_id"] == conversation.id
+    assert list_response.json()["items"][0]["is_human_takeover"] is False
     assert detail_response.status_code == 200
+    assert detail_response.json()["conversation_id"] == conversation.id
     assert detail_response.json()["parsed"]["quantity"] == 5000
     assert patch_response.status_code == 200
+    assert patch_response.json()["conversation_id"] == conversation.id
     assert patch_response.json()["grade"] == "B"
     assert patch_response.json()["status"] == "qualifying"
 
@@ -101,3 +105,15 @@ def test_conversation_detail_messages_takeover_release_and_human_send(client, db
 
     db_message = db_session.get(models.Message, sent.json()["id"])
     assert db_message.content == "Thanks, I will confirm the quote."
+
+
+def test_inquiries_list_exposes_takeover_state(client, db_session):
+    inquiry, conversation, _ = _seed_inquiry(db_session)
+
+    takeover = client.post(f"/api/v1/conversations/{conversation.id}/takeover")
+    response = client.get("/api/v1/inquiries")
+
+    assert takeover.status_code == 200
+    item = next(item for item in response.json()["items"] if item["id"] == inquiry.id)
+    assert item["conversation_id"] == conversation.id
+    assert item["is_human_takeover"] is True

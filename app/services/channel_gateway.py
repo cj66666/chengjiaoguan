@@ -20,7 +20,7 @@ from app.schemas import ChannelContact, InboundMessage
 
 
 DEFAULT_SELLER_NAME = "Demo Exporter"
-DEFAULT_SELLER_EMAIL = "owner@example.com"
+DEFAULT_SELLER_EMAIL_DOMAIN = "example.com"
 
 
 def ensure_seller(session: Session, seller_id: int) -> models.Seller:
@@ -28,7 +28,11 @@ def ensure_seller(session: Session, seller_id: int) -> models.Seller:
     if seller:
         return seller
 
-    seller = models.Seller(id=seller_id, name=DEFAULT_SELLER_NAME, email=DEFAULT_SELLER_EMAIL)
+    seller = models.Seller(
+        id=seller_id,
+        name=DEFAULT_SELLER_NAME,
+        email=f"owner+seller-{seller_id}@{DEFAULT_SELLER_EMAIL_DOMAIN}",
+    )
     session.add(seller)
     session.flush()
     return seller

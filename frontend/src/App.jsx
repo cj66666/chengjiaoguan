@@ -162,6 +162,16 @@ export default function App() {
     });
   }
 
+  async function sendHumanMessage(conversationId, content) {
+    const trimmed = content.trim();
+    if (!conversationId || !trimmed) return;
+    await runAction("人工回复已发送", async () => {
+      await api.post(`/api/v1/conversations/${conversationId}/messages`, { content: trimmed });
+      await loadMessages(conversationId);
+      await loadAll();
+    });
+  }
+
   async function runWorkers() {
     await runAction("Workers 已运行", async () => {
       const workers = await api.post("/api/v1/workers/run-due");
@@ -367,6 +377,7 @@ export default function App() {
             loadMessages={loadMessages}
             markInquiryWon={markInquiryWon}
             takeoverConversation={takeoverConversation}
+            sendHumanMessage={sendHumanMessage}
             approveApproval={approveApproval}
             openCustomer={openCustomerFromInbox}
             go={goTab}
@@ -572,15 +583,18 @@ function Inbox({
   loadMessages,
   markInquiryWon,
   takeoverConversation,
+  sendHumanMessage,
   approveApproval,
   openCustomer,
   go,
 }) {
   const [selectedId, setSelectedId] = useState(null);
+  const [draft, setDraft] = useState("");
   const items = prioritizeInquiries(inquiries.items || [], approvals);
   const selected = items.find((item) => item.id === selectedId) || items[0] || null;
   const selectedApproval = approvalForInquiry(approvals, selected?.id);
-  const conversationId = selectedApproval?.conversation_id || (demo?.inquiry_id === selected?.id ? demo?.conversation_id : null);
+  const conversationId = selectedApproval?.conversation_id || selected?.conversation_id || (demo?.inquiry_id === selected?.id ? demo?.conversation_id : null);
+  const isHumanTakeover = Boolean(selected?.is_human_takeover);
   const displayMessages = (messages.items?.length ? messages.items : fallbackMessages(selected)).slice(0, 4);
   const guardReasons = guardrailReasons(selectedApproval);
   const pendingCount = approvals.total ?? approvals.items?.length ?? 0;
@@ -588,11 +602,18 @@ function Inbox({
 
   function selectInquiry(item) {
     setSelectedId(item.id);
+    setDraft("");
     const nextApproval = approvalForInquiry(approvals, item.id);
-    const nextConversationId = nextApproval?.conversation_id || (demo?.inquiry_id === item.id ? demo?.conversation_id : null);
+    const nextConversationId = nextApproval?.conversation_id || item.conversation_id || (demo?.inquiry_id === item.id ? demo?.conversation_id : null);
     if (nextConversationId) {
       loadMessages(nextConversationId);
     }
+  }
+
+  async function submitHumanMessage(event) {
+    event.preventDefault();
+    await sendHumanMessage(conversationId, draft);
+    setDraft("");
   }
 
   return (
@@ -673,9 +694,9 @@ function Inbox({
                   <CheckCircle2 size={18} />
                   标记成交
                 </button>
-                <button type="button" onClick={() => takeoverConversation(conversationId)} disabled={!conversationId}>
+                <button type="button" onClick={() => takeoverConversation(conversationId)} disabled={!conversationId || isHumanTakeover}>
                   <Hand size={18} />
-                  接管
+                  {isHumanTakeover ? "已接管" : "接管"}
                 </button>
                 <button type="button" onClick={() => openCustomer(selected.customer?.id)} disabled={!selected.customer?.id}>
                   <UserRound size={18} />
@@ -735,9 +756,9 @@ function Inbox({
                         <SlidersHorizontal size={18} />
                         修改报价
                       </button>
-                      <button type="button" onClick={() => takeoverConversation(conversationId)} disabled={!conversationId}>
+                      <button type="button" onClick={() => takeoverConversation(conversationId)} disabled={!conversationId || isHumanTakeover}>
                         <Hand size={18} />
-                        我来接管
+                        {isHumanTakeover ? "已接管" : "我来接管"}
                       </button>
                     </div>
                   </>
@@ -757,15 +778,20 @@ function Inbox({
                 <Bot size={15} />
                 AI 自主处理中
               </span>
-              <p>{conversationId ? "如需亲自回复，点击上方「接管」" : "当前询盘还没有可接管会话"}</p>
-              <div className="composer-input">
+              <p>{conversationId ? (isHumanTakeover ? "已进入人工接管，可直接回复客户" : "如需亲自回复，点击上方「接管」") : "当前询盘还没有可接管会话"}</p>
+              <form className="composer-input" onSubmit={submitHumanMessage}>
                 <Paperclip size={20} />
-                <input disabled placeholder="AI 自主回复中，接管后可在此输入" />
-                <button disabled type="button">
+                <input
+                  value={draft}
+                  onChange={(event) => setDraft(event.target.value)}
+                  disabled={!conversationId || !isHumanTakeover}
+                  placeholder={isHumanTakeover ? "输入人工回复" : "AI 自主回复中，接管后可在此输入"}
+                />
+                <button disabled={!conversationId || !isHumanTakeover || !draft.trim()} type="submit">
                   <Send size={18} />
                   发送
                 </button>
-              </div>
+              </form>
             </div>
           </>
         )}

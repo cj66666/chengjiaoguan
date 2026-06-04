@@ -7,6 +7,7 @@
 
 import { expect, test } from "@playwright/test";
 
+const API_BASE_URL = process.env.E2E_API_BASE_URL || "http://127.0.0.1:8000";
 const RUN_SELLER_OFFSET = (Date.now() % 100000) * 10;
 
 test("workbench demo catalog flow", async ({ page }, testInfo) => {
@@ -116,6 +117,28 @@ test("workbench dashboard metric navigation flow", async ({ page }, testInfo) =>
   await expect(page).toHaveNoHorizontalOverflow();
 });
 
+test("workbench inbox takeover flow works without pending approval", async ({ page, request }, testInfo) => {
+  const sellerId = sellerIdFor(testInfo, 9270);
+  const seeded = await seedSingleInquiry(request, sellerId, "takeover-free");
+
+  await page.goto("/");
+  await page.getByLabel("Seller", { exact: true }).fill(sellerId);
+  await page.getByTestId("metric-today-inquiries").click();
+  await expect(page.getByTestId("inbox-workbench")).toBeVisible();
+  await page.getByTestId(`inquiry-${seeded.inquiry_id}-select`).click();
+
+  const takeoverButton = page.locator(".inbox-actions button").nth(1);
+  await expect(takeoverButton).toBeEnabled();
+  await takeoverButton.click();
+  await expect(takeoverButton).toBeDisabled();
+  await expect(page.locator(".composer-input input")).toBeEnabled();
+
+  await page.locator(".composer-input input").fill("Manual takeover reply.");
+  await page.locator(".composer-input button").click();
+  await expect(page.getByText("Manual takeover reply.")).toBeVisible();
+  await expect(page).toHaveNoHorizontalOverflow();
+});
+
 test("workbench settings notification flow", async ({ page }, testInfo) => {
   const sellerId = sellerIdFor(testInfo, 9300);
 
@@ -207,10 +230,10 @@ function sellerIdFor(testInfo, desktopBase) {
 
 async function seedDenseInquiries(request, sellerId, count) {
   const headers = { Authorization: `Bearer seller:${sellerId}` };
-  await expect(await request.post("http://127.0.0.1:8000/api/v1/demo/seed", { headers })).toBeOK();
+  await expect(await request.post(`${API_BASE_URL}/api/v1/demo/seed`, { headers })).toBeOK();
   for (let index = 0; index < count; index += 1) {
     const quantity = 2000 + index * 137;
-    const response = await request.post("http://127.0.0.1:8000/api/v1/webhooks/site_form", {
+    const response = await request.post(`${API_BASE_URL}/api/v1/webhooks/site_form`, {
       headers,
       data: {
         channel: "site_form",
@@ -229,6 +252,28 @@ async function seedDenseInquiries(request, sellerId, count) {
     });
     await expect(response).toBeOK();
   }
+}
+
+async function seedSingleInquiry(request, sellerId, suffix) {
+  const response = await request.post(`${API_BASE_URL}/api/v1/webhooks/site_form`, {
+    headers: { Authorization: `Bearer seller:${sellerId}` },
+    data: {
+      channel: "site_form",
+      channel_message_id: `single-${sellerId}-${suffix}`,
+      from: {
+        name: "BrightMart Buyer",
+        company: "BrightMart Sourcing",
+        country: "SG",
+        email: `single-${sellerId}-${suffix}@example.com`,
+      },
+      content: "We need 1800 LED desk lamps with CE certificate and neutral packaging for Singapore.",
+      language: "en",
+      attachments: [],
+      received_at: new Date(Date.UTC(2026, 5, 1, 8, 0)).toISOString(),
+    },
+  });
+  await expect(response).toBeOK();
+  return response.json();
 }
 
 function panelByTitle(page, title) {

@@ -10,6 +10,7 @@
  */
 """
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app import models
@@ -71,9 +72,12 @@ def customer_item(customer: models.Customer) -> dict:
 
 def inquiry_list_item(session: Session, inquiry: models.Inquiry) -> dict:
     customer = session.get(models.Customer, inquiry.customer_id)
+    conversation = _latest_inquiry_conversation(session, inquiry)
     return {
         "id": inquiry.id,
         "customer": customer_summary(customer),
+        "conversation_id": conversation.id if conversation else None,
+        "is_human_takeover": conversation.is_human_takeover if conversation else False,
         "source_channel": inquiry.source_channel,
         "grade": inquiry.grade,
         "score": float(inquiry.score) if inquiry.score is not None else None,
@@ -90,6 +94,16 @@ def inquiry_detail(session: Session, inquiry: models.Inquiry) -> dict:
         "parsed": inquiry.parsed or {},
         "language": inquiry.language,
     }
+
+
+def _latest_inquiry_conversation(session: Session, inquiry: models.Inquiry) -> models.Conversation | None:
+    return session.scalar(
+        select(models.Conversation)
+        .where(models.Conversation.seller_id == inquiry.seller_id)
+        .where(models.Conversation.inquiry_id == inquiry.id)
+        .order_by(models.Conversation.updated_at.desc().nullslast(), models.Conversation.id.desc())
+        .limit(1)
+    )
 
 
 def message_item(message: models.Message) -> dict:
