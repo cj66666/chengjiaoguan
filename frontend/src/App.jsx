@@ -253,6 +253,15 @@ export default function App() {
   const activeNav = NAV.find((item) => item.id === activeTab) || { ...NAV[0], label: "待我处理" };
   const pendingApprovalCount = data.approvals?.total ?? data.approvals?.items?.length ?? 0;
   const unreadNotificationCount = data.notifications?.total ?? data.notifications?.items?.length ?? 0;
+  const goTab = useCallback((tab) => {
+    setActiveTab(tab);
+    if (tab !== "customers") {
+      setSelectedCustomer(null);
+    }
+    if (!["customers", "approvals"].includes(tab)) {
+      setQuoteDetail(null);
+    }
+  }, []);
 
   return (
     <div className="shell row" id="app-shell">
@@ -270,7 +279,7 @@ export default function App() {
               key={item.id}
               className={`navlink ${activeTab === item.id ? "active" : ""}`}
               aria-label={item.testLabel}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => goTab(item.id)}
             >
               <item.icon size={18} />
               <span>{item.label}</span>
@@ -278,7 +287,7 @@ export default function App() {
             </button>
           ))}
         </nav>
-        <button className="setup-card" onClick={() => setActiveTab("settings")}>
+        <button className="setup-card" onClick={() => goTab("settings")}>
           <span><Zap size={15} /> 配置完成度 80%</span>
           <i><em /></i>
           <small>连接阿里国际站即可 100% →</small>
@@ -304,9 +313,9 @@ export default function App() {
               <Search size={16} />
               <input placeholder="全局搜索 客户 / 询盘 / 产品" aria-label="全局搜索" />
             </label>
-            <IconButton label="语言" onClick={() => setActiveTab("settings")} icon={Globe2} />
+            <IconButton label="语言" onClick={() => goTab("settings")} icon={Globe2} />
             <span className="notification-dot">
-              <IconButton label="转人工通知" onClick={() => setActiveTab("settings")} icon={Bell} />
+              <IconButton label="转人工通知" onClick={() => goTab("settings")} icon={Bell} />
               {unreadNotificationCount > 0 && <b>{unreadNotificationCount}</b>}
             </span>
             <span className="user-badge">H</span>
@@ -317,7 +326,7 @@ export default function App() {
         {notice && <div className="banner ok">{notice}</div>}
 
         {activeTab === "dashboard" && (
-          <Dashboard data={data} demo={demo} runWorkers={runWorkers} runDemoSeed={runDemoSeed} approveDemo={approveDemo} loading={loading} go={setActiveTab} />
+          <Dashboard data={data} demo={demo} runWorkers={runWorkers} runDemoSeed={runDemoSeed} approveDemo={approveDemo} loading={loading} go={goTab} />
         )}
         {activeTab === "inbox" && <Inbox inquiries={data.inquiries} messages={data.messages} demo={demo} />}
         {activeTab === "customers" && (
