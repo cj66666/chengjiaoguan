@@ -50,6 +50,11 @@ export default defineConfig({
     {
       command: `${python} -m uvicorn app.main:app --host 127.0.0.1 --port 8000`,
       cwd: repoRoot,
+      env: {
+        ...process.env,
+        CLOSER_ALLOW_DEV_AUTH: "1",
+        CLOSER_ALLOW_DEV_CREDENTIALS: "1",
+      },
       url: "http://127.0.0.1:8000/api/v1/health",
       reuseExistingServer: !process.env.CI,
       timeout: 60_000,

@@ -92,7 +92,7 @@ Closer 工作台（离线版）.html
 
 - `Closer 工作台（离线版）.html` 是视觉和交互参考，不是正式应用。正式前端在 `http://127.0.0.1:5173/`，不要在 `file://...html` 上判断 API 功能是否已接好。
 - Vite dev server 通过 `/api` 代理 FastAPI。后端重启时页面可能残留 502，先刷新并确认 `/api/v1/health`。
-- Playwright 配置默认 `CLOSER_E2E_PYTHON=.venv/bin/python`。Windows 下如 E2E 找不到 Python，设置为 `.venv\Scripts\python.exe`。
+- Playwright 配置默认 `CLOSER_E2E_PYTHON=.venv/bin/python`，并会给 E2E FastAPI 进程注入 `CLOSER_ALLOW_DEV_AUTH=1` 与 `CLOSER_ALLOW_DEV_CREDENTIALS=1`。Windows 下如 E2E 找不到 Python，设置为 `.venv\Scripts\python.exe`。
 - MiniMax 中国 OpenAI-compatible base URL 用 `https://api.minimaxi.com/v1`。不要把用户给过的 key 写进代码、文档或提交。
 - `CLOSER_DELIVERY_MODE=payload_only` 只产生投递 payload；只有 `live` 才允许真实外部发送。
 - 底价、敏感承诺、未匹配产品、大额合同等场景必须走 approval/handoff，不能让 Agent 直接发。
@@ -110,6 +110,8 @@ python -m pip install -e .[dev]
 启动后端：
 
 ```powershell
+$env:CLOSER_ALLOW_DEV_AUTH='1'
+$env:CLOSER_ALLOW_DEV_CREDENTIALS='1'
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
