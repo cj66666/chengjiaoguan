@@ -7,18 +7,23 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  AlertTriangle,
   ArrowRight,
   BarChart3,
   Bell,
   Bot,
   Check,
+  CheckCircle2,
   ClipboardList,
   Archive,
   Eye,
   Globe2,
+  Hand,
   Inbox as InboxIcon,
   LineChart,
+  MoreHorizontal,
   Package,
+  Paperclip,
   Play,
   Send,
   Settings,
@@ -27,6 +32,7 @@ import {
   SlidersHorizontal,
   Smartphone,
   TrendingUp,
+  UserRound,
   Zap,
   Users,
 } from "lucide-react";
@@ -140,6 +146,22 @@ export default function App() {
     });
   }
 
+  async function markInquiryWon(inquiryId) {
+    await runAction("询盘已标记成交", async () => {
+      await api.patch(`/api/v1/inquiries/${inquiryId}`, { status: "won" });
+      await loadAll();
+    });
+  }
+
+  async function takeoverConversation(conversationId) {
+    if (!conversationId) return;
+    await runAction("会话已接管，可人工回复", async () => {
+      await api.post(`/api/v1/conversations/${conversationId}/takeover`);
+      await loadMessages(conversationId);
+      await loadAll();
+    });
+  }
+
   async function runWorkers() {
     await runAction("Workers 已运行", async () => {
       const workers = await api.post("/api/v1/workers/run-due");
@@ -214,6 +236,12 @@ export default function App() {
         setQuoteDetail(null);
       }
     });
+  }
+
+  async function openCustomerFromInbox(customerId) {
+    if (!customerId) return;
+    await openCustomer(customerId);
+    goTab("customers");
   }
 
   async function openQuotation(quotationId) {
@@ -330,7 +358,20 @@ export default function App() {
         {activeTab === "dashboard" && (
           <Dashboard data={data} demo={demo} runWorkers={runWorkers} runDemoSeed={runDemoSeed} approveDemo={approveDemo} loading={loading} go={goTab} />
         )}
-        {activeTab === "inbox" && <Inbox inquiries={data.inquiries} messages={data.messages} demo={demo} />}
+        {activeTab === "inbox" && (
+          <Inbox
+            inquiries={data.inquiries}
+            messages={data.messages}
+            approvals={data.approvals}
+            demo={demo}
+            loadMessages={loadMessages}
+            markInquiryWon={markInquiryWon}
+            takeoverConversation={takeoverConversation}
+            approveApproval={approveApproval}
+            openCustomer={openCustomerFromInbox}
+            go={goTab}
+          />
+        )}
         {activeTab === "customers" && (
           <Customers
             customers={data.customers}
@@ -523,39 +564,309 @@ function Dashboard({ data, demo, runWorkers, runDemoSeed, approveDemo, loading, 
   );
 }
 
-function Inbox({ inquiries, messages, demo }) {
+function Inbox({
+  inquiries,
+  messages,
+  approvals,
+  demo,
+  loadMessages,
+  markInquiryWon,
+  takeoverConversation,
+  approveApproval,
+  openCustomer,
+  go,
+}) {
+  const [selectedId, setSelectedId] = useState(null);
+  const items = prioritizeInquiries(inquiries.items || [], approvals);
+  const selected = items.find((item) => item.id === selectedId) || items[0] || null;
+  const selectedApproval = approvalForInquiry(approvals, selected?.id);
+  const conversationId = selectedApproval?.conversation_id || (demo?.inquiry_id === selected?.id ? demo?.conversation_id : null);
+  const displayMessages = (messages.items?.length ? messages.items : fallbackMessages(selected)).slice(0, 4);
+  const guardReasons = guardrailReasons(selectedApproval);
+  const pendingCount = approvals.total ?? approvals.items?.length ?? 0;
+  const isWon = selected?.status === "won";
+
+  function selectInquiry(item) {
+    setSelectedId(item.id);
+    const nextApproval = approvalForInquiry(approvals, item.id);
+    const nextConversationId = nextApproval?.conversation_id || (demo?.inquiry_id === item.id ? demo?.conversation_id : null);
+    if (nextConversationId) {
+      loadMessages(nextConversationId);
+    }
+  }
+
   return (
-    <section className="split">
-      <Panel title="高价值询盘" span="list">
+    <section className="inbox-page split" data-testid="inbox-workbench">
+      <aside className="panel list inbox-sidebar-panel">
+        <header className="inbox-list-head">
+          <div>
+            <h2>询盘收件箱</h2>
+            <p>{items.length || 0} 条询盘 · 按价值和护栏优先</p>
+          </div>
+          {pendingCount > 0 && <span className="badge badge-red">{pendingCount} 待处理</span>}
+        </header>
+
+        <label className="inbox-search">
+          <Search size={17} />
+          <input placeholder="搜索客户 / 公司 / 国家" aria-label="搜索询盘" />
+        </label>
+
+        <div className="inbox-filters" aria-label="询盘筛选">
+          {["全部", "A 级", "待处理", "AI 中", "已成交"].map((filter, index) => (
+            <button className={index === 0 ? "active" : ""} key={filter} type="button">
+              {filter}
+            </button>
+          ))}
+        </div>
+
         <Rows
-          items={inquiries.items}
+          items={items}
           empty="暂无询盘。"
           render={(item) => (
-            <div className="row-main">
+            <button
+              className={`inbox-inquiry-card ${selected?.id === item.id ? "active" : ""}`}
+              type="button"
+              onClick={() => selectInquiry(item)}
+              data-testid={`inquiry-${item.id}-select`}
+            >
               <span className={`grade grade-${String(item.grade || "x").toLowerCase()}`}>{item.grade || "-"}</span>
-              <div>
+              <span className="inquiry-copy">
                 <strong>{item.customer?.company || item.customer?.email || `Inquiry #${item.id}`}</strong>
-                <p>{item.summary}</p>
+                <small>{[item.customer?.country, item.summary].filter(Boolean).join(" · ")}</small>
+                <em className={item.status === "pending_approval" ? "risk" : "ok"}>{statusLabel(item.status)}</em>
+              </span>
+              <span className="inquiry-meta">
+                <small>{relativeTime(item.received_at)}</small>
+                <strong>{inquiryValue(item)}</strong>
+                {item.status === "pending_approval" && <i aria-hidden="true" />}
+              </span>
+            </button>
+          )}
+        />
+      </aside>
+
+      <main className="inbox-detail-panel">
+        {!selected ? (
+          <div className="inbox-empty-state">
+            <ClipboardList size={36} />
+            <h2>暂无询盘</h2>
+            <p>生成 Demo 数据后，这里会出现完整的收件箱处理画面。</p>
+          </div>
+        ) : (
+          <>
+            <div className="inbox-detail-head">
+              <div className="customer-avatar">{customerInitials(selected.customer)}</div>
+              <div className="inbox-customer-copy">
+                <div className="row gap2">
+                  <h2>{selected.customer?.company || selected.customer?.email || `Inquiry #${selected.id}`}</h2>
+                  {selected.customer?.country && <span className="country-chip">{selected.customer.country}</span>}
+                  <span className={`grade grade-${String(selected.grade || "x").toLowerCase()}`}>{selected.grade || "-"}</span>
+                </div>
+                <p>{[selected.customer?.name, channelLabel(selected.source_channel), selected.customer?.country].filter(Boolean).join(" · ")}</p>
+                <div className="guard-status-line">
+                  <ShieldCheck size={16} />
+                  {selectedApproval ? "护栏触发 · 自动发送已暂停，等待你的决定" : "AI 自主处理中 · 暂无护栏拦截"}
+                </div>
               </div>
-              <small>{item.status}</small>
+              <div className="inbox-actions">
+                <button className="primary" type="button" onClick={() => markInquiryWon(selected.id)} disabled={isWon}>
+                  <CheckCircle2 size={18} />
+                  标记成交
+                </button>
+                <button type="button" onClick={() => takeoverConversation(conversationId)} disabled={!conversationId}>
+                  <Hand size={18} />
+                  接管
+                </button>
+                <button type="button" onClick={() => openCustomer(selected.customer?.id)} disabled={!selected.customer?.id}>
+                  <UserRound size={18} />
+                  客户档案
+                </button>
+                <button className="icon-button" type="button" onClick={() => go("settings")} aria-label="更多">
+                  <MoreHorizontal size={18} />
+                </button>
+              </div>
             </div>
-          )}
-        />
-      </Panel>
-      <Panel title="当前会话消息" span="detail">
-        <Rows
-          items={messages.items}
-          empty={demo ? "暂无新消息。" : "暂无会话消息。"}
-          render={(message) => (
-            <div className={`message ${message.sender_role}`}>
-              <small>{message.sender_role}</small>
-              <p>{message.content}</p>
+
+            <div className="inbox-thread">
+              {displayMessages.map((message) => (
+                <div className={`thread-message ${message.sender_role}`} key={message.id}>
+                  <span>{message.sender_role === "customer" ? customerInitials(selected.customer) : message.sender_role}</span>
+                  <div>
+                    <small>{message.sent_at ? timeLabel(message.sent_at) : relativeTime(selected.received_at)}</small>
+                    <p>{message.content}</p>
+                  </div>
+                </div>
+              ))}
+
+              <section className={`guardrail-card ${selectedApproval ? "risk" : "clear"}`} data-testid="inbox-guardrail-card">
+                <div className="guardrail-title">
+                  <span>
+                    {selectedApproval ? <ShieldCheck size={23} /> : <Bot size={23} />}
+                  </span>
+                  <div>
+                    <h3>{selectedApproval ? "已暂停自动发送 · 待你确认" : "AI 自主处理中"}</h3>
+                    <p>{selectedApproval ? `触发 ${guardReasons.length || 1} 条护栏，AI 不会自动让步` : "当前没有待审批护栏，AI 会继续推进跟进。"}</p>
+                  </div>
+                </div>
+
+                {selectedApproval ? (
+                  <>
+                    <div className="risk-list">
+                      {guardReasons.map((reason) => (
+                        <div key={reason.title}>
+                          <AlertTriangle size={17} />
+                          <strong>{reason.title}</strong>
+                          <p>{reason.detail}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="ai-summary-box">
+                      <strong>AI 对话摘要</strong>
+                      <p>{selectedApproval.summary || selected.summary || "客户仍在压价或要求敏感条款，当前自动发送已暂停。"}</p>
+                      <strong>AI 建议</strong>
+                      <p>{selectedApproval.suggestion || "建议守住底价，给出可批准的替代账期，并由人工确认后发送。"}</p>
+                    </div>
+                    <div className="guardrail-actions">
+                      <button className="primary danger-action" type="button" onClick={() => approveApproval(selectedApproval.id)}>
+                        <Check size={18} />
+                        采纳建议并发送
+                      </button>
+                      <button type="button" onClick={() => go("quoteRules")}>
+                        <SlidersHorizontal size={18} />
+                        修改报价
+                      </button>
+                      <button type="button" onClick={() => takeoverConversation(conversationId)} disabled={!conversationId}>
+                        <Hand size={18} />
+                        我来接管
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="ai-summary-box">
+                    <strong>AI 处理记录</strong>
+                    <p>{selected.summary || "AI 已识别需求并进入报价/跟进流程。"}</p>
+                    <strong>下一步</strong>
+                    <p>保持自动跟进；如客户要求底价、账期或敏感承诺，会自动转人工审批。</p>
+                  </div>
+                )}
+              </section>
             </div>
-          )}
-        />
-      </Panel>
+
+            <div className="composer-bar">
+              <span className="pill badge-pri">
+                <Bot size={15} />
+                AI 自主处理中
+              </span>
+              <p>{conversationId ? "如需亲自回复，点击上方「接管」" : "当前询盘还没有可接管会话"}</p>
+              <div className="composer-input">
+                <Paperclip size={20} />
+                <input disabled placeholder="AI 自主回复中，接管后可在此输入" />
+                <button disabled type="button">
+                  <Send size={18} />
+                  发送
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </main>
     </section>
   );
+}
+
+function approvalForInquiry(approvals, inquiryId) {
+  if (!inquiryId) return null;
+  return approvals.items?.find((approval) => approval.inquiry_id === inquiryId && approval.status === "pending") || null;
+}
+
+function prioritizeInquiries(items, approvals) {
+  const pendingInquiryIds = new Set((approvals.items || []).filter((approval) => approval.status === "pending").map((approval) => approval.inquiry_id));
+  const gradeRank = { A: 0, B: 1, C: 2 };
+  return [...items].sort((left, right) => {
+    const leftPendingRank = pendingInquiryRank(left, pendingInquiryIds);
+    const rightPendingRank = pendingInquiryRank(right, pendingInquiryIds);
+    if (leftPendingRank !== rightPendingRank) return leftPendingRank - rightPendingRank;
+    const gradeDelta = (gradeRank[left.grade] ?? 3) - (gradeRank[right.grade] ?? 3);
+    if (gradeDelta !== 0) return gradeDelta;
+    return new Date(right.received_at || 0).getTime() - new Date(left.received_at || 0).getTime();
+  });
+}
+
+function pendingInquiryRank(item, pendingInquiryIds) {
+  if (pendingInquiryIds.has(item.id)) return 0;
+  if (item.status === "pending_approval") return 1;
+  return 2;
+}
+
+function fallbackMessages(inquiry) {
+  if (!inquiry) return [];
+  return [
+    {
+      id: `inquiry-${inquiry.id}`,
+      sender_role: "customer",
+      content: inquiry.summary || "客户询盘内容待加载。",
+      sent_at: inquiry.received_at,
+    },
+  ];
+}
+
+function guardrailReasons(approval) {
+  if (!approval) return [];
+  const reasonText = [approval.reason, approval.summary, approval.payload?.reason, ...(approval.payload?.reasons || [])].filter(Boolean).join(" ");
+  const reasons = [];
+  if (/floor|底价|price|below/i.test(reasonText)) {
+    reasons.push({ title: "底价红线", detail: "客户目标价低于已配置底价，自动发送已暂停。" });
+  }
+  if (/sensitive|commitment|guarantee|net|payment|账期|敏感/i.test(reasonText)) {
+    reasons.push({ title: "敏感操作", detail: "涉及账期、担保或敏感承诺，需要人工确认。" });
+  }
+  if (!reasons.length) {
+    reasons.push({ title: "护栏触发", detail: approval.reason || approval.summary || "AI 触发审批策略，等待人工确认。" });
+  }
+  return reasons;
+}
+
+function customerInitials(customer) {
+  const source = customer?.company || customer?.name || customer?.email || "Closer";
+  const words = source.replace(/[^a-zA-Z0-9 ]/g, " ").trim().split(/\s+/).filter(Boolean);
+  if (words.length >= 2) return `${words[0][0]}${words[1][0]}`.toUpperCase();
+  return source.slice(0, 2).toUpperCase();
+}
+
+function channelLabel(channel) {
+  return {
+    whatsapp: "WhatsApp",
+    email: "Email",
+    site_form: "站点表单",
+  }[channel] || channel || "渠道";
+}
+
+function statusLabel(status) {
+  return {
+    pending_approval: "护栏触发 · 待确认",
+    won: "已成交",
+    new: "AI 自主处理中",
+    qualifying: "AI 正在核对",
+  }[status] || status || "处理中";
+}
+
+function inquiryValue(item) {
+  if (item.status === "won") return "$21,600";
+  if (item.grade === "A") return "$36,400";
+  if (item.grade === "B") return "$28,800";
+  return "$12,400";
+}
+
+function relativeTime(value) {
+  if (!value) return "刚刚";
+  const minutes = Math.max(1, Math.round((Date.now() - new Date(value).getTime()) / 60000));
+  if (minutes < 60) return `${minutes} 分钟前`;
+  const hours = Math.round(minutes / 60);
+  return `${hours} 小时前`;
+}
+
+function timeLabel(value) {
+  return new Date(value).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
 function Customers({ customers, selectedCustomer, quoteDetail, openCustomer, openQuotation, sendQuotation }) {

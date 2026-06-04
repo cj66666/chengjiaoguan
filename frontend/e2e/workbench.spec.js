@@ -97,6 +97,9 @@ test("workbench dashboard metric navigation flow", async ({ page }, testInfo) =>
 
   await page.getByTestId("metric-today-inquiries").click();
   await expect(page.locator(".split")).toBeVisible();
+  await expect(page.getByTestId("inbox-workbench")).toBeVisible();
+  await expect(page.getByText("已暂停自动发送 · 待你确认")).toBeVisible();
+  await expect(page.getByText("AI 对话摘要")).toBeVisible();
 
   await page.getByRole("button", { name: "看板", exact: true }).click();
   await page.getByTestId("metric-pending-handoffs").click();
@@ -183,7 +186,7 @@ test("workbench dense list flow", async ({ page, request }, testInfo) => {
   await page.getByLabel("Seller", { exact: true }).fill(sellerId);
 
   await page.getByRole("button", { name: "收件箱", exact: true }).click();
-  const inquiryPanel = panelByTitle(page, "高价值询盘");
+  const inquiryPanel = panelByTitle(page, "询盘收件箱");
   await expect(inquiryPanel.locator(".row")).toHaveCount(20);
   await expect(inquiryPanel.getByText("Dense Buyer 23")).toBeVisible();
   await expect(inquiryPanel.locator(".rows")).toHaveVerticalScroll();
