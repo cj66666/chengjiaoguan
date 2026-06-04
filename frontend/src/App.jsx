@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ArrowRight,
   BarChart3,
   Bell,
   Bot,
@@ -19,7 +20,6 @@ import {
   LineChart,
   Package,
   Play,
-  RefreshCw,
   Send,
   Settings,
   ShieldCheck,
@@ -255,13 +255,12 @@ export default function App() {
   const unreadNotificationCount = data.notifications?.total ?? data.notifications?.items?.length ?? 0;
 
   return (
-    <div className="shell" id="app-shell">
-      <aside className="side">
+    <div className="shell row" id="app-shell">
+      <aside className="side sidebar">
         <div className="brand">
           <span className="mark"><Check size={18} /></span>
           <div>
             <strong>Closer</strong>
-            <span>成交官工作台</span>
           </div>
         </div>
         <nav className="nav">
@@ -269,25 +268,25 @@ export default function App() {
           {NAV.map((item) => (
             <button
               key={item.id}
-              className={activeTab === item.id ? "active" : ""}
+              className={`navlink ${activeTab === item.id ? "active" : ""}`}
               aria-label={item.testLabel}
               onClick={() => setActiveTab(item.id)}
             >
               <item.icon size={18} />
               <span>{item.label}</span>
-              {item.id === "dashboard" && pendingApprovalCount > 0 && <b>{pendingApprovalCount}</b>}
+              {item.id === "inbox" && pendingApprovalCount > 0 && <b>{pendingApprovalCount}</b>}
             </button>
           ))}
         </nav>
         <button className="setup-card" onClick={() => setActiveTab("settings")}>
           <span><Zap size={15} /> 配置完成度 80%</span>
           <i><em /></i>
-          <small>连接真实渠道即可 100%</small>
+          <small>连接阿里国际站即可 100% →</small>
         </button>
         <div className="tenant">
           <span className="avatar">H</span>
           <div>
-            <strong>Sunpath Outdoor</strong>
+            <strong>Sunpath Outdoor Mfg.</strong>
             <label htmlFor="seller">Seller</label>
           </div>
           <input id="seller" type="number" min="1" value={sellerId} onChange={(event) => setSellerId(Number(event.target.value || 1))} />
@@ -296,23 +295,18 @@ export default function App() {
 
       <main className="workspace">
         <header className="topbar">
-          <div className="topbar-title">
-            <h1>{activeNav.label}</h1>
-            <p>{loading ? "同步中" : "本地 API 工作台"}</p>
+          <div className="topbar-title row gap2">
+            <span className="h3">{activeNav.label}</span>
+            {loading && <span className="badge badge-pri">同步中</span>}
           </div>
-          <label className="global-search">
-            <Search size={16} />
-            <input placeholder="全局搜索 客户 / 询盘 / 产品" aria-label="全局搜索" />
-          </label>
-          <div className="top-tools">
-            <IconButton label="刷新" onClick={loadAll} icon={RefreshCw} disabled={loading} />
+          <div className="top-tools row gap3">
+            <label className="global-search">
+              <Search size={16} />
+              <input placeholder="全局搜索 客户 / 询盘 / 产品" aria-label="全局搜索" />
+            </label>
+            <IconButton label="语言" onClick={() => setActiveTab("settings")} icon={Globe2} />
             <span className="notification-dot">
-              <IconButton label="审批" onClick={() => setActiveTab("approvals")} icon={ShieldCheck} />
-              {pendingApprovalCount > 0 && <b>{pendingApprovalCount}</b>}
-            </span>
-            <IconButton label="语言与区域" onClick={() => setActiveTab("settings")} icon={Globe2} />
-            <span className="notification-dot">
-              <IconButton label="通知" onClick={() => setActiveTab("settings")} icon={Bell} />
+              <IconButton label="转人工通知" onClick={() => setActiveTab("settings")} icon={Bell} />
               {unreadNotificationCount > 0 && <b>{unreadNotificationCount}</b>}
             </span>
             <span className="user-badge">H</span>
@@ -391,17 +385,17 @@ function Dashboard({ data, demo, runWorkers, runDemoSeed, approveDemo, loading, 
           </p>
         </div>
         <div className="actions">
-          <button className="primary" onClick={runDemoSeed} disabled={loading}>
+          <button className="btn btn-pri primary" onClick={() => go("inbox")}>
+            <InboxIcon size={17} />
+            进入收件箱
+          </button>
+          <button className="btn btn-sec" onClick={runDemoSeed} disabled={loading}>
             <Play size={17} />
             Demo Seed
           </button>
-          <button onClick={approveDemo} disabled={loading}>
+          <button className="btn btn-sec" onClick={approveDemo} disabled={loading}>
             <Check size={17} />
             审批发送
-          </button>
-          <button onClick={() => go("inbox")}>
-            <InboxIcon size={17} />
-            进入收件箱
           </button>
         </div>
       </div>
@@ -412,6 +406,7 @@ function Dashboard({ data, demo, runWorkers, runDemoSeed, approveDemo, loading, 
           value={metrics.today_inquiries ?? pipeline.total ?? 0}
           tone="blue"
           delta="+3"
+          icon={InboxIcon}
           onClick={() => go("inbox")}
           testId="metric-today-inquiries"
         />
@@ -420,6 +415,8 @@ function Dashboard({ data, demo, runWorkers, runDemoSeed, approveDemo, loading, 
           value={metrics.pending_handoffs ?? approval.pending ?? 0}
           tone="amber"
           delta="转人工"
+          icon={ShieldCheck}
+          alert={(metrics.pending_handoffs ?? approval.pending ?? 0) > 0}
           onClick={() => go("approvals")}
           testId="metric-pending-handoffs"
         />
@@ -428,6 +425,7 @@ function Dashboard({ data, demo, runWorkers, runDemoSeed, approveDemo, loading, 
           value={`${Math.round((metrics.auto_handle_rate || 0) * 100)}%`}
           tone="green"
           delta="+4pt"
+          icon={Bot}
           onClick={() => go("analytics")}
           testId="metric-auto-handle-rate"
         />
@@ -436,6 +434,7 @@ function Dashboard({ data, demo, runWorkers, runDemoSeed, approveDemo, loading, 
           value={metrics.conversion ?? 0}
           tone="teal"
           delta="+2pt"
+          icon={TrendingUp}
           onClick={() => go("analytics")}
           testId="metric-conversion"
         />
@@ -462,6 +461,10 @@ function Dashboard({ data, demo, runWorkers, runDemoSeed, approveDemo, loading, 
               </div>
             )}
           />
+          <button className="btn btn-sec btn-sm full-row-action" onClick={() => go("inbox")}>
+            查看全部询盘
+            <ArrowRight size={14} />
+          </button>
       </Panel>
 
         <Panel title="近 7 日" subtitle="询盘量 vs 成交" span="trend" action={<TrendingUp size={17} />}>

@@ -5,11 +5,11 @@
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
-import { Plus } from "lucide-react";
+import { BarChart3, Plus } from "lucide-react";
 
 export function Panel({ title, subtitle, action, children, span = "" }) {
   return (
-    <section className={`panel ${span}`}>
+    <section className={`panel card card-pad ${span}`}>
       <header>
         <div>
           <h2>{title}</h2>
@@ -43,7 +43,7 @@ export function ApiForm({ children, submitLabel, onSubmit, testId }) {
       }}
     >
       {children}
-      <button className="primary" type="submit" data-testid={testId ? `${testId}-submit` : undefined}>
+      <button className="btn btn-pri primary" type="submit" data-testid={testId ? `${testId}-submit` : undefined}>
         <Plus size={17} />
         {submitLabel}
       </button>
@@ -69,8 +69,25 @@ export function JsonField({ label, name, defaultValue }) {
   );
 }
 
-export function Metric({ label, value, tone, delta, onClick, testId }) {
+function MetricSpark({ color }) {
+  const points = "0,22 16,17 31,24 47,10 64,16 88,7";
+  return (
+    <svg className="metric-spark" viewBox="0 0 88 30" aria-hidden="true">
+      <polyline points={points} fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="88" cy="7" r="2.8" fill="#fff" stroke={color} strokeWidth="2" />
+    </svg>
+  );
+}
+
+export function Metric({ label, value, tone = "blue", delta, onClick, testId, icon: Icon = BarChart3, alert = false }) {
   const Component = onClick ? "button" : "div";
+  const toneColor = {
+    blue: "var(--primary)",
+    amber: "var(--orange)",
+    green: "var(--green)",
+    teal: "var(--green)",
+    red: "var(--red)",
+  }[tone] || "var(--primary)";
   return (
     <Component
       className={`metric ${tone}${onClick ? " metric-button" : ""}`}
@@ -79,17 +96,27 @@ export function Metric({ label, value, tone, delta, onClick, testId }) {
       data-testid={testId}
       aria-label={onClick ? `${label} ${value}` : undefined}
     >
-      <span>{label}</span>
-      <strong>{value}</strong>
-      {delta && <em>{delta}</em>}
-      <i className="sparkline" aria-hidden="true" />
+      {alert && <i className="metric-alert" aria-hidden="true" />}
+      <span className="metric-head">
+        <span className="metric-icon">
+          <Icon size={18} />
+        </span>
+        <span>{label}</span>
+      </span>
+      <span className="metric-body">
+        <span className="metric-value">
+          <strong>{value}</strong>
+          {delta && <em>{delta}</em>}
+        </span>
+        <MetricSpark color={toneColor} />
+      </span>
     </Component>
   );
 }
 
 export function IconButton({ label, icon: Icon, ...props }) {
   return (
-    <button className="icon-button" aria-label={label} title={label} {...props}>
+    <button className="btn-icon btn-sec icon-button" aria-label={label} title={label} {...props}>
       <Icon size={18} />
     </button>
   );
