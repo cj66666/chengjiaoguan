@@ -78,6 +78,9 @@ button:disabled{cursor:not-allowed;opacity:.55}
 .panel header p{color:var(--text-2);margin:2px 0 0;font-size:12.5px}
 .panel-action{color:var(--primary);align-items:center;display:inline-flex}
 .metric{border:1px solid var(--border-2);border-radius:var(--radius-lg);background:var(--white);min-height:146px;box-shadow:var(--shadow-sm);padding:22px 20px;position:relative;overflow:hidden}
+.metric.metric-button{width:100%;font:inherit;text-align:left;white-space:normal;display:block}
+.metric.metric-button:hover{border-color:var(--border);box-shadow:var(--shadow);transform:translateY(-1px)}
+.metric.metric-button:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
 .metric>span{color:var(--text-2);font-size:13px;font-weight:600;display:block}
 .metric strong{font-family:var(--mono);margin-top:20px;font-size:34px;font-weight:600;line-height:1;display:block}
 .metric em{border-radius:5px;align-items:center;margin-top:10px;padding:2px 7px;font-size:12px;font-style:normal;font-weight:700;display:inline-flex}

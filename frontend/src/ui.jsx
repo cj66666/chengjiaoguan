@@ -69,14 +69,21 @@ export function JsonField({ label, name, defaultValue }) {
   );
 }
 
-export function Metric({ label, value, tone, delta }) {
+export function Metric({ label, value, tone, delta, onClick, testId }) {
+  const Component = onClick ? "button" : "div";
   return (
-    <div className={`metric ${tone}`}>
+    <Component
+      className={`metric ${tone}${onClick ? " metric-button" : ""}`}
+      type={onClick ? "button" : undefined}
+      onClick={onClick}
+      data-testid={testId}
+      aria-label={onClick ? `${label} ${value}` : undefined}
+    >
       <span>{label}</span>
       <strong>{value}</strong>
       {delta && <em>{delta}</em>}
       <i className="sparkline" aria-hidden="true" />
-    </div>
+    </Component>
   );
 }
 

@@ -78,6 +78,31 @@ test("workbench customer approval flow", async ({ page }, testInfo) => {
   await expect(page).toHaveNoHorizontalOverflow();
 });
 
+test("workbench dashboard metric navigation flow", async ({ page }, testInfo) => {
+  const sellerId = sellerIdFor(testInfo, 9250);
+
+  await page.goto("/");
+  await page.getByLabel("Seller", { exact: true }).fill(sellerId);
+  await page.getByRole("button", { name: "Demo Seed" }).click();
+  await expect(page.getByText("已生成 Demo 主链路数据")).toBeVisible();
+
+  await page.getByTestId("metric-today-inquiries").click();
+  await expect(page.locator(".split")).toBeVisible();
+
+  await page.getByRole("button", { name: "看板", exact: true }).click();
+  await page.getByTestId("metric-pending-handoffs").click();
+  await expect(page.locator('button[data-testid^="approval-"][data-testid$="-approve"]').first()).toBeVisible();
+
+  await page.getByRole("button", { name: "看板", exact: true }).click();
+  await page.getByTestId("metric-auto-handle-rate").click();
+  await expect(page.locator(".analytics-page")).toBeVisible();
+
+  await page.getByRole("button", { name: "看板", exact: true }).click();
+  await page.getByTestId("metric-conversion").click();
+  await expect(page.locator(".analytics-page")).toBeVisible();
+  await expect(page).toHaveNoHorizontalOverflow();
+});
+
 test("workbench settings notification flow", async ({ page }, testInfo) => {
   const sellerId = sellerIdFor(testInfo, 9300);
 

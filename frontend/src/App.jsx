@@ -407,10 +407,38 @@ function Dashboard({ data, demo, runWorkers, runDemoSeed, approveDemo, loading, 
       </div>
 
       <div className="metrics kpi-grid">
-        <Metric label="今日新询盘" value={metrics.today_inquiries ?? pipeline.total ?? 0} tone="blue" delta="+3" />
-        <Metric label="待我处理" value={metrics.pending_handoffs ?? approval.pending ?? 0} tone="amber" delta="转人工" />
-        <Metric label="自动处理率" value={`${Math.round((metrics.auto_handle_rate || 0) * 100)}%`} tone="green" delta="+4pt" />
-        <Metric label="本月成交转化" value={metrics.conversion ?? 0} tone="teal" delta="+2pt" />
+        <Metric
+          label="今日新询盘"
+          value={metrics.today_inquiries ?? pipeline.total ?? 0}
+          tone="blue"
+          delta="+3"
+          onClick={() => go("inbox")}
+          testId="metric-today-inquiries"
+        />
+        <Metric
+          label="待我处理"
+          value={metrics.pending_handoffs ?? approval.pending ?? 0}
+          tone="amber"
+          delta="转人工"
+          onClick={() => go("approvals")}
+          testId="metric-pending-handoffs"
+        />
+        <Metric
+          label="自动处理率"
+          value={`${Math.round((metrics.auto_handle_rate || 0) * 100)}%`}
+          tone="green"
+          delta="+4pt"
+          onClick={() => go("analytics")}
+          testId="metric-auto-handle-rate"
+        />
+        <Metric
+          label="本月成交转化"
+          value={metrics.conversion ?? 0}
+          tone="teal"
+          delta="+2pt"
+          onClick={() => go("analytics")}
+          testId="metric-conversion"
+        />
       </div>
 
       <div className="dashboard-grid">
