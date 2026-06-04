@@ -2,7 +2,7 @@
 > L3 | 父级: ./CLAUDE.md
 
 /**
- * [INPUT]: 依赖根目录原始 docx/xlsx/html 规格、CLAUDE.md、AGENTS.md、app 代码、tests 与 migrations
+ * [INPUT]: 依赖 docs/source 原始规格、docs/reference 离线视觉参考、CLAUDE.md、AGENTS.md、app 代码、tests 与 migrations
  * [OUTPUT]: 对外提供当前完成度审计、已补齐项、剩余缺口与下一步优先级
  * [POS]: docs 的实现状态镜像，用来把产品/技术/接口/排期语义相映射回当前机器相
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
@@ -10,15 +10,14 @@
 
 ## 已读取文档
 
-- `成交官_需求规格说明书_V1.0.docx`: P0/P1/P2 功能需求与验收标准。
-- `成交官_产品设计文档_V1.1.docx`: 产品模块 M1-M10、前端页面、Agent 工作流、MVP 范围。
-- `成交官_技术架构设计文档_V1.1.docx`: 分层架构、PydanticAI、RAG、报价、护栏、部署与合规。
-- `成交官_数据库设计文档_V1.0.docx`: 业务实体、字段、枚举、索引、安全约定。
-- `成交官_后端API契约_V1.0.docx`: `/api/v1` REST API、配置/看板接口、错误与分页形状。
-- `成交官_Agent工具接口清单_V1.0.docx`: Agent 工具签名、状态机映射、人工审批约定。
-- `成交官_两人开发分工排期表_方案A平衡版_V2.1.xlsx`: T01-T31 任务分工、里程碑、接缝清单。
-- `跨境B2B_AI询盘成交Agent_市场调研报告.docx`: 市场定位、竞品空白、商业模式与风险。
-- `Closer 工作台（离线版）.html`: 离线原型文件；当前可提取文本很少，主要价值是前端视觉参考，React/Vite 工作台与 Playwright E2E 已另落在 frontend/。
+- `docs/source/成交官_需求规格说明书_V1.0.docx`: P0/P1/P2 功能需求与验收标准。
+- `docs/source/成交官_产品设计文档_V1.1.docx`: 产品模块 M1-M10、前端页面、Agent 工作流、MVP 范围。
+- `docs/source/成交官_技术架构设计文档_V1.1.docx`: 分层架构、PydanticAI、RAG、报价、护栏、部署与合规。
+- `docs/source/成交官_数据库设计文档_V1.0.docx`: 业务实体、字段、枚举、索引、安全约定。
+- `docs/source/成交官_后端API契约_V1.0.docx`: `/api/v1` REST API、配置/看板接口、错误与分页形状。
+- `docs/source/成交官_Agent工具接口清单_V1.0.docx`: Agent 工具签名、状态机映射、人工审批约定。
+- `docs/source/跨境B2B_AI询盘成交Agent_市场调研报告.docx`: 市场定位、竞品空白、商业模式与风险。
+- `docs/reference/Closer 工作台（离线版）.html`: 离线原型文件；当前可提取文本很少，主要价值是前端视觉参考，React/Vite 工作台与 Playwright E2E 已另落在 frontend/。
 - `CLAUDE.md` / `AGENTS.md` / `docs/EXECUTION_PLAN.md` / `migrations/001_initial.sql`: 当前项目契约、执行计划与数据库机器相。
 - `docs/COMPLETION_AUDIT.md`: 完成度收口矩阵，明确本地已完成、边界完成与真实外部阻塞。
 

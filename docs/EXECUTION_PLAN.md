@@ -3,7 +3,7 @@
 
 <!--
 /**
- * [INPUT]: 依赖根目录原始规格文档、CLAUDE.md、AGENTS.md 与当前后端排期
+ * [INPUT]: 依赖 docs/source 原始规格文档、CLAUDE.md、AGENTS.md 与当前后端排期
  * [OUTPUT]: 对外提供开发提交顺序、MVP 范围裁剪与验证约束
  * [POS]: docs 的执行路径镜像，和 IMPLEMENTATION_AUDIT.md 共同描述计划与现实的差距
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
@@ -12,15 +12,14 @@
 
 ## Source Documents Verified
 
-- `成交官_需求规格说明书_V1.0.docx`: M1-M10 功能需求、P0/P1/P2 优先级、M8 客户档案、M10 数据看板、非功能安全合规。
-- `成交官_产品设计文档_V1.1.docx`: Agent 工作流、前端 7 页面、会话右侧客户档案抽屉、报价规则与产品库、首次配置向导。
-- `成交官_技术架构设计文档_V1.1.docx`: 接入层、Agent 编排层、能力服务层、数据层；队列、缓存、对象存储、向量库、护栏与审计。
-- `成交官_数据库设计文档_V1.0.docx`: seller 根租户、13 张核心表、多租户索引、jsonb 可变字段、软删除与审计。
-- `成交官_后端API契约_V1.0.docx`: `/api/v1` 主链路、错误形状、分页形状、入站幂等、配置与看板接口。
-- `成交官_Agent工具接口清单_V1.0.docx`: 10 个工具、PydanticAI Graph 八步状态机、human-in-the-loop 审批约定。
-- `成交官_两人开发分工排期表_方案A平衡版_V2.1.xlsx`: T01-T31 排期；A 负责后端大头，队友负责前端与部分 Agent 编排。
-- `跨境B2B_AI询盘成交Agent_市场调研报告.docx`: inbound 询盘成交定位、小微工贸卖家、报价/议价差异化与主要风险。
-- `Closer 工作台（离线版）.html`: 前端视觉参考；当前仓库已有 React/Vite 工作台、移动/窄屏基础适配与 Playwright 主链路 E2E，仍需更全面视觉 QA 与部署联调。
+- `docs/source/成交官_需求规格说明书_V1.0.docx`: M1-M10 功能需求、P0/P1/P2 优先级、M8 客户档案、M10 数据看板、非功能安全合规。
+- `docs/source/成交官_产品设计文档_V1.1.docx`: Agent 工作流、前端 7 页面、会话右侧客户档案抽屉、报价规则与产品库、首次配置向导。
+- `docs/source/成交官_技术架构设计文档_V1.1.docx`: 接入层、Agent 编排层、能力服务层、数据层；队列、缓存、对象存储、向量库、护栏与审计。
+- `docs/source/成交官_数据库设计文档_V1.0.docx`: seller 根租户、13 张核心表、多租户索引、jsonb 可变字段、软删除与审计。
+- `docs/source/成交官_后端API契约_V1.0.docx`: `/api/v1` 主链路、错误形状、分页形状、入站幂等、配置与看板接口。
+- `docs/source/成交官_Agent工具接口清单_V1.0.docx`: 10 个工具、PydanticAI Graph 八步状态机、human-in-the-loop 审批约定。
+- `docs/source/跨境B2B_AI询盘成交Agent_市场调研报告.docx`: inbound 询盘成交定位、小微工贸卖家、报价/议价差异化与主要风险。
+- `docs/reference/Closer 工作台（离线版）.html`: 前端视觉参考；当前仓库已有 React/Vite 工作台、移动/窄屏基础适配与 Playwright 主链路 E2E，仍需更全面视觉 QA 与部署联调。
 
 ## Current Evidence
 

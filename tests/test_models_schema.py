@@ -15,11 +15,17 @@ from pathlib import Path
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import sessionmaker
 
-from app.database import Base
+from app.database import Base, configured_database_url
 import app.models  # noqa: F401
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_database_url_can_be_overridden_for_local_runtime(monkeypatch):
+    monkeypatch.setenv("CLOSER_DATABASE_URL", "sqlite:///./tmp/closer-test.db")
+
+    assert configured_database_url() == "sqlite:///./tmp/closer-test.db"
 
 
 def test_sqlalchemy_models_create_core_tables():

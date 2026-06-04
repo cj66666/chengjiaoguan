@@ -10,6 +10,7 @@
  */
 """
 
+import os
 from collections.abc import Generator
 from datetime import UTC, datetime
 
@@ -18,6 +19,7 @@ from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 
 DEFAULT_DATABASE_URL = "sqlite:///./closer.db"
+DATABASE_URL_ENV = "CLOSER_DATABASE_URL"
 
 
 def utcnow() -> datetime:
@@ -28,7 +30,12 @@ class Base(DeclarativeBase):
     pass
 
 
-def build_engine(database_url: str = DEFAULT_DATABASE_URL):
+def configured_database_url() -> str:
+    return os.getenv(DATABASE_URL_ENV) or DEFAULT_DATABASE_URL
+
+
+def build_engine(database_url: str | None = None):
+    database_url = database_url or configured_database_url()
     connect_args = {"check_same_thread": False} if database_url.startswith("sqlite") else {}
     return create_engine(database_url, connect_args=connect_args, future=True)
 

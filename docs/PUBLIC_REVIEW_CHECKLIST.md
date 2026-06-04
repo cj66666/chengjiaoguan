@@ -50,18 +50,16 @@ W1/W2/W3 主要展示团队 AI 实战能力，评审关注 Specs、Skill、Agent
 
 当前仓库中以下已被 git 跟踪的材料可能超出 Wave 2 评分范围，公开前建议移到私有仓库、删除出公开分支，或替换为摘要版：
 
-- `成交官_需求规格说明书_V1.0.docx`
-- `成交官_产品设计文档_V1.1.docx`
-- `成交官_技术架构设计文档_V1.1.docx`
-- `成交官_数据库设计文档_V1.0.docx`
-- `成交官_后端API契约_V1.0.docx`
-- `成交官_Agent工具接口清单_V1.0.docx`
-- `成交官_两人开发分工排期表_方案A平衡版_V2.1.xlsx`
-- `跨境B2B_AI询盘成交Agent_市场调研报告.docx`
-- `Closer 工作台（离线版）.html`
-- `docs/Closer 工作台（离线版）.html`
+- `docs/source/成交官_需求规格说明书_V1.0.docx`
+- `docs/source/成交官_产品设计文档_V1.1.docx`
+- `docs/source/成交官_技术架构设计文档_V1.1.docx`
+- `docs/source/成交官_数据库设计文档_V1.0.docx`
+- `docs/source/成交官_后端API契约_V1.0.docx`
+- `docs/source/成交官_Agent工具接口清单_V1.0.docx`
+- `docs/source/跨境B2B_AI询盘成交Agent_市场调研报告.docx`
+- `docs/reference/Closer 工作台（离线版）.html`
 
-原因：这些文件包含完整产品规格、排期、原始调研或离线原型，不是 Wave 2 必需的 Specs/Skill/Agent 交付物。公开它们会增加信息泄露和评审噪音。
+原因：这些文件包含完整产品规格、原始调研或离线原型，不是 Wave 2 必需的 Specs/Skill/Agent 交付物。公开它们会增加信息泄露和评审噪音。
 
 ## 绝不能公开
 

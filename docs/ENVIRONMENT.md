@@ -14,6 +14,12 @@
 
 不要提交 `.env`、密钥、token 或本地数据库。本文只记录变量名、用途和默认行为；真实值必须由部署平台或本机 secret 管理注入。
 
+## 基础运行
+
+| 变量 | 默认 | 用途 |
+| --- | --- | --- |
+| `CLOSER_DATABASE_URL` | `sqlite:///./closer.db` | SQLAlchemy 数据库 URL；本地整理后建议指向系统临时目录，例如 PowerShell 中的 `"sqlite:///$(($env:TEMP -replace '\\','/'))/closer.db"`，避免根目录生成运行库。 |
+
 ## Agent 与 LLM
 
 | 变量 | 默认 | 用途 |

@@ -31,8 +31,8 @@ migrations/             PostgreSQL/pgvector 生产 DDL
 scripts/                demo_flow 与 production_check 等公开 API 脚本
 skills/                 Wave 2 复赛 Skills 交付物，映射供应链询盘核心技能到 API、Agent 工具和测试
 docs/                   环境、部署、审计、视觉 QA、执行计划等过程文档
-Closer 工作台（离线版）.html
-                        前端离线视觉参考真源，不是运行中的正式前端
+docs/source/            原始需求、产品、架构、数据库、API、Agent 工具和市场调研资料
+docs/reference/         离线视觉参考真源，不是运行中的正式前端
 ```
 
 局部文件：
@@ -63,7 +63,7 @@ Closer 工作台（离线版）.html
 - `frontend/src/api.js` 是 API client 边界，统一 seller token、JSON 和错误处理。
 - `frontend/src/App.jsx` 是工作台组合根，承载导航状态、数据加载和页面装配。
 - `frontend/src/ui.jsx` 是通用 UI primitives，修改时注意所有页面共享影响。
-- `frontend/src/styles.css` 对齐离线设计真源，桌面要接近 `Closer 工作台（离线版）.html`，移动端必须无横向溢出。
+- `frontend/src/styles.css` 对齐离线设计真源，桌面要接近 `docs/reference/Closer 工作台（离线版）.html`，移动端必须无横向溢出。
 - 前端不能直接访问数据库，不能复制后端业务判断，不能绕过审批发送。
 
 ## API 和鉴权默认契约
@@ -92,7 +92,7 @@ Closer 工作台（离线版）.html
 
 ## 关键坑点
 
-- `Closer 工作台（离线版）.html` 是视觉和交互参考，不是正式应用。正式前端在 `http://127.0.0.1:5173/`，不要在 `file://...html` 上判断 API 功能是否已接好。
+- `docs/reference/Closer 工作台（离线版）.html` 是视觉和交互参考，不是正式应用。正式前端在 `http://127.0.0.1:5173/`，不要在 `file://...html` 上判断 API 功能是否已接好。
 - Vite dev server 通过 `/api` 代理 FastAPI。后端重启时页面可能残留 502，先刷新并确认 `/api/v1/health`。
 - Playwright 配置默认 `CLOSER_E2E_PYTHON=.venv/bin/python`，并会给 E2E FastAPI 进程注入 `CLOSER_ALLOW_DEV_AUTH=1` 与 `CLOSER_ALLOW_DEV_CREDENTIALS=1`。Windows 下如 E2E 找不到 Python，设置为 `.venv\Scripts\python.exe`。
 - MiniMax 中国 OpenAI-compatible base URL 用 `https://api.minimaxi.com/v1`。不要把用户给过的 key 写进代码、文档或提交。
@@ -114,6 +114,7 @@ python -m pip install -e .[dev]
 ```powershell
 $env:CLOSER_ALLOW_DEV_AUTH='1'
 $env:CLOSER_ALLOW_DEV_CREDENTIALS='1'
+$env:CLOSER_DATABASE_URL="sqlite:///$(($env:TEMP -replace '\\','/'))/closer.db"
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 

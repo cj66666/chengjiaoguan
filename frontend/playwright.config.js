@@ -6,6 +6,7 @@
  */
 
 import { defineConfig } from "@playwright/test";
+import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -13,6 +14,8 @@ const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, "..");
 const python = process.env.CLOSER_E2E_PYTHON || ".venv/bin/python";
 const browserChannel = process.env.PLAYWRIGHT_BROWSER_CHANNEL || "chrome";
+const sqliteUrlForPath = (path) => `sqlite:///${path.replaceAll("\\", "/")}`;
+const e2eDatabaseUrl = process.env.CLOSER_E2E_DATABASE_URL || sqliteUrlForPath(resolve(tmpdir(), "closer-e2e.db"));
 
 export default defineConfig({
   testDir: "./e2e",
@@ -54,6 +57,7 @@ export default defineConfig({
         ...process.env,
         CLOSER_ALLOW_DEV_AUTH: "1",
         CLOSER_ALLOW_DEV_CREDENTIALS: "1",
+        CLOSER_DATABASE_URL: e2eDatabaseUrl,
       },
       url: "http://127.0.0.1:8000/api/v1/health",
       reuseExistingServer: !process.env.CI,

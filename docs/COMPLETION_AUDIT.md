@@ -22,7 +22,7 @@
 
 | 范围 | 要求来源 | 本地证据 | 状态 | 剩余动作 |
 | --- | --- | --- | --- | --- |
-| 原始规格读取 | `EXECUTION_PLAN.md` 与 `IMPLEMENTATION_AUDIT.md` 的 Source Documents 列表 | 需求、产品、架构、数据库、API、Agent 工具、排期、市场调研、离线工作台均已登记 | 已完成 | 无 |
+| 原始规格读取 | `EXECUTION_PLAN.md` 与 `IMPLEMENTATION_AUDIT.md` 的 Source Documents 列表 | 需求、产品、架构、数据库、API、Agent 工具、市场调研、离线工作台均已登记；两人分工排期表已移除 | 已完成 | 无 |
 | 入站主链路 | MVP path 1-2，T05-T10 | site form、email、WhatsApp 入站边界；customer、inquiry、conversation、message 创建；相关 API 测试覆盖 | 已完成 | 生产渠道凭据另见外部项 |
 | 询盘甄别与客户画像 | MVP path 3，T08-T09 | `score_inquiry`、`get_customer`、客户列表/详情/擦除 API 与测试 | 已完成 | 真实模型增强不影响本地确定性闭环 |
 | 知识与产品匹配 | MVP path 4，T13-T14 | 知识切块、embedding provider、index upsert provider、search provider、产品 token 匹配与测试 | 边界完成 | 配置真实 embedding/search/index provider 与托管语义索引 |

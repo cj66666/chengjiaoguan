@@ -5,7 +5,7 @@
 index.html: Vite HTML 入口，挂载 React 工作台根节点。
 package.json: 前端依赖与脚本配置，定义 dev/build/preview 命令。
 package-lock.json: npm 锁文件，固定 React/Vite/lucide 依赖图与安全审计基线。
-playwright.config.js: Playwright 配置，启动 FastAPI 与 Vite，显式启用本地 dev auth/credential seal，并使用本地 Chrome channel 执行桌面/移动浏览器 E2E。
+playwright.config.js: Playwright 配置，启动 FastAPI 与 Vite，显式启用本地 dev auth/credential seal，把 E2E SQLite 放入系统临时目录，并使用本地 Chrome channel 执行桌面/移动浏览器 E2E。
 vite.config.js: Vite 配置，提供 React 插件与 /api 到后端的本地代理。
 e2e/: Playwright 浏览器测试，验证工作台主链路 UI 到 API 接缝与窄屏无横向溢出。
 src/: React 工作台源码，承载 API 客户端、页面组合根与样式。
