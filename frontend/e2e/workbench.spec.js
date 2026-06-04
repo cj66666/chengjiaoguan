@@ -7,7 +7,7 @@
 
 import { expect, test } from "@playwright/test";
 
-const API_BASE_URL = process.env.E2E_API_BASE_URL || "http://127.0.0.1:8000";
+const API_BASE_URL = process.env.E2E_API_BASE_URL || "";
 const RUN_SELLER_OFFSET = (Date.now() % 100000) * 10;
 
 test("workbench demo catalog flow", async ({ page }, testInfo) => {
@@ -114,6 +114,35 @@ test("workbench dashboard metric navigation flow", async ({ page }, testInfo) =>
   await page.getByRole("button", { name: "看板", exact: true }).click();
   await page.getByTestId("metric-conversion").click();
   await expect(page.locator(".analytics-page")).toBeVisible();
+  await expect(page).toHaveNoHorizontalOverflow();
+});
+
+test("workbench inbox guardrail actions stay above composer in short viewport", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop", "desktop short viewport regression");
+  const sellerId = sellerIdFor(testInfo, 9260);
+
+  await page.setViewportSize({ width: 1280, height: 760 });
+  await page.goto("/");
+  await page.getByLabel("Seller", { exact: true }).fill(sellerId);
+  await Promise.all([
+    page.waitForResponse((response) => response.url().includes("/api/v1/demo/seed") && response.ok()),
+    page.getByRole("button", { name: "Demo Seed" }).click(),
+  ]);
+  await page.waitForLoadState("networkidle");
+
+  await page.getByTestId("metric-today-inquiries").click();
+  await expect(page.getByTestId("inbox-workbench")).toBeVisible();
+  await expect(page.locator(".guardrail-actions")).toBeVisible();
+  await expect(page.locator(".composer-bar")).toBeVisible();
+
+  const boxes = await page.evaluate(() => ({
+    actions: document.querySelector(".guardrail-actions")?.getBoundingClientRect().toJSON(),
+    composer: document.querySelector(".composer-bar")?.getBoundingClientRect().toJSON(),
+    thread: document.querySelector(".inbox-thread")?.getBoundingClientRect().toJSON(),
+  }));
+
+  expect(boxes.actions.bottom).toBeLessThanOrEqual(boxes.thread.bottom);
+  expect(boxes.actions.bottom).toBeLessThanOrEqual(boxes.composer.top);
   await expect(page).toHaveNoHorizontalOverflow();
 });
 
@@ -230,10 +259,10 @@ function sellerIdFor(testInfo, desktopBase) {
 
 async function seedDenseInquiries(request, sellerId, count) {
   const headers = { Authorization: `Bearer seller:${sellerId}` };
-  await expect(await request.post(`${API_BASE_URL}/api/v1/demo/seed`, { headers })).toBeOK();
+  await expect(await request.post(apiUrl("/api/v1/demo/seed"), { headers })).toBeOK();
   for (let index = 0; index < count; index += 1) {
     const quantity = 2000 + index * 137;
-    const response = await request.post(`${API_BASE_URL}/api/v1/webhooks/site_form`, {
+    const response = await request.post(apiUrl("/api/v1/webhooks/site_form"), {
       headers,
       data: {
         channel: "site_form",
@@ -255,7 +284,7 @@ async function seedDenseInquiries(request, sellerId, count) {
 }
 
 async function seedSingleInquiry(request, sellerId, suffix) {
-  const response = await request.post(`${API_BASE_URL}/api/v1/webhooks/site_form`, {
+  const response = await request.post(apiUrl("/api/v1/webhooks/site_form"), {
     headers: { Authorization: `Bearer seller:${sellerId}` },
     data: {
       channel: "site_form",
@@ -278,6 +307,10 @@ async function seedSingleInquiry(request, sellerId, suffix) {
 
 function panelByTitle(page, title) {
   return page.locator(".panel", { has: page.getByRole("heading", { name: title }) });
+}
+
+function apiUrl(path) {
+  return API_BASE_URL ? `${API_BASE_URL}${path}` : path;
 }
 
 expect.extend({
