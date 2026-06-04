@@ -134,12 +134,16 @@ class RuleBasedGraphDecisionProvider:
         if context.stage == "understand":
             parsed = _parsed(context)
             requirement = context.extra.get("requirement") or parsed or context.user_prompt
-            if parsed.get("product") and not context.product_matches and context.conversation_id is not None:
+            if (
+                not context.product_matches
+                and context.conversation_id is not None
+                and _requires_catalog_match(parsed, requirement)
+            ):
                 return _handoff(
                     "product_out_of_scope",
                     "No active product matched the inquiry requirement.",
                     suggestion="Review the inquiry manually or add the missing product to the catalog.",
-                    payload={"requirement": parsed},
+                    payload={"requirement": parsed or requirement},
                     knowledge_query=_query_text(requirement),
                 )
             return GraphPolicyDecision(knowledge_query=_query_text(requirement))
@@ -433,6 +437,14 @@ def _query_text(requirement: Any) -> str:
     if isinstance(requirement, Mapping):
         return " ".join(str(value) for value in requirement.values() if value)
     return str(requirement or "")
+
+
+def _requires_catalog_match(parsed: Mapping[str, Any], requirement: Any) -> bool:
+    if parsed.get("product") or parsed.get("quantity"):
+        return True
+    text = _query_text(requirement).lower()
+    buying_terms = ("quote", "price", "supply", "need", "pcs", "units", "ship", "cif", "fob")
+    return any(term in text for term in buying_terms)
 
 
 def _provider_name(env: Mapping[str, str]) -> str:

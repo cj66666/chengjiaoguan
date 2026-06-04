@@ -154,6 +154,29 @@ def test_closer_graph_requests_handoff_when_product_is_out_of_scope(db_session):
     assert db_session.get(models.Conversation, conversation.id).is_human_takeover is True
 
 
+def test_closer_graph_requests_handoff_when_unparsed_requirement_has_no_catalog_match(db_session):
+    inquiry, conversation, _ = _seed_operating_graph(
+        db_session,
+        parsed_product=None,
+        raw_content="Need 20 custom wind turbines with installation and performance guarantee.",
+        quantity=20,
+    )
+
+    result = run_closer_graph_result(
+        db_session,
+        1,
+        "Handle this out-of-catalog inquiry.",
+        inquiry_id=inquiry.id,
+        conversation_id=conversation.id,
+    )
+
+    assert result.output.requires_human_review is True
+    assert result.state.steps == ["receive", "qualify", "understand", "handoff", "persist"]
+    approval = db_session.get(models.Approval, result.state.handoff["approval_id"])
+    assert approval.reason == "product_out_of_scope"
+    assert db_session.query(models.Message).filter_by(sender_role="ai").count() == 0
+
+
 def test_closer_graph_uses_injected_policy_before_sending(db_session):
     class HoldBeforeSendPolicy:
         name = "hold_before_send"
@@ -203,7 +226,13 @@ def test_closer_graph_mermaid_exposes_eight_operating_nodes():
         assert node in diagram
 
 
-def _seed_operating_graph(db_session, *, parsed_product: str = "led desk lamp"):
+def _seed_operating_graph(
+    db_session,
+    *,
+    parsed_product: str | None = "led desk lamp",
+    raw_content: str | None = None,
+    quantity: int = 500,
+):
     seller = models.Seller(id=1, name="Demo Exporter", email="owner@example.com")
     customer = models.Customer(
         seller_id=1,
@@ -223,12 +252,16 @@ def _seed_operating_graph(db_session, *, parsed_product: str = "led desk lamp"):
     )
     db_session.add_all([seller, customer, product])
     db_session.flush()
+    parsed = {"quantity": quantity, "destination": "US"}
+    if parsed_product is not None:
+        parsed["product"] = parsed_product
+    content = raw_content or f"Need {quantity} {parsed_product} shipped to US."
     inquiry = models.Inquiry(
         seller_id=1,
         customer_id=customer.id,
         source_channel="email",
-        raw_content=f"Need 500 {parsed_product} shipped to US.",
-        parsed={"product": parsed_product, "quantity": 500, "destination": "US"},
+        raw_content=content,
+        parsed=parsed,
         status="new",
         language="en",
     )
