@@ -56,9 +56,9 @@
 .venv/bin/python -m pytest
 ```
 
-当前结果：`165 passed`，无测试警告。
+当前结果：`169 passed`，1 个 pydantic_ai event loop deprecation warning。
 
-前端结果：`npm run build` 通过，`npm audit --json` 为 0 vulnerabilities，`npm run test:e2e` 为 8 passed。
+前端结果：`npm run build` 通过，`npm run test:e2e` 为 12 passed。
 
 完成度判定：`docs/COMPLETION_AUDIT.md` 已把仓库内可交付项与真实 provider、cron、monitoring、生产彩排等外部阻塞分离。
 

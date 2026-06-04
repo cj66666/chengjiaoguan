@@ -29,6 +29,7 @@ frontend/e2e/           Playwright 桌面/移动 E2E
 tests/                  后端 API、服务、工具、Agent/Graph 契约测试
 migrations/             PostgreSQL/pgvector 生产 DDL
 scripts/                demo_flow 与 production_check 等公开 API 脚本
+skills/                 Wave 2 复赛 Skills 交付物，映射供应链询盘核心技能到 API、Agent 工具和测试
 docs/                   环境、部署、审计、视觉 QA、执行计划等过程文档
 Closer 工作台（离线版）.html
                         前端离线视觉参考真源，不是运行中的正式前端
@@ -43,6 +44,7 @@ Closer 工作台（离线版）.html
 - `frontend/CLAUDE.md` 与 `frontend/src/CLAUDE.md`: 前端 API-only、设计参考和 UI 约定。
 - `tests/CLAUDE.md`: 测试域约定。
 - `docs/CLAUDE.md`: 文档用途边界。
+- `skills/CLAUDE.md`: 复赛 Skills 交付物边界。
 
 ## 架构边界
 
