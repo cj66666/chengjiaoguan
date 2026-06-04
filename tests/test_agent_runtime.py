@@ -115,6 +115,19 @@ def test_agent_model_config_requires_key_for_openai_model(monkeypatch):
     assert configured.status == "ok"
 
 
+def test_agent_model_config_supports_openai_compatible_chat_base_url(monkeypatch):
+    monkeypatch.setenv("CLOSER_AGENT_MODEL", "openai-chat:MiniMax-M2.7")
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("OPENAI_BASE_URL", "https://api.minimax.io/v1")
+
+    configured = get_agent_model_config()
+
+    assert configured.status == "ok"
+    assert configured.provider == "openai-chat"
+    assert configured.api_key_env == "OPENAI_API_KEY"
+    assert configured.details()["base_url"] == "https://api.minimax.io/v1"
+
+
 def test_closer_graph_runs_quote_answer_followup_path(db_session):
     inquiry, conversation, _ = _seed_operating_graph(db_session)
 

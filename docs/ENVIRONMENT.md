@@ -21,6 +21,7 @@
 | `CLOSER_AGENT_MODEL` | 未配置 | PydanticAI runtime 使用的模型名；未配置时 readiness 警告，运行时必须显式传 model。 |
 | `CLOSER_AGENT_API_KEY_ENV` | provider 默认 | 指向真实模型 API key 的环境变量名；OpenAI provider 默认读取 `OPENAI_API_KEY`。 |
 | `OPENAI_API_KEY` | 未配置 | OpenAI-compatible Agent、Graph decision 与 embedding provider 的默认 key 变量。 |
+| `OPENAI_BASE_URL` | OpenAI 默认 | OpenAI-compatible Agent base URL；MiniMax 使用 `https://api.minimax.io/v1`。 |
 | `CLOSER_GRAPH_DECISION_PROVIDER` | `rule_based` | Graph 决策 provider；生产可用 `http`/`webhook`/`remote` 或 `openai`/`llm`。 |
 | `CLOSER_GRAPH_DECISION_ENDPOINT` | 未配置 | HTTP 决策 provider endpoint。 |
 | `CLOSER_GRAPH_DECISION_AUTH_TOKEN` | 未配置 | HTTP 决策 provider Bearer token。 |

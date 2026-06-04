@@ -21,6 +21,8 @@ from typing import Any
 MODEL_ENV = "CLOSER_AGENT_MODEL"
 API_KEY_ENV_OVERRIDE = "CLOSER_AGENT_API_KEY_ENV"
 OPENAI_API_KEY_ENV = "OPENAI_API_KEY"
+OPENAI_BASE_URL_ENV = "OPENAI_BASE_URL"
+OPENAI_COMPATIBLE_PROVIDERS = {"openai", "openai-chat", "openai-responses"}
 
 
 @dataclass(frozen=True)
@@ -28,6 +30,7 @@ class AgentModelConfig:
     model: str | None
     provider: str | None
     api_key_env: str | None
+    base_url: str | None
     status: str
     message: str
 
@@ -36,6 +39,7 @@ class AgentModelConfig:
             "model": self.model,
             "provider": self.provider,
             "api_key_env": self.api_key_env,
+            "base_url": self.base_url,
         }
 
 
@@ -57,17 +61,20 @@ def get_agent_model_config(env: Mapping[str, str] | None = None) -> AgentModelCo
             model=None,
             provider=None,
             api_key_env=None,
+            base_url=None,
             status="warning",
             message=f"{MODEL_ENV} is not configured; runtime must pass an explicit model.",
         )
 
     provider = _provider(model)
     api_key_env = _api_key_env(provider, env)
+    base_url = _base_url(provider, env)
     if api_key_env and not _clean(env.get(api_key_env)):
         return AgentModelConfig(
             model=model,
             provider=provider,
             api_key_env=api_key_env,
+            base_url=base_url,
             status="failed",
             message=f"{api_key_env} is required for {provider} agent model.",
         )
@@ -76,6 +83,7 @@ def get_agent_model_config(env: Mapping[str, str] | None = None) -> AgentModelCo
         model=model,
         provider=provider,
         api_key_env=api_key_env,
+        base_url=base_url,
         status="ok",
         message="Agent model is configured.",
     )
@@ -93,8 +101,14 @@ def _api_key_env(provider: str, env: Mapping[str, str]) -> str | None:
     override = _clean(env.get(API_KEY_ENV_OVERRIDE))
     if override:
         return override
-    if provider == "openai":
+    if provider in OPENAI_COMPATIBLE_PROVIDERS:
         return OPENAI_API_KEY_ENV
+    return None
+
+
+def _base_url(provider: str, env: Mapping[str, str]) -> str | None:
+    if provider in OPENAI_COMPATIBLE_PROVIDERS:
+        return _clean(env.get(OPENAI_BASE_URL_ENV))
     return None
 
 
