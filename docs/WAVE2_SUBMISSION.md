@@ -231,11 +231,11 @@ python scripts/demo_flow.py --base-url http://127.0.0.1:8000 --approve --run-wor
 
 ### 项目标题
 
-成交官 Closer - 跨境供应链询盘成交工作台
+Closer 工作台 - 跨境供应链询盘成交工作台
 
 ### 复赛短简介
 
-成交官 Closer 面向跨境 B2B 供应链询盘场景，把多渠道询盘接入、客户建档、询盘评分、产品匹配、报价、人工审批、投递记录和跟进调度做成可运行闭环。Wave 2 提交包含 8 个核心 Skills、公开 API 工作流、React/Vite 原型和自动化测试证据。
+Closer 工作台面向跨境 B2B 供应链询盘场景，把多渠道询盘接入、客户建档、询盘评分、产品匹配、报价、人工审批、投递记录和跟进调度做成可运行闭环。Wave 2 提交包含 8 个核心 Skills、公开 API 工作流、React/Vite 原型和自动化测试证据。
 
 ### Skills 摘要
 

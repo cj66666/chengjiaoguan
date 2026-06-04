@@ -12,7 +12,7 @@
 
 ## 提交定位
 
-项目名称：成交官 Closer
+项目名称：Closer 工作台
 
 复赛阶段：Wave 2。
 
@@ -26,7 +26,7 @@
 
 ## 提交摘要
 
-成交官 Closer 服务小微工贸和跨境 B2B 出口卖家。买家询盘从站点表单、Email、WhatsApp 等渠道进入后，系统自动建档客户和会话，Agent 调用确定性业务工具完成询盘评分、产品匹配、知识检索、报价草稿和跟进建议。涉及底价、敏感承诺、大额合同、未匹配产品和 PI 生成等风险动作时，后端强制进入人工审批，保证 Agent 不能绕过业务护栏。项目提供可运行的 FastAPI 后端、React/Vite 工作台、公开 API、Demo seed、生产 readiness/alerts、调度入口和 E2E 测试证据。
+Closer 工作台服务小微工贸和跨境 B2B 出口卖家。买家询盘从站点表单、Email、WhatsApp 等渠道进入后，系统自动建档客户和会话，Agent 调用确定性业务工具完成询盘评分、产品匹配、知识检索、报价草稿和跟进建议。涉及底价、敏感承诺、大额合同、未匹配产品和 PI 生成等风险动作时，后端强制进入人工审批，保证 Agent 不能绕过业务护栏。项目提供可运行的 FastAPI 后端、React/Vite 工作台、公开 API、Demo seed、生产 readiness/alerts、调度入口和 E2E 测试证据。
 
 ## 目标用户
 
@@ -78,7 +78,7 @@
 
 ### 1. 开场
 
-“跨境 B2B 卖家最大的问题不是缺一个聊天机器人，而是询盘来了以后，客户是谁、值不值得跟、产品能不能匹配、报价能不能发、底价有没有被碰、后面谁跟进，这些环节都断在不同工具里。成交官把这些动作收束到一个 AI 工作台里。”
+“跨境 B2B 卖家最大的问题不是缺一个聊天机器人，而是询盘来了以后，客户是谁、值不值得跟、产品能不能匹配、报价能不能发、底价有没有被碰、后面谁跟进，这些环节都断在不同工具里。Closer 工作台把这些动作收束到一个 AI 工作台里。”
 
 ### 2. 启动 Demo
 
@@ -137,7 +137,7 @@ npm run test:e2e
 ## 建议提交材料
 
 - 仓库链接：提交当前仓库。
-- 项目名称：成交官 Closer。
+- 项目名称：Closer 工作台。
 - 复赛材料：优先使用 `docs/WAVE2_SUBMISSION.md`，突出 Skills/Workflow 和 Prototype。
 - Specs 材料：使用 `docs/SPECS.md`，覆盖项目名称、应用场景、目标用户、核心问题、产品思路、AI 作用和评测标准。
 - Skills 材料：使用 `skills/README.md` 和 8 个 `skills/*/SKILL.md`，每个技能都有输入输出、运行入口、护栏和验证命令。
@@ -151,11 +151,11 @@ npm run test:e2e
 
 ### 短简介
 
-成交官 Closer 是面向跨境 B2B 出口卖家的 AI 询盘成交工作台，把入站询盘、客户建档、产品匹配、报价、风控审批、投递和跟进串成可审计闭环，避免 Agent 绕过底价、敏感承诺和大额合同审批。
+Closer 工作台是面向跨境 B2B 出口卖家的 AI 询盘成交工作台，把入站询盘、客户建档、产品匹配、报价、风控审批、投递和跟进串成可审计闭环，避免 Agent 绕过底价、敏感承诺和大额合同审批。
 
 ### 长简介
 
-成交官 Closer 服务小微工贸和跨境 B2B 出口团队。询盘从站点表单、Email、WhatsApp 等渠道进入后，系统自动创建客户、询盘、会话和消息，Agent 调用后端工具完成询盘评分、客户画像、产品匹配、知识检索、报价草稿和跟进建议。所有高风险动作都由服务端护栏拦截并进入人工审批，包括底价、敏感承诺、大额报价、未匹配产品和 PI 生成。项目包含 FastAPI 后端、React/Vite 工作台、PydanticAI/Pydantic Graph 编排、租户隔离、正式 API key、delivery retry、readiness/alerts、Demo seed、production check 和 Playwright E2E。
+Closer 工作台服务小微工贸和跨境 B2B 出口团队。询盘从站点表单、Email、WhatsApp 等渠道进入后，系统自动创建客户、询盘、会话和消息，Agent 调用后端工具完成询盘评分、客户画像、产品匹配、知识检索、报价草稿和跟进建议。所有高风险动作都由服务端护栏拦截并进入人工审批，包括底价、敏感承诺、大额报价、未匹配产品和 PI 生成。项目包含 FastAPI 后端、React/Vite 工作台、PydanticAI/Pydantic Graph 编排、租户隔离、正式 API key、delivery retry、readiness/alerts、Demo seed、production check 和 Playwright E2E。
 
 ### 创新点
 
