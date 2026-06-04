@@ -71,6 +71,8 @@ test("workbench customer approval flow", async ({ page }, testInfo) => {
 
   await page.getByRole("button", { name: "产品", exact: true }).click();
   await expect(page.getByRole("heading", { name: "价格规则列表" })).toBeVisible();
+  await expect(page.locator(".profile")).not.toBeVisible();
+  await expect(page.locator(".banner")).not.toBeVisible();
   await page.getByRole("button", { name: "客户", exact: true }).click();
   await expect(page.getByText("选择一个客户查看询盘、会话、报价与跟进。")).toBeVisible();
   await expect(page.getByRole("heading", { name: "客户活动" })).not.toBeVisible();

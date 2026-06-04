@@ -255,6 +255,8 @@ export default function App() {
   const unreadNotificationCount = data.notifications?.total ?? data.notifications?.items?.length ?? 0;
   const goTab = useCallback((tab) => {
     setActiveTab(tab);
+    setNotice("");
+    setError("");
     if (tab !== "customers") {
       setSelectedCustomer(null);
     }
