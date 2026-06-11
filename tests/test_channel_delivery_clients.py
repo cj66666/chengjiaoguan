@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 pytest、json 与 app.services.channel_delivery_clients 的 payload-only、SMTP、WhatsApp 客户端
  * [OUTPUT]: 验证默认 payload-only 不触网、SMTP 客户端组合邮件、WhatsApp Cloud 客户端组合 HTTP 请求
  * [POS]: tests 的外部发送客户端边界证明文件，锁住真实渠道实发能力与确定性测试隔离
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI APIRouter/Depends、SQLAlchemy 查询、InquiryPatch 与 common 序列化
  * [OUTPUT]: 对外提供 router，暴露 /api/v1/inquiries 列表、详情、补丁接口
  * [POS]: routers 的询盘资源边界，负责筛选、价值排序、人工修正和审计写入
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

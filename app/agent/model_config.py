@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 os.environ 与 PydanticAI model 字符串约定
  * [OUTPUT]: 对外提供 AgentModelConfig、configured_agent_model、selected_agent_model、get_agent_model_config
  * [POS]: app/agent 的生产模型配置边界，让 runtime 与 readiness 共享同一份 LLM 配置事实
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

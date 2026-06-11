@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session、channel_gateway、agent_tools、knowledge 与 models
  * [OUTPUT]: 对外提供 seed_demo_scenario，创建或复用演示产品、价格规则、知识、询盘、报价、审批和跟进
  * [POS]: services 的演示数据编排边界，用确定性数据证明 MVP 主链路，不拥有业务规则本身
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

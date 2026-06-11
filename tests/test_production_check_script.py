@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 subprocess、sys、json 与 scripts/production_check.py
  * [OUTPUT]: 验证 production_check dry-run 输出部署检查步骤、保护 token 且默认不触发 scheduler
  * [POS]: tests 的生产彩排脚本证明文件，锁住部署检查只走公开 API 并避免默认副作用
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

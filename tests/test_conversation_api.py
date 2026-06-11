@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI TestClient、SQLite 会话夹具、schemas 与 channel_gateway
  * [OUTPUT]: 验证会话详情、消息列表、人工接管、释放与人工发信投递
  * [POS]: tests 的 conversations HTTP 契约证明文件，锁住会话资源行为
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI 异常机制与 JSONResponse
  * [OUTPUT]: 对外提供 add_error_handlers 与 api_error
  * [POS]: app 的错误形状守门员，保证 API 输出符合统一 error contract
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

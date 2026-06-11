@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session、app.models.KnowledgeChunk、embedding_providers、knowledge_index_providers 与 knowledge_search_providers
  * [OUTPUT]: 对外提供 chunk_text、embed_text、embed_texts、ingest_knowledge、search_knowledge
  * [POS]: services 的知识切块与检索服务，只消费 embedding provider 和 search provider 协议，不绑定具体模型或索引
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -2,7 +2,7 @@
  * [INPUT]: 依赖浏览器 FormData
  * [OUTPUT]: 对外提供 safeGet、productPayload、pricingPayload、channelPayload、settingsPayload
  * [POS]: frontend/src 的表单归一层，把 UI 表单值折叠成后端 schema 接受的最小 payload
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 
 export async function safeGet(api, path, fallback) {

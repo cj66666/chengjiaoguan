@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI APIRouter/Depends、NotificationPatch、notifications 服务与 common 序列化
  * [OUTPUT]: 对外提供 router，暴露 /api/v1/notifications 列表与通知状态修改接口
  * [POS]: routers 的通知资源边界，让前端工作台读取未读提醒并标记 read/archived
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

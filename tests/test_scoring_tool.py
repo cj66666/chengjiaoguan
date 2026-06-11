@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLite 会话夹具、agent_tools、models、schemas 与 channel_gateway
  * [OUTPUT]: 验证 score_inquiry 输出 A/B/C grade、score 与 explainable signals
  * [POS]: tests 的 scoring 工具证明文件，锁住询盘优先级判断规则
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

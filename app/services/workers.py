@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session、ChannelAccount、credentials、followups、delivery_attempts、email_polling 与 pricing 服务
  * [OUTPUT]: 对外提供 run_due_jobs，统一执行到期 follow-up、投递重试、显式启用的 email 轮询与价格规则汇率刷新
  * [POS]: services 的 deterministic worker 薄层，给外部 cron/queue/API 一个稳定入口
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

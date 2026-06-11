@@ -2,7 +2,7 @@
  * [INPUT]: 依赖 React JSX 与 lucide-react Plus 图标
  * [OUTPUT]: 对外提供 Panel、Rows、StatusRows、ApiForm、Field、JsonField、Metric、IconButton、CodeBlock
  * [POS]: frontend/src 的通用 UI 基元层，承载标题副文案、右侧动作与 KPI delta 等设计稿通用结构
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 
 import { BarChart3, Plus } from "lucide-react";

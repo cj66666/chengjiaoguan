@@ -1,12 +1,10 @@
 # Environment
-> L3 | 父级: ./CLAUDE.md
-
 <!--
 /**
  * [INPUT]: 依赖 app/agent、app/services、scripts、frontend/playwright.config.js 中的 CLOSER_* 配置真源
  * [OUTPUT]: 对外提供生产/演示/测试环境变量地图、默认值、用途与上线判定
  * [POS]: docs 的部署配置镜像，把 provider key、外部服务、调度检查和本地测试配置从代码常量折叠成可读清单
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 -->
 

@@ -4,16 +4,16 @@
 /* ========================================================================== */
 /**
  * [INPUT]: 依赖 os、datetime、SQLAlchemy Session/select/func、app.models、agent.model_config、graph policy、knowledge search/index、embedding_providers、exchange_rate_sources、object_storage、ops_monitoring 与 credentials
- * [OUTPUT]: 对外提供 get_readiness，返回租户 scoped 的 seller、API key、agent model、graph decision、knowledge search/index、embedding provider、exchange provider、monitoring sink、credentials、delivery、email polling、storage、exchange 与 failed delivery 状态
+ * [OUTPUT]: 对外提供 get_readiness，返回租户 scoped 的 seller、API key、agent model、graph decision、knowledge search/index、embedding provider、exchange provider、monitoring sink、credentials、delivery、email polling、storage、exchange、channel token expiry 与 failed delivery 状态
  * [POS]: services 的只读运维画像，提前暴露生产配置缺口，不触真实外部网络
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 
 from __future__ import annotations
 
 import os
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import func, select
@@ -201,6 +201,15 @@ def _credential_detail(
     else:
         status = "ok"
         message = "Credentials include required keys"
+    expiry = _credential_expiry_status(credentials)
+    if expiry is not None:
+        expiry_status, expiry_message, expires_at = expiry
+        if expiry_status == "failed" or status == "ok":
+            status = expiry_status
+            message = expiry_message
+        elif expiry_status == "warning" and status != "failed":
+            status = "warning"
+            message = expiry_message
     return {
         "id": channel.id,
         "channel_type": channel.channel_type,
@@ -208,6 +217,7 @@ def _credential_detail(
         "message": message,
         "missing": missing,
         "poll_enabled": poll_enabled,
+        "credential_expires_at": expiry[2].isoformat() if expiry is not None else None,
     }
 
 
@@ -299,6 +309,24 @@ def _polling_enabled(credentials: dict[str, Any]) -> bool:
     return bool(credentials.get("poll_enabled") or credentials.get("polling_enabled"))
 
 
+def _credential_expiry_status(credentials: dict[str, Any]) -> tuple[str, str, datetime] | None:
+    raw = (
+        credentials.get("expires_at")
+        or credentials.get("token_expires_at")
+        or credentials.get("access_token_expires_at")
+        or credentials.get("oauth_expires_at")
+    )
+    expires_at = _expiry_datetime(raw)
+    if expires_at is None:
+        return None
+    now = datetime.now(tz=expires_at.tzinfo)
+    if expires_at <= now:
+        return "failed", "Channel credential token has expired", expires_at
+    if expires_at <= now + timedelta(days=3):
+        return "warning", "Channel credential token expires soon", expires_at
+    return None
+
+
 def _delivery_mode() -> str:
     return os.getenv("CLOSER_DELIVERY_MODE") or "payload_only"
 
@@ -311,6 +339,16 @@ def _expiry_date(value: Any) -> date | None:
     if isinstance(value, date):
         return value
     return datetime.fromisoformat(str(value).replace("Z", "+00:00")).date()
+
+
+def _expiry_datetime(value: Any) -> datetime | None:
+    if value in (None, ""):
+        return None
+    if isinstance(value, datetime):
+        return value
+    if isinstance(value, date):
+        return datetime.combine(value, datetime.min.time())
+    return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
 
 
 def _check(name: str, status: str, message: str, details: dict[str, Any] | None = None) -> dict[str, Any]:

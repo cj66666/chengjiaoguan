@@ -198,11 +198,11 @@ npm run build
 npm run test:e2e
 ```
 
-2026-06-04 本地验证结果：
+2026-06-11 本地验证结果：
 
-- `python -m pytest`: 169 passed
+- `python -m pytest`: 180 passed，1 warning
 - `npm run build`: passed
-- `npm run test:e2e`: 12 passed
+- `npm run test:e2e`: 2026-06-04 浏览器回归记录为 12 passed
 
 ## 生产边界
 
@@ -224,3 +224,17 @@ npm run test:e2e
 - `docs/DEMO_RUNBOOK.md`
 - `docs/PRODUCTION_RUNBOOK.md`
 - `docs/ENVIRONMENT.md`
+
+## 交叉评测响应入口
+
+针对 Synnovator 上 6 个交叉评测 issue，本仓库已补充三份评审材料：
+
+- `docs/CROSS_REVIEW_ACTION_PLAN.md`：逐条归纳 issue #1-#6，说明本轮已完成修复和仍需外部材料。
+- `docs/END_TO_END_EVIDENCE.md`：用一条询盘串起 8 个 Skill/Workflow，区分确定性能力与 LLM/provider 依赖。
+- `docs/DATA_OPERATIONS.md`：给出产品 CSV、价格规则 JSON、硬底价 `hard_min_price`、多语言边界、ROI 口径和 30 秒录屏脚本。
+
+本轮代码侧也已回应生产安全建议：
+
+- 渠道凭证缺失、token 过期、通道掉线会进入 `/api/v1/ops/alerts` 和 `/api/v1/ops/readiness`。
+- `pricing_rule.logistics_template.hard_min_price` 会作为后端硬底价熔断线，阻断 PI 生成和报价发送。
+- `match_product` 对低置信度非标询盘返回 2-3 个备选品和差异提示，不直接给单一匹配结论。

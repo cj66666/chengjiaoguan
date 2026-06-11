@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI APIRouter/Depends/Response、租户依赖、SQLAlchemy Session 与 data_exports 服务
  * [OUTPUT]: 对外提供 router，暴露 /api/v1/exports/{dataset}.csv
  * [POS]: routers 的数据导出边界，给看板与 CRM 提供询盘、客户、报价 CSV 下载
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

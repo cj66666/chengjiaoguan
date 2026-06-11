@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session/select/func/or_ 与 app.models 的 Customer/Inquiry/Conversation/Quotation/FollowupTask
  * [OUTPUT]: 对外提供 list_customers、get_customer、get_customer_profile、update_customer_profile、get_customer_activity
  * [POS]: services 的客户画像真源，被 Agent 工具层与 customers HTTP 路由消费
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -4,9 +4,9 @@
 /* ========================================================================== */
 /**
  * [INPUT]: 依赖 SQLAlchemy Session、app.models、Decimal、日期有效期规则与 exchange_rates.resolve_exchange_rate
- * [OUTPUT]: 对外提供 QuoteItemInput、QuoteLine、QuoteResult、calculate_quote
- * [POS]: services 的报价算法真源，统一 MOQ、阶梯价、利润、物流、汇率换算、地板价判断
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [OUTPUT]: 对外提供 QuoteItemInput、QuoteLine、QuoteResult、calculate_quote、hard_minimum_price
+ * [POS]: services 的报价算法真源，统一 MOQ、阶梯价、利润、物流、汇率换算、底价与硬底价判断
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 
@@ -37,7 +37,9 @@ class QuoteLine:
     unit_price: Money
     amount: Money
     floor_price: Money
+    hard_min_price: Money | None
     hits_floor: bool
+    hard_minimum_breached: bool
 
 
 @dataclass(frozen=True)
@@ -47,6 +49,7 @@ class QuoteResult:
     total_amount: Money
     valid_until: date
     hits_floor: bool
+    hard_minimum_breached: bool
     lines: list[QuoteLine]
 
 
@@ -83,7 +86,9 @@ def calculate_quote(
             rule,
         )
         floor_price = _convert_money(_money(rule.floor_price), base_currency, currency, rule)
+        hard_min_price = hard_minimum_price(rule, currency)
         hits_floor = unit_price < floor_price
+        hard_minimum_breached = hard_min_price is not None and unit_price <= hard_min_price
         amount = _money(unit_price * Decimal(item.quantity))
         total += amount
         lines.append(
@@ -93,7 +98,9 @@ def calculate_quote(
                 unit_price=unit_price,
                 amount=amount,
                 floor_price=floor_price,
+                hard_min_price=hard_min_price,
                 hits_floor=hits_floor,
+                hard_minimum_breached=hard_minimum_breached,
             )
         )
 
@@ -103,8 +110,22 @@ def calculate_quote(
         total_amount=_money(total),
         valid_until=date.today() + timedelta(days=valid_days),
         hits_floor=any(line.hits_floor for line in lines),
+        hard_minimum_breached=any(line.hard_minimum_breached for line in lines),
         lines=lines,
     )
+
+
+def hard_minimum_price(rule: models.PricingRule, target_currency: str) -> Money | None:
+    logistics = rule.logistics_template if isinstance(rule.logistics_template, dict) else {}
+    raw = (
+        logistics.get("hard_min_price")
+        or logistics.get("hard_minimum_price")
+        or logistics.get("absolute_floor_price")
+    )
+    if raw in (None, ""):
+        return None
+    source_currency = _currency(logistics.get("hard_min_currency") or rule.currency)
+    return _convert_money(_money(raw), source_currency, target_currency, rule)
 
 
 def _require_product(session: Session, seller_id: int, product_id: int) -> models.Product:

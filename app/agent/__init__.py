@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 app.agent.types、app.agent.model_config、app.agent.runtime 与 app.agent.graph 的公共导出
  * [OUTPUT]: 对外提供 CloserAgentDeps、CloserAgentOutput、CloserGraphState、AgentModelConfig、模型配置 helper、closer_agent、closer_operating_graph、build_closer_agent、run_closer_agent、run_closer_graph、run_closer_graph_result、closer_graph_mermaid
  * [POS]: app/agent 的稳定包入口，折叠 Agent 类型、模型配置、工具绑定、图状态机与运行门面
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

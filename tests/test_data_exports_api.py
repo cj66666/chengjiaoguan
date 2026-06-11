@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 csv/io、FastAPI TestClient、SQLite 会话夹具与 app.models
  * [OUTPUT]: 验证 exports CSV API 可导出 customers、inquiries、quotations，且保持租户隔离与错误形状
  * [POS]: tests 的 M10 数据导出证明文件，锁住看板导出需求的后端资源面
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

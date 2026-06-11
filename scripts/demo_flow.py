@@ -7,7 +7,7 @@
  * [INPUT]: 依赖标准库 argparse/json/urllib 与正在运行的 Closer HTTP API
  * [OUTPUT]: 对外提供 CLI，编排 /demo/seed、approval approve、messages 与 workers run-due
  * [POS]: scripts 的演示入口，只走公开 API，不绕过后端服务、护栏和租户鉴权
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

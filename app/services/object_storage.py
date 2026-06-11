@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 os、json、pathlib、urllib、dataclass 与二进制对象内容
  * [OUTPUT]: 对外提供 StoredObject、ObjectStorage、ObjectStorageConfig、LocalObjectStorage、HttpObjectStorage、document_storage、get_document_storage_config、store_document_object
  * [POS]: services 的文件产物存储边界，把业务服务从本地文件系统与远端对象存储细节中解耦
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

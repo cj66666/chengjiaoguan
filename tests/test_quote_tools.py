@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 pytest、Decimal、SQLite 会话夹具、app.agent_tools、app.models 与 approvals 服务
  * [OUTPUT]: 验证 calc_quote 草稿报价、generate_pi 审批语义、PI 文档文本/PDF 与文件产物、租户隔离
  * [POS]: tests 的 Agent 报价工具证明文件，锁住工具门面到报价/审批服务的成交链路
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 
@@ -82,6 +82,35 @@ def test_generate_pi_requests_approval_before_mutating_quotation(db_session):
     approval = db_session.get(models.Approval, pi["approval_id"])
     assert approval.type == "pi_generate"
     assert approval.payload["quotation_id"] == quote["quotation_id"]
+    assert db_session.get(models.Quotation, quote["quotation_id"]).is_pi is False
+
+
+def test_generate_pi_blocks_when_hard_minimum_is_breached(db_session):
+    inquiry, product = _seed(db_session)
+    rule = db_session.query(models.PricingRule).filter_by(product_id=product.id).one()
+    rule.logistics_template = {"unit_cost": "0.10", "hard_min_price": "3.30"}
+    quote = agent_tools.calc_quote(db_session, 1, inquiry.id, [{"product_id": product.id, "quantity": 500}])
+
+    pi = agent_tools.generate_pi(db_session, 1, quote["quotation_id"])
+
+    assert quote["hard_minimum_breached"] is True
+    assert pi["status"] == "blocked"
+    assert pi["reason"] == "hard_minimum_price"
+    assert db_session.query(models.Approval).count() == 0
+
+
+def test_pi_approval_rechecks_current_hard_minimum_before_document_generation(db_session, monkeypatch, tmp_path):
+    monkeypatch.setenv("CLOSER_DOCUMENT_STORAGE_DIR", str(tmp_path))
+    inquiry, product = _seed(db_session)
+    quote = agent_tools.calc_quote(db_session, 1, inquiry.id, [{"product_id": product.id, "quantity": 500}])
+    pending = agent_tools.generate_pi(db_session, 1, quote["quotation_id"])
+    rule = db_session.query(models.PricingRule).filter_by(product_id=product.id).one()
+    rule.logistics_template = {"unit_cost": "0.10", "hard_min_price": "3.30"}
+    db_session.flush()
+
+    with pytest.raises(PermissionError, match="hard_minimum_price"):
+        approve_approval(db_session, 1, pending["approval_id"])
+
     assert db_session.get(models.Quotation, quote["quotation_id"]).is_pi is False
 
 

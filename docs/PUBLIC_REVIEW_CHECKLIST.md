@@ -1,12 +1,10 @@
 # Public Review Checklist
-> L3 | 父级: ./CLAUDE.md
-
 <!--
 /**
  * [INPUT]: 依赖比赛公开仓库说明、git ls-files、.gitignore 与当前 Wave 2 提交范围
  * [OUTPUT]: 对外提供公开评审前清理清单，区分必须公开、建议公开、公开前应移除或脱敏的材料
  * [POS]: docs 的公开评审风险镜像，防止把本赛段不要求的内部资料误公开
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 -->
 

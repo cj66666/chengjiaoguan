@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 imaplib、EmailAdapter、channel_gateway、credentials 与 channel_account 配置
  * [OUTPUT]: 对外提供 RawEmailMessage、EmailInboxClient、ImapEmailInboxClient、StaticEmailInboxClient、poll_email_channel
  * [POS]: services 的 email 入站轮询边界，把 IMAP 拉取和入站事实创建解耦，测试中可用静态 inbox 替身
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

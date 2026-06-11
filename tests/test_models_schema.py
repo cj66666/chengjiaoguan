@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 pathlib、SQLAlchemy inspect/sessionmaker、app.database.Base、app.models 与 migrations/001_initial.sql
  * [OUTPUT]: 验证核心 ORM 表、租户列、关键约束、最小插入与 PostgreSQL migration 同构性
  * [POS]: tests 的数据库结构证明文件，锁住 SQLAlchemy 机器相与 migration 生产相
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

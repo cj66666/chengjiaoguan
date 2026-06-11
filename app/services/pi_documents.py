@@ -6,7 +6,7 @@
  * [INPUT]: 依赖对象存储边界、PI 编号/文档文本与最小 PDF 生成器
  * [OUTPUT]: 对外提供 write_pi_document_file、write_pi_document_pdf，把 PI 文本/PDF 写入对象存储并返回文件元数据
  * [POS]: services 的文档产物边界，让报价审批生成可追踪的 PI 文本与 PDF 文件而非只停留在 JSON 字段
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

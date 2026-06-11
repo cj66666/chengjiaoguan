@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy ORM、PostgreSQL JSONB 变体与 app.database.Base/utcnow
  * [OUTPUT]: 对外提供 Seller、SellerApiKey、ChannelAccount、Product、PricingRule、PricingRuleVersion、Customer、Inquiry、Conversation、Message、DeliveryAttempt、Quotation、QuotationItem、FollowupTask、KnowledgeChunk、Notification、AuditLog、Approval
  * [POS]: app 的数据库结构真源，必须与 migrations/001_initial.sql 保持同构
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

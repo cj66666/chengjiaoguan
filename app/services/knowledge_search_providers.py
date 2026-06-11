@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 os/json/Decimal/urllib、SQLAlchemy KnowledgeChunk 记录与知识检索上下文
  * [OUTPUT]: 对外提供 KnowledgeSearchProvider、RuleBasedKnowledgeSearchProvider、HttpKnowledgeSearchProvider、ManagedIndexKnowledgeSearchProvider、KnowledgeSearchProviderConfig、get_knowledge_search_provider、get_knowledge_search_provider_config
  * [POS]: services 的知识检索决策边界，把本地余弦排序、远端重排与托管向量索引查询分离
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

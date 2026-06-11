@@ -6,6 +6,6 @@
  * [INPUT]: 无外部业务依赖，仅承载 services 包初始化语义
  * [OUTPUT]: 对外提供 app.services 包命名空间
  * [POS]: app/services 的根标记文件，隔离确定性业务规则层
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """

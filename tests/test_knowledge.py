@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 pytest、SQLite 会话夹具、agent_tools、models、embedding provider、search provider 与 knowledge 服务
  * [OUTPUT]: 验证知识切块、默认 embedding、provider 注入、入库和检索排序
  * [POS]: tests 的轻量 RAG 证明文件，锁住知识库切块、embedding 和 search provider 边界
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

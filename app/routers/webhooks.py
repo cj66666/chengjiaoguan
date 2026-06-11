@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI APIRouter/Depends、数据库 session、seller 依赖、InboundMessage 与渠道适配服务
  * [OUTPUT]: 对外提供 router，暴露 POST /api/v1/webhooks/{channel}
  * [POS]: routers 的公开入站边界，把渠道 payload 归一化后交给 channel_gateway
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

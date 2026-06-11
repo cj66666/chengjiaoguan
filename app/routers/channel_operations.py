@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI APIRouter/Depends、email_polling、channel_receipts 服务与租户依赖
  * [OUTPUT]: 对外提供 router，暴露 email channel 的 poll-email 入站轮询接口与渠道 delivery receipt 同步接口
  * [POS]: routers 的渠道运维边界，连接渠道配置、入站轮询任务与出站回执同步
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

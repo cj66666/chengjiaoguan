@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 Pydantic GraphRunContext、app.models、graph_domain.policy 与 app.agent.types 的状态/输出契约
  * [OUTPUT]: 对外提供 resolve_graph_ids、record_step、policy_decision、apply_policy_decision、need_handoff、query_text、fallback_response、graph_output
  * [POS]: app/agent/graph_domain 的共享状态转换层，避免节点文件重复处理图上下文细节
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

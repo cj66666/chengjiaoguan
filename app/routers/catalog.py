@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI APIRouter/Depends/File、catalog 服务、配置 schemas 与 common 序列化
  * [OUTPUT]: 对外提供 router，暴露 products、products/import 错误报告、pricing-rules、pricing-rule versions、汇率缓存刷新确认、channels、渠道凭据轮换、dashboard/metrics API
  * [POS]: routers 的配置资源边界，连接前端产品库、报价规则、渠道设置与看板
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

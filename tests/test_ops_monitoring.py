@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 json、pytest monkeypatch 与 ops_monitoring 服务
  * [OUTPUT]: 验证 disabled/http 运维监控 sink、事件上报请求与配置画像
  * [POS]: tests 的外部监控边界证明文件，锁住 scheduler 事件上报不触真实网络
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

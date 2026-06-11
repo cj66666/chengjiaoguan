@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session、app.models、utcnow、channel_delivery、seller_settings、notifications、Decimal 与敏感/金额解析规则
  * [OUTPUT]: 对外提供 send_message
  * [POS]: services 的出站护栏核心，在安全时经渠道投递边界发消息，在风险时创建 approval
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

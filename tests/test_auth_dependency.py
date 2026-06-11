@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI TestClient、SQLite 会话夹具与 app.models
  * [OUTPUT]: 验证 Authorization Bearer seller:<id>、Bearer cak_<token> API key、X-Seller-Id shortcut、撤销与 invalid_token 错误
  * [POS]: tests 的租户上下文证明文件，覆盖 API 契约中的 Bearer token 与正式 API key 接缝
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

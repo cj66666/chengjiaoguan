@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 PydanticAI TestModel、SQLite 会话夹具、app.models、graph policy 与 app.agent_runtime
  * [OUTPUT]: 验证 PydanticAI runtime 的工具绑定、结构化输出、graph policy 注入与 Pydantic Graph 八步状态机
  * [POS]: tests 的 Agent 编排证明文件，锁住模型运行入口与确定性图执行契约
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -1,12 +1,10 @@
 # Demo Runbook
-> L3 | 父级: ./CLAUDE.md
-
 <!--
 /**
  * [INPUT]: 依赖 /api/v1/demo/seed、approvals、conversations、workers API、scripts/demo_flow.py 与 frontend Playwright E2E
  * [OUTPUT]: 对外提供本地演示主链路步骤，从种子数据到人工审批发送、调度入口再到前端浏览器验证
  * [POS]: docs 的演示操作镜像，把后端可演示能力折叠成可执行路径
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 -->
 

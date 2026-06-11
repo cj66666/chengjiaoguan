@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI APIRouter/Depends、KnowledgeCreate、knowledge 服务与 common 序列化
  * [OUTPUT]: 对外提供 router，暴露 /api/v1/knowledge 入库与检索接口
  * [POS]: routers 的知识库资源边界，把前端配置转成 RAG 检索材料
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -2,7 +2,7 @@
  * [INPUT]: 依赖浏览器 fetch、VITE_API_BASE_URL 与 seller id
  * [OUTPUT]: 对外提供 createApiClient，统一 Closer API 请求、租户 token 与错误解析
  * [POS]: frontend/src 的 HTTP 边界，被 App.jsx 消费，隔离传输细节与界面状态
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 
 const DEFAULT_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";

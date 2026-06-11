@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 pytest、SQLite 会话夹具、agent_tools、schemas 与 channel_gateway
  * [OUTPUT]: 验证 get_customer 工具可按询盘或客户返回租户 scoped CRM 画像
  * [POS]: tests 的 CRM 工具证明文件，锁住 Agent 门面到客户画像服务的契约
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

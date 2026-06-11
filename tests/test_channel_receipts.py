@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLite 会话夹具、FastAPI TestClient、app.models 与 channel_receipts 服务
  * [OUTPUT]: 验证 WhatsApp/generic 回执可同步 delivery_attempt 状态、追加 response.receipts 并保持租户隔离
  * [POS]: tests 的出站回执证明文件，锁住外部渠道状态回声到投递记录的闭环
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 json、pytest monkeypatch 与 app.agent.graph_domain.policy
  * [OUTPUT]: 验证规则型 graph policy、HTTP/OpenAI-compatible graph policy 请求与配置画像
  * [POS]: tests 的 Agent 图决策边界证明文件，锁住规则决策与生产 HTTP/LLM 决策 provider 的隔离
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

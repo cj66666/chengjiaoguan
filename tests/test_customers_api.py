@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI TestClient、SQLite 会话夹具、app.models、agent_tools 与 channel_gateway
  * [OUTPUT]: 验证 customers API 可列表筛选、详情聚合、修改档案、GDPR 擦除、记录审计并保持租户隔离
  * [POS]: tests 的 CRM HTTP 契约证明文件，锁住前端客户页和会话档案抽屉需要的后端资源面
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

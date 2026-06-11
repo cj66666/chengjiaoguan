@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session、app.models、api_error 与 credentials 配置状态 helper
  * [OUTPUT]: 对外提供 require helper 与 api-key/customer/inquiry/message/product/pricing-rule-version/approval/notification/quotation/delivery_attempt 等响应序列化函数
  * [POS]: routers 的共享边界层，让各资源路由复用一致的租户校验与响应形状
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

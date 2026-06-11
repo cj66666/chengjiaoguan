@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session 与 app.models.Seller
  * [OUTPUT]: 对外提供 get_seller_settings、update_seller_settings、apply_ai_disclosure
  * [POS]: services 的租户设置真源，管理 AI 身份披露与可扩展 seller.settings
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

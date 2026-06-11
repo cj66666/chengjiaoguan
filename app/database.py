@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy engine、DeclarativeBase、Session 与 datetime UTC
  * [OUTPUT]: 对外提供 Base、build_engine、engine、SessionLocal、get_session、utcnow
  * [POS]: app 的持久化根基，被 models、main、services 与 tests 共享
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

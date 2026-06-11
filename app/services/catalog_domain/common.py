@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session、app.models 与任意标量输入
  * [OUTPUT]: 对外提供 page、require_product_scope、blank_to_none
  * [POS]: services/catalog_domain 的低层 helper，被产品、价格、导入服务复用
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

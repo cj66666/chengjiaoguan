@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session、app.models 与 Decimal 规则权重
  * [OUTPUT]: 对外提供 InquiryScore、score_inquiry_record、score_inquiry
  * [POS]: services 的询盘分级核心，以可解释 signals 输出 A/B/C
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

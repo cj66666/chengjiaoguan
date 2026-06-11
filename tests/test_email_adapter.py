@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 app.models、channel_gateway 与 EmailAdapter/OutboundEmail
  * [OUTPUT]: 验证原始邮件解析、SMTP 文本组合与 email 入站幂等落库
  * [POS]: tests 的 email adapter 证明文件，锁住邮件边界的确定性解析和组合
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

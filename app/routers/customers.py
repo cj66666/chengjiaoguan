@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI APIRouter/Depends、CustomerPatch、crm 与 data_privacy 服务、common 序列化
  * [OUTPUT]: 对外提供 router，暴露 /api/v1/customers 列表、详情、档案修改与客户数据擦除接口
  * [POS]: routers 的 CRM 资源边界，给前端客户页和会话右侧档案抽屉提供租户隔离数据
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session、app.models 与 schemas.ChannelContact/InboundMessage
  * [OUTPUT]: 对外提供 ensure_seller、ensure_channel_account、find_or_create_customer、parse_inquiry_content、ingest_inbound_message
  * [POS]: services 的入站事实创建器，把渠道消息转成客户、询盘、会话、首条消息与审计日志
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

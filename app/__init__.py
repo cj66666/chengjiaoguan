@@ -6,6 +6,6 @@
  * [INPUT]: 无外部业务依赖，仅承载 Python 包初始化语义
  * [OUTPUT]: 对外提供 app 包命名空间
  * [POS]: app 的根标记文件，连接 HTTP、Agent、模型、服务等兄弟模块
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """

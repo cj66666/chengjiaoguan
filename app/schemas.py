@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 Pydantic BaseModel/Field、Decimal、date/datetime 与 typing Literal/Any
  * [OUTPUT]: 对外提供 webhook、询盘、消息、客户补丁、卖家设置补丁、API key、产品创建/补丁、价格规则、汇率缓存刷新、渠道、知识、审批、通知、报价补丁等请求/响应模型
  * [POS]: app 的输入输出类型边界，被 main.py、adapters 与 tests 消费
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

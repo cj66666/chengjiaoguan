@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 os/json/urllib 与运维事件 payload
  * [OUTPUT]: 对外提供 MonitoringSink、DisabledMonitoringSink、HttpMonitoringSink、MonitoringSinkConfig、emit_ops_event、get_monitoring_sink、get_monitoring_sink_config
  * [POS]: services 的外部监控边界，把 scheduler/readiness/alerts 事件上报从业务任务执行中分离
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

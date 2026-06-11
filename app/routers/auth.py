@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI APIRouter/Depends、ApiKeyCreate、auth_keys 服务与 common 序列化
  * [OUTPUT]: 对外提供 router，暴露 /api/v1/auth/api-keys 列表/创建与 revoke 接口
  * [POS]: routers 的正式认证资源边界，让卖家可签发、轮换、撤销 API key
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

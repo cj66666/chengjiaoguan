@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 os/json/hashlib/math/re/urllib 与 embedding provider 环境变量
  * [OUTPUT]: 对外提供 EMBEDDING_DIMENSIONS、EmbeddingProvider、EmbeddingProviderConfig、DeterministicHashEmbeddingProvider、OpenAICompatibleEmbeddingProvider、embed_texts、get_embedding_provider、get_embedding_provider_config
  * [POS]: services 的 RAG 向量生成边界，把测试用确定性哈希向量与生产 OpenAI-compatible embedding 隔离
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

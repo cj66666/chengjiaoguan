@@ -7,7 +7,7 @@
  * [INPUT]: 依赖标准库 argparse/json/urllib 与已部署的 Closer HTTP API
  * [OUTPUT]: 对外提供 CLI，检查 health、readiness、alerts，并可显式触发 scheduler/monitoring 入口
  * [POS]: scripts 的生产彩排入口，只走公开 API，把部署前检查、告警读取和外部调度接线收束成一条路径
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

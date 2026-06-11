@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI TestClient、pytest monkeypatch、SQLite 会话夹具、app.agent_tools 与 app.models
  * [OUTPUT]: 验证 delivery-attempts 列表、单条手动 retry、due retry 调度入口与租户隔离
  * [POS]: tests 的出站投递运维 API 证明文件，锁住 delivery_attempt 状态机对 HTTP 层的暴露契约
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

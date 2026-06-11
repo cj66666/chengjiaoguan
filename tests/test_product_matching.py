@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLite 会话夹具、agent_tools、models 与 product_matching 服务
  * [OUTPUT]: 验证产品字段 token 命中、排序、解释与软删除过滤
  * [POS]: tests 的产品匹配证明文件，锁住询盘理解到产品候选的确定性桥梁
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 
@@ -48,6 +48,9 @@ def test_match_product_ranks_best_product_from_requirement(db_session):
 
     assert matches[0]["product_id"] == lamp.id
     assert matches[0]["score"] > 0
+    assert matches[0]["confidence"] >= matches[0]["confidence_threshold"]
+    assert matches[0]["match_status"] == "matched"
+    assert matches[0]["requires_human_review"] is False
     assert set(matches[0]["matched_fields"]) >= {"name", "specs"}
 
 
@@ -84,3 +87,15 @@ def test_match_product_ignores_inactive_products(db_session):
     )
 
     assert match_product(db_session, 1, "LED lamp CE") == []
+
+
+def test_match_product_returns_review_alternatives_for_low_confidence_requirement(db_session):
+    _seed_products(db_session)
+
+    matches = match_product(db_session, 1, "custom patio sofa like competitor model with thicker rattan", limit=5)
+
+    assert len(matches) == 2
+    assert {item["match_status"] for item in matches} == {"needs_review"}
+    assert all(item["requires_human_review"] is True for item in matches)
+    assert all(item["confidence"] < item["confidence_threshold"] for item in matches)
+    assert "thicker" in matches[0]["differences"]["unmatched_requirement_terms"]

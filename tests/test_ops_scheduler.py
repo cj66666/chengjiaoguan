@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 pytest monkeypatch、SQLite 会话夹具、ops_scheduler 服务与 workers 路由
  * [OUTPUT]: 验证外部 scheduler 单入口可组合 due jobs、readiness、alerts 与 monitoring 上报，并保持租户隔离
  * [POS]: tests 的外部 cron/queue 适配证明文件，锁住调度入口的可观测结果契约
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -2,7 +2,7 @@
  * [INPUT]: 依赖 Closer 工作台离线设计稿的 design tokens、App.jsx DOM 结构与系统字体
  * [OUTPUT]: 对外提供对齐设计稿的深色侧栏、玻璃顶栏、运营卡片、状态色、表单、滚动列表与响应式样式
  * [POS]: frontend/src 的视觉规则层，将 React 工作台重构为《成交官》操作型 SaaS 界面
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 
 :root{--primary:#1f5c8c;--primary-2:#19496f;--primary-light:#dce9f2;--primary-tint:#edf3f8;--green:#2e9e8f;--green-light:#e2f1ee;--orange:#e8a13a;--orange-light:#fbefd9;--red:#d9534f;--red-light:#fae6e5;--text:#1b2733;--text-2:#5c6b7a;--text-3:#94a2af;--border:#e4e9ed;--border-2:#eef1f4;--bg:#f5f7f9;--white:#fff;--grey:#8a94a0;--grey-light:#edf0f2;--nav-bg:#14222f;--nav-bg-2:#0e1a24;--nav-text:#93a6b6;--nav-text-dim:#6b7e8e;--nav-hover:#ffffff0f;--nav-active:#ffffff1a;--font:Inter, "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", system-ui, sans-serif;--mono:"Roboto Mono", "SF Mono", ui-monospace, monospace;--radius-sm:7px;--radius:9px;--radius-lg:14px;--shadow-sm:0 1px 2px #1021300d, 0 1px 1px #10213008;--shadow:0 1px 3px #1021300d, 0 8px 20px -6px #10213014;--shadow-lg:0 20px 48px -12px #10213033, 0 6px 16px -8px #1021301a;--nav-w:238px;--topbar-h:62px;color:var(--text);background:var(--bg);font-family:var(--font);letter-spacing:0;font-size:14px;line-height:1.55}

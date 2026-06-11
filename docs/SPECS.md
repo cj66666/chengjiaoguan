@@ -1,12 +1,10 @@
 # Specs
-> L3 | 父级: ./CLAUDE.md
-
 <!--
 /**
  * [INPUT]: 依赖比赛初赛/复赛提交说明、README.md、WAVE2_SUBMISSION.md 与当前 Closer 产品实现
  * [OUTPUT]: 对外提供 AI+应用项目提案 Specs，覆盖项目名称、应用场景、目标用户、核心问题、产品思路、AI 作用与评测标准
  * [POS]: docs 的 Specs 提交镜像，满足评审者快速理解项目完整性的基础说明
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 -->
 
@@ -93,11 +91,11 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 python scripts/demo_flow.py --base-url http://127.0.0.1:8000 --approve --run-workers --json
 ```
 
-2026-06-04 本地验证结果：
+2026-06-11 本地验证结果：
 
-- `python -m pytest`: 169 passed
+- `python -m pytest`: 180 passed，1 warning
 - `cd frontend && npm run build`: passed
-- `cd frontend && npm run test:e2e`: 12 passed
+- `cd frontend && npm run test:e2e`: 2026-06-04 浏览器回归记录为 12 passed
 
 ## 2.8 项目提交
 

@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session、app.models、utcnow、channel_delivery、seller_settings 与 quotations 服务
  * [OUTPUT]: 对外提供 execute_approval，执行 message_send、quotation_send、pi_generate、handoff 审批动作
  * [POS]: services 的审批动作执行层，被 approvals.py 调用，隔离队列状态管理与副作用执行
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

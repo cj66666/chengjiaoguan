@@ -5,8 +5,8 @@
 /**
  * [INPUT]: 依赖 json/re、SQLAlchemy Session 与 app.models.Product
  * [OUTPUT]: 对外提供 match_product
- * [POS]: services 的产品证据检索器，用字段 token 重叠为 Agent 回复提供可解释 grounding
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [POS]: services 的产品证据检索器，用字段 token 重叠、置信度和备选差异提示为 Agent 回复提供可解释 grounding
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 
@@ -21,6 +21,7 @@ from app import models
 
 
 TOKEN_PATTERN = re.compile(r"[a-z0-9]+|[\u4e00-\u9fff]", re.IGNORECASE)
+CONFIDENCE_THRESHOLD = 0.35
 
 
 def match_product(
@@ -43,24 +44,96 @@ def match_product(
         .where(models.Product.deleted_at.is_(None))
     ).all()
 
-    matches = []
+    candidates = []
     for product in products:
         score, fields = _score_product(product, query_tokens, query_text)
-        if score > 0:
-            matches.append((score, product, fields))
-    matches.sort(key=lambda item: (item[0], item[1].id), reverse=True)
+        candidates.append((score, product, fields))
+    candidates.sort(key=lambda item: (item[0], item[1].id), reverse=True)
+
+    if not candidates:
+        return []
+
+    top_confidence = _confidence(candidates[0][0])
+    if top_confidence < CONFIDENCE_THRESHOLD:
+        selected = candidates[: min(max(limit, 2), 3)]
+        return [
+            _match_payload(
+                product,
+                score,
+                fields,
+                query_tokens,
+                match_status="needs_review",
+                requires_human_review=True,
+            )
+            for score, product, fields in selected
+        ]
+
+    selected = [candidate for candidate in candidates if candidate[0] > 0][:limit]
 
     return [
-        {
-            "product_id": product.id,
-            "name": product.name,
-            "sku": product.sku,
-            "score": round(score, 6),
-            "matched_fields": fields,
-            "reason": _reason(fields),
-        }
-        for score, product, fields in matches[:limit]
+        _match_payload(
+            product,
+            score,
+            fields,
+            query_tokens,
+            match_status="matched",
+            requires_human_review=False,
+        )
+        for score, product, fields in selected
     ]
+
+
+def _match_payload(
+    product: models.Product,
+    score: float,
+    fields: list[str],
+    query_tokens: set[str],
+    *,
+    match_status: str,
+    requires_human_review: bool,
+) -> dict:
+    return {
+        "product_id": product.id,
+        "name": product.name,
+        "sku": product.sku,
+        "score": round(score, 6),
+        "confidence": _confidence(score),
+        "confidence_threshold": CONFIDENCE_THRESHOLD,
+        "match_status": match_status,
+        "requires_human_review": requires_human_review,
+        "matched_fields": fields,
+        "differences": _differences(product, query_tokens),
+        "reason": _reason(fields, requires_human_review=requires_human_review),
+    }
+
+
+def _confidence(score: float) -> float:
+    return round(min(max(score / 1.5, 0.0), 1.0), 6)
+
+
+def _differences(product: models.Product, query_tokens: set[str]) -> dict[str, list[str]]:
+    product_tokens = set(
+        _tokens(
+            " ".join(
+                [
+                    product.name,
+                    product.sku or "",
+                    product.description or "",
+                    json.dumps(product.specs or {}, ensure_ascii=False, sort_keys=True),
+                ]
+            )
+        )
+    )
+    unmatched_terms = sorted(query_tokens - product_tokens)[:8]
+    differentiators = []
+    for key, value in (product.specs or {}).items():
+        text = f"{key}: {value}"
+        if not (set(_tokens(text)) & query_tokens):
+            differentiators.append(text)
+    return {
+        "unmatched_requirement_terms": unmatched_terms,
+        "product_differentiators": differentiators[:5],
+    }
 
 
 def _requirement_text(requirement: str | dict[str, Any]) -> str:
@@ -107,7 +180,9 @@ def _tokens(text: str) -> list[str]:
     return [match.group(0).lower() for match in TOKEN_PATTERN.finditer(text)]
 
 
-def _reason(fields: list[str]) -> str:
+def _reason(fields: list[str], *, requires_human_review: bool = False) -> str:
+    if requires_human_review:
+        return "Low confidence product match; review alternatives before quoting."
     if not fields:
         return "No direct product evidence matched."
     return "Matched " + ", ".join(fields) + "."

@@ -2,7 +2,7 @@
  * [INPUT]: 依赖 lucide-react 图标、frontend/src/ui.jsx 基元与离线设计稿的产品库工具栏结构
  * [OUTPUT]: 对外提供 Products 组件，承载设计稿对齐的产品库标题、搜索工具、价格规则编辑/版本与渠道凭据轮换 UI
  * [POS]: frontend/src 的产品配置域，从 App.jsx 拆出产品/价格/渠道交互，避免页面组合根膨胀
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 
 import { Eye, RefreshCw, Search, Upload } from "lucide-react";

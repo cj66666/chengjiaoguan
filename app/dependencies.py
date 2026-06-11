@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI Header/HTTPException、数据库 Session、auth_keys 服务解析 Bearer API key、Bearer seller token 与 MVP 租户头
  * [OUTPUT]: 对外提供 get_seller_id 与 parse_seller_token
  * [POS]: app 的请求上下文入口，被 main.py 的 /api/v1 路由消费；正式 API key 与本地 shortcut 在此收束
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

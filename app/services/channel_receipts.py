@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session/select、app.models、utcnow、delivery_attempts.DEFAULT_RETRY_DELAY 与渠道回执 payload
  * [OUTPUT]: 对外提供 sync_channel_receipts，把 WhatsApp/email/provider 回执同步到 delivery_attempt 状态与 response.receipts
  * [POS]: services 的出站回执状态机薄层，让外部渠道状态回声回到统一投递记录
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

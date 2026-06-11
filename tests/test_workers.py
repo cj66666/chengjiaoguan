@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 pytest monkeypatch、SQLite 会话夹具、FastAPI TestClient、app.models 与 workers 服务
  * [OUTPUT]: 验证 unified worker 可执行 follow-up、delivery retry、价格规则汇率刷新、启用轮询的 email channel，并证明 HTTP 入口租户隔离
  * [POS]: tests 的后台调度证明文件，锁住 due jobs 从服务层到 API 的单入口契约
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

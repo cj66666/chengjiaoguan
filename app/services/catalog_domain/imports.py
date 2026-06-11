@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 csv/json/zipfile/XML、SQLAlchemy Session、app.models、products.create_product 与 catalog_domain.common
  * [OUTPUT]: 对外提供 ProductImportError、ProductImportResult、ProductImportFailed、import_products、import_products_with_report
  * [POS]: services/catalog_domain 的批量导入边界，解析 CSV/XLSX 并保留行级错误报告
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

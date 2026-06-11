@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI APIRouter/Depends、SellerSettingsPatch、租户依赖与 seller_settings 服务
  * [OUTPUT]: 对外提供 router，暴露 /api/v1/settings 读取与修改接口
  * [POS]: routers 的租户设置边界，为设置页提供 AI 身份披露与 seller.settings 配置面
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 quote_engine.QuoteResult 的结构化报价结果
  * [OUTPUT]: 对外提供 render_quote_message
  * [POS]: services 的确定性语言层，把报价结果渲染为客户可读消息
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

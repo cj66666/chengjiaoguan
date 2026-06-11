@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 pytest、FastAPI TestClient、SQLAlchemy SQLite 内存库与 app.main.create_app
  * [OUTPUT]: 对外提供 db_session、client 夹具，并默认关闭 live delivery、托管知识索引、全局汇率源与运维监控外部边界
  * [POS]: tests 的基础设施真源，让所有测试共享确定性数据库和零网络外部边界
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

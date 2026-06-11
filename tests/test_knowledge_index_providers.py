@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 json、pytest monkeypatch、SQLite 会话夹具、knowledge 服务与 knowledge index provider boundary
  * [OUTPUT]: 验证 disabled/http 知识索引 provider、入库 upsert 同步与配置画像
  * [POS]: tests 的 RAG 索引同步证明文件，锁住本地知识入库与托管语义索引 upsert 的隔离
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

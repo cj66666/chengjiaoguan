@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI TestClient、SQLite 会话夹具、app.agent_tools、app.models 与 seller_settings
  * [OUTPUT]: 验证 settings API 可读写 seller 设置、记录审计，并让 AI 身份披露开关影响出站消息
  * [POS]: tests 的租户设置证明文件，锁住设置页与 AI 披露合规需求的后端行为
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

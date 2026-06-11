@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 os、Decimal、datetime、urllib JSON 边界与 models.PricingRule.logistics_template
  * [OUTPUT]: 对外提供 ExchangeRateSnapshot、ExchangeRateProvider、ExchangeRateProviderConfig、MappingExchangeRateProvider、HttpJsonExchangeRateProvider、get_configured_exchange_rate_provider、get_exchange_rate_provider_config、refresh_exchange_rate_cache、confirm_exchange_rate_cache
  * [POS]: services 的外部汇率源入口，把“获取汇率”“生产源配置”和“确认后使用汇率”分离，供报价配置流程刷新 exchange_rate_cache
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

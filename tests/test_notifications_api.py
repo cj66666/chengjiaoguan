@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI TestClient、SQLite 会话夹具、app.models、agent_tools、notifications 服务与 channel_gateway
  * [OUTPUT]: 验证 notifications API 列表/标记、审批请求自动通知、审批解决后通知已读与租户隔离
  * [POS]: tests 的通知资源契约证明文件，锁住前端工作台未读提醒需要的后端资源面
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session/select、app.models、ensure_seller 与 credentials seal/rotation 服务
  * [OUTPUT]: 对外提供 list_channels、create_channel、rotate_channel_credentials
  * [POS]: services/catalog_domain 的渠道配置真源，管理 channel_account、凭据封存与 seal secret 轮换
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 base64、dataclass、hashlib、hmac、json、os、secrets 与 typing.Mapping
  * [OUTPUT]: 对外提供 seal_credentials、reveal_credentials、rotate_credentials_seal、credentials_key_status、is_credentials_configured、CredentialsError
  * [POS]: services 的敏感配置边界，负责把 channel_account.credentials 从明文 JSON 变为可校验、可轮换的封存结构
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

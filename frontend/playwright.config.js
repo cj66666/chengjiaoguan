@@ -2,7 +2,7 @@
  * [INPUT]: 依赖 @playwright/test、FastAPI 本地启动命令与 Vite dev server
  * [OUTPUT]: 对外提供 Playwright E2E 配置，自动启动 API/前端工作台并运行桌面/移动项目
  * [POS]: frontend 的浏览器测试边界，验证公开 API 经过真实 UI 被正确消费
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 
 import { defineConfig } from "@playwright/test";

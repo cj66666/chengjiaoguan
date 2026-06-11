@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session/select/func、app.models、utcnow、ensure_seller 与 catalog_domain.common
  * [OUTPUT]: 对外提供 list_products、create_product、get_product、update_product、delete_product
  * [POS]: services/catalog_domain 的产品真源，管理 product CRUD、软删除与审计日志
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

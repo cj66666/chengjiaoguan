@@ -1,12 +1,10 @@
 # Wave 2 Skills
-> L3 | 父级: ./CLAUDE.md
-
 <!--
 /**
  * [INPUT]: 依赖 docs/SPECS.md、docs/WAVE2_SUBMISSION.md、app/agent_tools.py、scripts/demo_flow.py 与当前测试证据
  * [OUTPUT]: 对外提供复赛 Wave 2 可评审 Skills 索引，说明技能顺序、运行入口、验证命令与公开提交范围
  * [POS]: skills 的组合根，把供应链询盘核心能力拆成可审查、可运行、可测试的 Skill 交付物
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 -->
 
@@ -76,11 +74,11 @@ npm run build
 npm run test:e2e
 ```
 
-2026-06-04 本地验证结果：
+2026-06-11 本地验证结果：
 
-- `python -m pytest`: 169 passed
+- `python -m pytest`: 180 passed, 1 warning
 - `cd frontend && npm run build`: passed
-- `cd frontend && npm run test:e2e`: 12 passed
+- `cd frontend && npm run test:e2e`: 2026-06-04 historical run, 12 passed
 
 ## 公开提交说明
 

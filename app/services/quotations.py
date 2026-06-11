@@ -4,9 +4,9 @@
 /* ========================================================================== */
 /**
  * [INPUT]: 依赖 SQLAlchemy Session、app.models、utcnow、channel_delivery、seller_settings、notifications、PI 文档产物与 Decimal 金额规整
- * [OUTPUT]: 对外提供 get_quotation、patch_quotation、generate_pi_document、request_quotation_send_approval、send_quotation
- * [POS]: services 的报价持久化、PI 文档产物与发送边界，配合 approvals 执行地板价移交
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [OUTPUT]: 对外提供 get_quotation、patch_quotation、generate_pi_document、request_quotation_send_approval、send_quotation、quotation_hard_minimum_violations
+ * [POS]: services 的报价持久化、PI 文档产物与发送边界，配合 approvals 执行底价移交和硬底价熔断
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 
@@ -21,6 +21,7 @@ from app.database import utcnow
 from app.services.channel_delivery import deliver_message
 from app.services.notifications import notify_approval_requested
 from app.services.pi_documents import write_pi_document_file, write_pi_document_pdf
+from app.services.quote_engine import hard_minimum_price
 from app.services.seller_settings import apply_ai_disclosure
 
 
@@ -91,6 +92,21 @@ def patch_quotation(
 
 def generate_pi_document(session: Session, seller_id: int, quotation_id: int) -> dict:
     quotation = get_quotation(session, seller_id, quotation_id)
+    violations = quotation_hard_minimum_violations(session, seller_id, quotation)
+    if violations:
+        session.add(
+            models.AuditLog(
+                seller_id=seller_id,
+                actor="system",
+                action_type="pi_generation_blocked",
+                target_type="quotation",
+                target_id=quotation.id,
+                is_auto=True,
+                snapshot={"reason": "hard_minimum_price", "violations": violations},
+            )
+        )
+        session.flush()
+        raise PermissionError("hard_minimum_price")
     pi_number = f"PI-{quotation.id:06d}"
     terms = dict(quotation.terms or {})
     terms["pi_number"] = pi_number
@@ -172,6 +188,8 @@ def send_quotation(
     approved: bool = False,
 ) -> dict:
     quotation = get_quotation(session, seller_id, quotation_id)
+    if quotation_hard_minimum_violations(session, seller_id, quotation):
+        raise PermissionError("hard_minimum_price")
     if quotation.hits_floor and not approved:
         raise PermissionError("below_floor_price")
 
@@ -204,6 +222,35 @@ def send_quotation(
     return {"status": "sent", "quotation_id": quotation.id, "message_id": message.id, "delivery": delivery}
 
 
+def quotation_hard_minimum_violations(
+    session: Session,
+    seller_id: int,
+    quotation: models.Quotation,
+) -> list[dict[str, Any]]:
+    if quotation.seller_id != seller_id:
+        raise LookupError("Quotation not found")
+    violations: list[dict[str, Any]] = []
+    for item in quotation.items:
+        rule = _pricing_rule_for_product(session, seller_id, item.product_id)
+        if rule is None:
+            continue
+        minimum = hard_minimum_price(rule, quotation.currency)
+        if minimum is None:
+            continue
+        unit_price = _money(item.unit_price)
+        if unit_price <= minimum:
+            violations.append(
+                {
+                    "quotation_item_id": item.id,
+                    "product_id": item.product_id,
+                    "unit_price": str(unit_price),
+                    "hard_min_price": str(minimum),
+                    "currency": quotation.currency,
+                }
+            )
+    return violations
+
+
 def _quotation_conversation(session: Session, seller_id: int, quotation: models.Quotation) -> models.Conversation:
     conversation = session.scalar(
         select(models.Conversation).where(
@@ -214,6 +261,25 @@ def _quotation_conversation(session: Session, seller_id: int, quotation: models.
     if conversation is None:
         raise LookupError("Conversation not found")
     return conversation
+
+
+def _pricing_rule_for_product(session: Session, seller_id: int, product_id: int) -> models.PricingRule | None:
+    product_rule = session.scalar(
+        select(models.PricingRule).where(
+            models.PricingRule.seller_id == seller_id,
+            models.PricingRule.product_id == product_id,
+            models.PricingRule.deleted_at.is_(None),
+        )
+    )
+    if product_rule is not None:
+        return product_rule
+    return session.scalar(
+        select(models.PricingRule).where(
+            models.PricingRule.seller_id == seller_id,
+            models.PricingRule.product_id.is_(None),
+            models.PricingRule.deleted_at.is_(None),
+        )
+    )
 
 
 def _quote_message(quotation: models.Quotation) -> str:

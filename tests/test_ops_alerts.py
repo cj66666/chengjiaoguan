@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 datetime/date、SQLite 会话夹具、FastAPI TestClient、app.models 与 ops_alerts 服务
  * [OUTPUT]: 验证 ops alerts 聚合失败投递、待审批、到期/暂停跟进、汇率缓存风险并保持租户隔离
  * [POS]: tests 的运行监控证明文件，锁住既有状态到只读告警列表的映射
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 
@@ -14,6 +14,7 @@ from datetime import date, timedelta
 
 from app import models
 from app.database import utcnow
+from app.services.credentials import seal_credentials
 from app.services.ops_alerts import list_ops_alerts
 
 
@@ -116,3 +117,40 @@ def test_ops_alerts_endpoint_supports_limit_and_tenant_scope(client, db_session)
     assert other_tenant.status_code == 200
     assert other_tenant.json()["status"] == "ok"
     assert other_tenant.json()["total"] == 0
+
+
+def test_list_ops_alerts_surfaces_channel_credential_health(db_session):
+    db_session.add(models.Seller(id=1, name="Demo Exporter", email="owner@example.com"))
+    db_session.add_all(
+        [
+            models.ChannelAccount(
+                seller_id=1,
+                channel_type="email",
+                name="Sales inbox",
+                credentials=seal_credentials({"host": "imap.example.com"}),
+                status="connected",
+            ),
+            models.ChannelAccount(
+                seller_id=1,
+                channel_type="whatsapp",
+                name="WhatsApp",
+                credentials=seal_credentials(
+                    {
+                        "access_token": "token",
+                        "phone_number_id": "phone-id",
+                        "expires_at": (utcnow() - timedelta(days=1)).isoformat(),
+                    }
+                ),
+                status="connected",
+            ),
+        ]
+    )
+    db_session.flush()
+
+    result = list_ops_alerts(db_session, 1)
+    alerts = [item for item in result["items"] if item["code"] == "channel_credential_attention"]
+
+    assert result["status"] == "critical"
+    assert result["counts"]["critical"] == 2
+    assert len(alerts) == 2
+    assert {alert["target_type"] for alert in alerts} == {"channel_account"}

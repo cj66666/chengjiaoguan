@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 json、pytest monkeypatch 与 app.services.embedding_providers
  * [OUTPUT]: 验证确定性哈希 provider、OpenAI-compatible HTTP provider、环境选择与配置画像
  * [POS]: tests 的 RAG provider 边界证明文件，锁住生产 embedding 配置与确定性测试隔离
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

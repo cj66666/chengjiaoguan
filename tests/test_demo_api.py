@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI TestClient、SQLite 会话夹具与 app.models
  * [OUTPUT]: 验证 /api/v1/demo/seed 可创建确定性演示主链路、护栏审批和跟进，并保持幂等与租户隔离
  * [POS]: tests 的 Demo 主链路证明文件，锁住兜底假数据入口不会绕过业务服务
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

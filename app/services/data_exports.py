@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 csv/io/json、SQLAlchemy Session/select 与 app.models 的 Customer/Inquiry/Quotation
  * [OUTPUT]: 对外提供 export_dataset_csv，导出 customers、inquiries、quotations 的租户隔离 CSV
  * [POS]: services 的数据导出边界，为 M10 数据看板导出需求提供确定性机器相
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

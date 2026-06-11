@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session、workers、readiness、ops_alerts 与 ops_monitoring
  * [OUTPUT]: 对外提供 run_scheduled_operations，把 due jobs、生产就绪画像、运行告警与监控上报收束成单次调度结果
  * [POS]: services 的外部 cron/queue 适配薄层，给部署调度器一个稳定且可观测的入口
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

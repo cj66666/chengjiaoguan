@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session/select/or_、utcnow 与 app.models 的客户关联实体
  * [OUTPUT]: 对外提供 erase_customer_data，按租户擦除 customer 及其询盘、会话、消息、报价、跟进、投递、审批、通知与审计快照
  * [POS]: services 的 GDPR/MVP 隐私边界，让客户删除成为可审计、不可继续触发出站动作的确定性服务
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

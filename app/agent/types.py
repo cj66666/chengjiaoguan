@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 dataclasses、typing.Any/TYPE_CHECKING、graph_domain.policy、Pydantic BaseModel/Field 与 SQLAlchemy Session
  * [OUTPUT]: 对外提供 CloserAgentDeps、CloserAgentOutput、CloserGraphState
  * [POS]: app/agent 的状态真源，供 PydanticAI 工具绑定、Graph policy 注入与 Pydantic Graph 节点共享
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

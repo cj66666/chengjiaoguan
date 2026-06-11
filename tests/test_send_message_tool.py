@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 pytest、Decimal、SQLite 会话夹具、app.agent_tools 与 app.models
  * [OUTPUT]: 验证 send_message 安全发送、email/WhatsApp payload-only 客户端状态、delivery_attempt 记录、失败重试候选、护栏审批与租户隔离
  * [POS]: tests 的出站消息工具证明文件，锁住 Agent 工具到 channel_delivery 的安全发送路径
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI APIRouter/Depends/Response、QuotationPatch、quotations 服务与 common 序列化
  * [OUTPUT]: 对外提供 router，暴露 quotations 详情、修改、发送与底价发送审批接口
  * [POS]: routers 的报价资源边界，处理报价人工编辑、发送与地板价审批移交
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 
@@ -74,6 +74,12 @@ def send_quotation_endpoint(
     except LookupError as exc:
         raise api_error(404, "quotation_not_found", str(exc)) from exc
     except PermissionError as exc:
+        if str(exc) == "hard_minimum_price":
+            raise api_error(
+                409,
+                "hard_minimum_price",
+                "Quotation violates the configured hard minimum price and cannot be sent.",
+            ) from exc
         try:
             result = request_quotation_send_approval(session, seller_id, quotation_id)
         except LookupError as lookup_exc:

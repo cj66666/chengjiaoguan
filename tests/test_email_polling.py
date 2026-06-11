@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 pytest monkeypatch、SQLite 会话夹具、FastAPI TestClient、app.models 与 email_polling 静态 inbox
  * [OUTPUT]: 验证 email channel 轮询入站落库、幂等重复、acknowledge 与 HTTP poll-email 入口
  * [POS]: tests 的 email 入站轮询证明文件，锁住 IMAP 边界到 channel_gateway 的闭环
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

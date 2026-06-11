@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 PydanticAI RunContext、app.agent.types.CloserAgentDeps 与 app.agent_tools 稳定服务门面
  * [OUTPUT]: 对外提供 get_inquiry、score_inquiry、get_customer、calc_quote、generate_pi、search_knowledge、match_product、send_message、create_followup、request_handoff、CLOSER_AGENT_TOOLS
  * [POS]: app/agent 的 PydanticAI 工具适配层，只把 RunContext 解包为稳定工具签名
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

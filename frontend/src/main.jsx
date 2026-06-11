@@ -2,7 +2,7 @@
  * [INPUT]: 依赖 React、ReactDOM、App 与 styles.css
  * [OUTPUT]: 对外启动 CloserWorkBench React 应用
  * [POS]: frontend/src 的浏览器入口，只负责 DOM 挂载
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 
 import React from "react";

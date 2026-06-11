@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI APIRouter/Depends、delivery_attempts 服务与 common 序列化
  * [OUTPUT]: 对外提供 router，暴露 delivery-attempts 列表、单条重试、due retry 调度入口
  * [POS]: routers 的出站投递运行监控边界，连接 delivery_attempt 状态机与运维/调度 API
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

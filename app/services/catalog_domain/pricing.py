@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session/select、app.models、ensure_seller、exchange_rate_sources 与 catalog_domain.common.require_product_scope
  * [OUTPUT]: 对外提供 list_pricing_rules、create_pricing_rule、get_pricing_rule、list_pricing_rule_versions、update_pricing_rule、refresh_pricing_rule_exchange_rate_cache、confirm_pricing_rule_exchange_rate_cache、run_due_pricing_rule_exchange_rate_refreshes
  * [POS]: services/catalog_domain 的报价规则配置真源，管理 pricing_rule 生命周期、版本快照、可信汇率缓存刷新与调度
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 
@@ -240,6 +240,9 @@ def _validate_logistics_template(template: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("logistics_template must be an object")
     if template.get("unit_cost") is not None:
         _require_non_negative_decimal(template["unit_cost"], "logistics_template.unit_cost")
+    for field in ("hard_min_price", "hard_minimum_price", "absolute_floor_price"):
+        if template.get(field) is not None:
+            _require_positive_decimal(template[field], f"logistics_template.{field}")
     for destination, value in (template.get("destination_unit_costs") or {}).items():
         _require_non_negative_decimal(value, f"logistics_template.destination_unit_costs.{destination}")
     for source, targets in (template.get("exchange_rates") or {}).items():

@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 app.agent.graph_domain.nodes 与 support 的公共导出
  * [OUTPUT]: 对外提供八步节点与 graph_support helper
  * [POS]: app/agent/graph_domain 的稳定入口，供 app.agent.graph 组合根使用
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

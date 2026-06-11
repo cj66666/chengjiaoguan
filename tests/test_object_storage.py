@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 pytest、tmp_path、monkeypatch、app.services.object_storage 的本地/远端对象存储边界
  * [OUTPUT]: 验证本地对象写入元数据、远端 HTTP PUT、storage config 与 unsafe storage key 拒绝
  * [POS]: tests 的文件产物存储证明文件，锁住业务服务与文件系统/远端对象存储之间的隔离边界
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI APIRouter/Depends、租户依赖、SQLAlchemy Session、workers、ops_scheduler、readiness 与 ops_alerts 服务
  * [OUTPUT]: 对外提供 router，暴露 /api/v1/workers/run-due、/api/v1/ops/scheduler/run、/api/v1/ops/readiness 与 /api/v1/ops/alerts
  * [POS]: routers 的运维边界，让外部 cron/queue 触发 due jobs/调度组合入口，并让部署层读取生产配置画像与运行告警
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

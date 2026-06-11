@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 datetime UTC、SQLAlchemy Session/select/func 与 app.models
  * [OUTPUT]: 对外提供 dashboard_metrics
  * [POS]: services/catalog_domain 的看板聚合边界，计算配置页、首页、运维和报价可信度指标
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

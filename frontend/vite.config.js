@@ -2,7 +2,7 @@
  * [INPUT]: 依赖 Vite、@vitejs/plugin-react 与环境变量 VITE_API_PROXY_TARGET
  * [OUTPUT]: 对外提供 Vite React 构建配置与本地 /api 代理
  * [POS]: frontend 的开发服务器边界，避免浏览器 CORS 干扰本地 FastAPI 联调
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 
 import { defineConfig } from "vite";

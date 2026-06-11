@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI lifespan、数据库 Base/engine、错误处理与 app.routers 分域路由
  * [OUTPUT]: 对外提供 create_app 工厂与 app 实例，挂载 /api/v1 health、auth、webhook、inquiries、customers、conversations、settings、products、pricing-rules、channels、channel-operations、knowledge、approvals、notifications、quotations、delivery-attempts、workers、exports、dashboard、demo API
  * [POS]: app 的 HTTP 组合根，只负责应用生命周期、错误处理与 router 装配
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

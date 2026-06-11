@@ -1,12 +1,10 @@
 # Competition Submission
-> L3 | 父级: ./CLAUDE.md
-
 <!--
 /**
- * [INPUT]: 依赖 README.md、DEMO_RUNBOOK.md、COMPLETION_AUDIT.md、IMPLEMENTATION_AUDIT.md、PRODUCTION_RUNBOOK.md 与 2026-06-04 本地验证结果
+ * [INPUT]: 依赖 README.md、DEMO_RUNBOOK.md、COMPLETION_AUDIT.md、IMPLEMENTATION_AUDIT.md、PRODUCTION_RUNBOOK.md 与 2026-06-11 本地验证结果
  * [OUTPUT]: 对外提供比赛提交摘要、差异化、演示话术、验收证据与提交清单
  * [POS]: docs 的比赛提交镜像，把工程完成度翻译成评委可读的产品叙事和交付证据
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 -->
 
@@ -112,13 +110,13 @@ python scripts/demo_flow.py --base-url http://127.0.0.1:8000 --approve --run-wor
 
 ## 验收证据
 
-2026-06-04 本地验证：
+2026-06-11 本地验证：
 
 ```powershell
 python -m pytest
 ```
 
-结果：169 passed，1 warning。
+结果：180 passed，1 warning。
 
 ```powershell
 cd frontend
@@ -132,7 +130,7 @@ cd frontend
 npm run test:e2e
 ```
 
-结果：12 passed。
+结果：2026-06-04 浏览器回归记录为 12 passed。
 
 ## 建议提交材料
 
@@ -144,7 +142,7 @@ npm run test:e2e
 - 项目简介：使用“提交摘要”第一段，可压缩到平台字数限制。
 - 技术说明：使用“技术结构”和“产品亮点”。
 - 演示说明：使用“演示脚本”。
-- 验证说明：填写 169 passed、build passed、12 passed。
+- 验证说明：填写 180 passed、build passed；浏览器 E2E 历史记录为 12 passed。
 - 风险说明：使用“生产边界”，明确真实 provider、渠道和监控还需要生产环境接线。
 
 ## 平台字段草稿

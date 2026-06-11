@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 pytest monkeypatch/tmp_path、SQLite 会话夹具、FastAPI TestClient、app.models 与 readiness 服务
  * [OUTPUT]: 验证 readiness 可报告 API key、agent、embedding、渠道、汇率等生产配置 ready/degraded/unready，并通过 /ops/readiness 暴露租户 scoped 画像
  * [POS]: tests 的运维画像证明文件，锁住生产配置缺口在运行前可见
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 
@@ -134,6 +134,31 @@ def test_readiness_warns_when_channel_credentials_need_rotation(db_session, monk
     assert checks["channels"]["status"] == "warning"
     assert checks["channels"]["details"]["channels"][0]["credentials_key_status"] == "legacy"
     assert checks["channels"]["details"]["channels"][0]["message"] == "Credential seal rotation is pending"
+
+
+def test_readiness_fails_when_channel_token_is_expired(db_session):
+    db_session.add(models.Seller(id=1, name="Demo Exporter", email="owner@example.com"))
+    db_session.add(
+        models.ChannelAccount(
+            seller_id=1,
+            channel_type="whatsapp",
+            credentials=seal_credentials(
+                {
+                    "access_token": "token",
+                    "phone_number_id": "phone-id",
+                    "expires_at": "2000-01-01T00:00:00",
+                }
+            ),
+            status="connected",
+        )
+    )
+    db_session.flush()
+
+    result = get_readiness(db_session, 1)
+    channels = {check["name"]: check for check in result["checks"]}["channels"]
+
+    assert channels["status"] == "failed"
+    assert channels["details"]["channels"][0]["message"] == "Channel credential token has expired"
 
 
 def test_readiness_surfaces_default_and_missing_production_config(db_session, monkeypatch):

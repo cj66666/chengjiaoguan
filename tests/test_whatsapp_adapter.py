@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 hmac/sha256、app.models 与 WhatsAppAdapter
  * [OUTPUT]: 验证 WhatsApp webhook 标准化、文本 payload 组合与签名校验
  * [POS]: tests 的 WhatsApp 边界证明文件，锁住 Cloud API payload 与入站解析契约
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 json、pytest monkeypatch、SQLite 会话夹具与 knowledge search provider boundary
  * [OUTPUT]: 验证 rule_based 知识检索、HTTP 重排、managed-index 查询 provider 与配置画像
  * [POS]: tests 的知识检索边界证明文件，锁住本地排序、远端重排与托管索引查询的隔离
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

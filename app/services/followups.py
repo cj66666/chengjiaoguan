@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session、app.models、utcnow 与 outbound.send_message
  * [OUTPUT]: 对外提供 create_followup 与 run_due_followups
  * [POS]: services 的未回复询盘推进器，调度 follow-up 并在护栏触发时暂停
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

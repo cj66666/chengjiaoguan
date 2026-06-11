@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 pytest monkeypatch、SQLite 会话夹具、app.agent_tools、app.models 与 delivery_attempts 服务
  * [OUTPUT]: 验证 failed delivery_attempt 可被 due retry worker 重试，成功清除 next_retry_at，失败重新排期
  * [POS]: tests 的投递状态机证明文件，锁住出站失败从候选查询到重试执行的闭环
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

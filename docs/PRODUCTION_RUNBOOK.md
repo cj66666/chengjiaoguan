@@ -1,12 +1,10 @@
 # Production Runbook
-> L3 | 父级: ./CLAUDE.md
-
 <!--
 /**
  * [INPUT]: 依赖 /ops/readiness、/ops/alerts、/ops/scheduler/run、scripts/production_check.py 与生产 provider 配置边界
  * [OUTPUT]: 对外提供生产部署前检查、外部 cron/monitoring 接线与 provider 配置核对路径
  * [POS]: docs 的生产彩排镜像，把剩余真实部署缺口折叠成可执行检查清单
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 -->
 

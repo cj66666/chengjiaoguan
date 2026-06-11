@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI APIRouter/Depends、ApprovalPatch/Reject、approvals 服务与 common 序列化
  * [OUTPUT]: 对外提供 router，暴露 approvals 列表、修改、批准、拒绝接口
  * [POS]: routers 的人工处理队列边界，连接护栏挂起动作与卖家确认
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 
@@ -70,6 +70,8 @@ def approve_pending_approval(
         raise api_error(404, "approval_not_found", "Approval not found") from exc
     except ValueError as exc:
         raise api_error(409, "approval_not_executable", str(exc)) from exc
+    except PermissionError as exc:
+        raise api_error(409, str(exc), "Approval execution is blocked by a server-side guardrail.") from exc
     session.commit()
     return result
 

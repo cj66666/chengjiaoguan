@@ -2,7 +2,7 @@
  * [INPUT]: 依赖 lucide-react 图标、frontend/src/ui.jsx 基元、dashboard metrics、pricingRules 与 approvals 数据
  * [OUTPUT]: 对外提供 QuoteRulesPage、AnalyticsPage、MobilePreviewPage 三个设计稿独立页面
  * [POS]: frontend/src 的设计稿补齐层，承载离线工作台中的报价规则、数据看板与移动端轻量接管视图
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 
 import { Bell, Check, Clock, Download, MessageSquare, Shield, SlidersHorizontal, Smartphone, Target, TrendingUp } from "lucide-react";

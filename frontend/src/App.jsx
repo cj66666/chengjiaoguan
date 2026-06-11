@@ -2,7 +2,7 @@
  * [INPUT]: 依赖 React hooks、lucide-react 图标、createApiClient、Products 域组件与离线设计稿信息架构
  * [OUTPUT]: 对外提供 App 组件，展示设计稿对齐的 Closer 工作台外壳、首页、Demo 编排、审批发送、行级审批与配置数据
  * [POS]: frontend/src 的页面组合根，连接后端 /api/v1 资源与《成交官》操作型 SaaS UI
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";

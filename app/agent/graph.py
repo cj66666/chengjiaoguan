@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 Pydantic Graph、SQLAlchemy Session、app.agent.types、graph_domain.policy 与 graph_domain 八步节点
  * [OUTPUT]: 对外提供八个图节点、closer_operating_graph、run_closer_graph_result、run_closer_graph、closer_graph_mermaid
  * [POS]: app/agent 的编排图组合根，只装配 Graph、运行入口与默认 graph policy provider
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

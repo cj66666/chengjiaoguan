@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 os/json/urllib、KnowledgeChunk 记录与知识索引同步配置
  * [OUTPUT]: 对外提供 KnowledgeIndexProvider、DisabledKnowledgeIndexProvider、HttpKnowledgeIndexProvider、KnowledgeIndexProviderConfig、sync_knowledge_index、get_knowledge_index_provider、get_knowledge_index_provider_config
  * [POS]: services 的 RAG 索引同步边界，把本地知识入库与托管语义索引 upsert 隔离
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

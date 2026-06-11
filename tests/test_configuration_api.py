@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI TestClient、SQLite 会话夹具、app.agent_tools、app.models、quote_engine 与 credentials reveal helper
  * [OUTPUT]: 验证 products CRUD、pricing-rules、价格规则版本、汇率缓存刷新确认、channels、凭据封存、dashboard 与 request_handoff 契约
  * [POS]: tests 的配置接口证明文件，覆盖 API 契约第五节缺失的 MVP 配置面
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 
@@ -331,6 +331,14 @@ def test_pricing_rule_api_rejects_invalid_rule_shape(client, db_session):
             "logistics_template": {"exchange_rate_cache": {"confirmed": True, "rates": {"USD": {"EUR": "0.90"}}}},
         },
     )
+    invalid_hard_min = client.post(
+        "/api/v1/pricing-rules",
+        json={
+            "product_id": 1,
+            "floor_price": "3.00",
+            "logistics_template": {"hard_min_price": "-2.00"},
+        },
+    )
 
     assert negative_floor.status_code == 422
     assert negative_floor.json()["error"]["code"] == "invalid_pricing_rule"
@@ -340,6 +348,8 @@ def test_pricing_rule_api_rejects_invalid_rule_shape(client, db_session):
     assert "exchange_rates" in invalid_exchange.json()["error"]["message"]
     assert invalid_cache.status_code == 422
     assert "expires_at" in invalid_cache.json()["error"]["message"]
+    assert invalid_hard_min.status_code == 422
+    assert "hard_min_price" in invalid_hard_min.json()["error"]["message"]
 
 
 def test_pricing_rule_exchange_rate_cache_refresh_and_confirm_api(client, db_session):

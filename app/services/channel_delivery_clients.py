@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 os、json、smtplib、urllib、EmailMessage 与渠道 payload/credentials
  * [OUTPUT]: 对外提供 DeliveryClient、PayloadOnlyDeliveryClient、SmtpDeliveryClient、WhatsAppCloudDeliveryClient、send_with_delivery_client
  * [POS]: services 的真实渠道发送客户端边界，让 channel_delivery 只选择客户端，不直接理解 SMTP/HTTP 细节
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

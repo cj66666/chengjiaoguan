@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session、app.models、EmailAdapter、WhatsAppAdapter、credentials 与 channel_delivery_clients
  * [OUTPUT]: 对外提供 deliver_message，为 email/whatsapp/site_form 生成投递结果、payload 与可插拔客户端执行状态
  * [POS]: services 的外部渠道发送边界，把数据库消息与真实渠道客户端之间的接缝收束到单一位置
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

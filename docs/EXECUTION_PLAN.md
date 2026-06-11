@@ -1,12 +1,10 @@
 # Execution Plan
-> L3 | 父级: ./CLAUDE.md
-
 <!--
 /**
- * [INPUT]: 依赖 docs/source 原始规格文档、CLAUDE.md、AGENTS.md 与当前后端排期
+ * [INPUT]: 依赖 docs/source 原始规格文档、README.md、docs/SPECS.md 与当前后端排期
  * [OUTPUT]: 对外提供开发提交顺序、MVP 范围裁剪与验证约束
  * [POS]: docs 的执行路径镜像，和 IMPLEMENTATION_AUDIT.md 共同描述计划与现实的差距
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 -->
 
@@ -24,13 +22,13 @@
 ## Current Evidence
 
 - 验证命令：`.venv/bin/python -m pytest`
-- 当前结果：`169 passed`
-- 前端验证：`cd frontend && npm run build`、`npm run test:e2e` 当前 `12 passed`
+- 当前结果：`180 passed`
+- 前端验证：`cd frontend && npm run build` 当前通过；`npm run test:e2e` 2026-06-04 浏览器回归记录为 `12 passed`
 - 视觉 QA：`docs/VISUAL_QA.md` 记录桌面 1280x900、移动 390x844 截图与无横向溢出指标
 - 环境配置：`docs/ENVIRONMENT.md` 汇总所有生产 provider、投递、存储、汇率、监控、演示与 E2E 环境变量
 - 完成度审计：`docs/COMPLETION_AUDIT.md` 区分仓库内已完成、本地可证、生产边界与真实外部阻塞
 - 浏览器烟测：Demo Seed、价格规则更新、价格规则版本查看、渠道凭据轮换与窄屏产品页无横向溢出通过；截图见 `/private/tmp/closer-pricing-channel-smoke.png`、`/private/tmp/closer-responsive-products.png`
-- GEB 扫描：`app/`、`tests/`、`docs/`、`scripts/`、`frontend/` 下 Python/Markdown/JS/JSX/CSS/HTML 文件均带 `[PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md`
+- GEB 扫描：`app/`、`tests/`、`docs/`、`scripts/`、`frontend/` 下 Python/Markdown/JS/JSX/CSS/HTML 文件均带 `[PROTOCOL]: 变更时同步更新相关测试与公开文档`
 
 ## Schedule Reality
 

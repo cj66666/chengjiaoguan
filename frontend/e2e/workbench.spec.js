@@ -2,7 +2,7 @@
  * [INPUT]: 依赖 @playwright/test、Vite 工作台、FastAPI /api/v1/demo 与配置 API
  * [OUTPUT]: 对外提供工作台浏览器 E2E，验证 Demo Seed、客户/报价、审批发送、通知/设置、设计稿导航页、密集列表、价格规则版本/更新、渠道凭据轮换与横向溢出
  * [POS]: frontend/e2e 的桌面/移动主链路测试，覆盖人工烟测最容易遗漏的 UI 到 API 接缝
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 
 import { expect, test } from "@playwright/test";

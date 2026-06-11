@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 pytest、Decimal、date、SQLite 会话夹具、app.models、quote_engine.calculate_quote 与 exchange_rate_sources
  * [OUTPUT]: 验证 MOQ、阶梯价、成本利润、物流、汇率换算、汇率源刷新、汇率缓存过期/确认与地板价判断
  * [POS]: tests 的报价算法证明文件，锁住服务层金额计算的确定性契约
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 
@@ -93,6 +93,19 @@ def test_calculate_quote_detects_floor_price_hit(db_session):
     inquiry2, product2 = _seed_quote_data(db_session, tiers=[{"min_qty": 500, "price": "2.90"}], floor_price="3.20")
     result2 = calculate_quote(db_session, 1, inquiry2.id, [QuoteItemInput(product_id=product2.id, quantity=500)])
     assert result2.hits_floor is True
+
+
+def test_calculate_quote_reports_hard_minimum_breach(db_session):
+    inquiry, product = _seed_quote_data(db_session, tiers=[{"min_qty": 500, "price": "2.90"}])
+    rule = db_session.query(models.PricingRule).filter_by(product_id=product.id).one()
+    rule.logistics_template = {"unit_cost": "0.20", "hard_min_price": "3.10"}
+    db_session.flush()
+
+    result = calculate_quote(db_session, 1, inquiry.id, [QuoteItemInput(product_id=product.id, quantity=500)])
+
+    assert result.hard_minimum_breached is True
+    assert result.lines[0].hard_min_price == Decimal("3.10")
+    assert result.lines[0].hard_minimum_breached is True
 
 
 def test_calculate_quote_rejects_below_moq_quantity(db_session):

@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI APIRouter/Depends、SQLAlchemy 查询、MessageCreate、utcnow、channel_delivery 与 common 序列化
  * [OUTPUT]: 对外提供 router，暴露 conversations 详情、消息、接管、释放与人工发送接口
  * [POS]: routers 的会话资源边界，处理人工接管态下的人机协作入口
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

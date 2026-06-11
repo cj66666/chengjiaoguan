@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 datetime.date、Decimal、Mapping 与 pricing_rule.logistics_template 的 exchange_rates/exchange_rate_cache
  * [OUTPUT]: 对外提供 resolve_exchange_rate，解析静态汇率表或已确认且未过期的汇率缓存
  * [POS]: services 的报价汇率边界，让 quote_engine 不直接理解缓存、过期与人工确认结构
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

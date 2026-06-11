@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI TestClient、SQLite 会话夹具、SQLAlchemy select 与 app.models
  * [OUTPUT]: 验证 site_form webhook 创建客户、询盘、会话、首条消息与幂等
  * [POS]: tests 的入站主链路证明文件，锁住站点表单渠道到数据库事实的闭环
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session/select/func、utcnow 与 app.models 的 Notification/Approval
  * [OUTPUT]: 对外提供 create_notification、notify_approval_requested、list_notifications、update_notification_status、resolve_approval_notifications
  * [POS]: services 的通知状态机，把需要人工处理的业务事件固化为租户隔离的未读/已读/归档消息
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

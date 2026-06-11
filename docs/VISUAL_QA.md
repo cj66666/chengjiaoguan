@@ -1,12 +1,10 @@
 # Visual QA
-> L3 | 父级: ./CLAUDE.md
-
 <!--
 /**
  * [INPUT]: 依赖 Closer 工作台离线设计稿、frontend 工作台、Playwright 浏览器截图、/demo/seed 与 /webhooks/site_form 公开 API
  * [OUTPUT]: 对外提供设计稿对齐、桌面/移动视觉 QA 证据、截图路径与剩余视觉风险
  * [POS]: docs 的前端视觉证明镜像，把生产部署级视觉走查从口头判断转成可复核证据
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 -->
 

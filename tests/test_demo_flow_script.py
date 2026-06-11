@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 subprocess、sys、json 与 scripts/demo_flow.py
  * [OUTPUT]: 验证 demo_flow dry-run 可输出确定性演示步骤且不访问网络
  * [POS]: tests 的演示脚本证明文件，锁住演示脚本不会绕过 API 或默认触发副作用
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

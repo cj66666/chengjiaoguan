@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 hashlib/secrets、SQLAlchemy Session/select、utcnow 与 app.models 的 Seller/SellerApiKey
  * [OUTPUT]: 对外提供 create_api_key、list_api_keys、revoke_api_key、authenticate_api_key
  * [POS]: services 的正式认证边界，用哈希存储和撤销语义替代裸 seller token 直通生产
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

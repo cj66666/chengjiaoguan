@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 datetime timedelta、SQLite 会话夹具、agent_tools、models 与 followups 服务
  * [OUTPUT]: 验证 follow-up 创建、到期发送、最大次数完成与客户回复停止
  * [POS]: tests 的 follow-up 状态机证明文件，锁住未回复询盘推进器行为
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

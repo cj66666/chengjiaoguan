@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session/select、datetime timedelta、app.models、credentials、channel_delivery_clients 与 delivery result
  * [OUTPUT]: 对外提供 list_delivery_attempts、record_delivery_attempt、list_retryable_delivery_attempts、retry_delivery_attempt、run_due_delivery_retries
  * [POS]: services 的出站投递状态机薄层，把一次性 delivery 结果固化为可查询、可重试、可执行的记录
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

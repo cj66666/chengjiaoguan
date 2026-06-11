@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 os/json/urllib、dataclass 与 Graph 节点运行上下文快照
  * [OUTPUT]: 对外提供 GraphPolicyContext、GraphPolicyDecision、GraphDecisionProvider、RuleBasedGraphDecisionProvider、HttpGraphDecisionProvider、OpenAICompatibleGraphDecisionProvider、get_graph_decision_provider、get_graph_decision_provider_config
  * [POS]: app/agent/graph_domain 的决策边界，把确定性规则与生产 HTTP/OpenAI-compatible LLM 决策 provider 从节点跳转中分离
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 
@@ -135,6 +135,18 @@ class RuleBasedGraphDecisionProvider:
             parsed = _parsed(context)
             requirement = context.extra.get("requirement") or parsed or context.user_prompt
             if (
+                _matches_need_review(context.product_matches)
+                and context.conversation_id is not None
+                and _requires_catalog_match(parsed, requirement)
+            ):
+                return _handoff(
+                    "product_out_of_scope",
+                    "No high-confidence product matched the inquiry requirement.",
+                    suggestion="Review the low-confidence alternatives manually or add the missing product to the catalog.",
+                    payload={"requirement": parsed or requirement, "product_matches": list(context.product_matches)},
+                    knowledge_query=_query_text(requirement),
+                )
+            if (
                 not context.product_matches
                 and context.conversation_id is not None
                 and _requires_catalog_match(parsed, requirement)
@@ -149,7 +161,13 @@ class RuleBasedGraphDecisionProvider:
             return GraphPolicyDecision(knowledge_query=_query_text(requirement))
         if context.stage == "quote":
             parsed = _parsed(context)
-            return GraphPolicyDecision(should_quote=bool(context.inquiry_id and parsed.get("quantity") and context.product_matches))
+            return GraphPolicyDecision(
+                should_quote=bool(
+                    context.inquiry_id
+                    and parsed.get("quantity")
+                    and _has_quoteable_match(context.product_matches)
+                )
+            )
         return GraphPolicyDecision()
 
 
@@ -445,6 +463,14 @@ def _requires_catalog_match(parsed: Mapping[str, Any], requirement: Any) -> bool
     text = _query_text(requirement).lower()
     buying_terms = ("quote", "price", "supply", "need", "pcs", "units", "ship", "cif", "fob")
     return any(term in text for term in buying_terms)
+
+
+def _matches_need_review(matches: Sequence[Mapping[str, Any]]) -> bool:
+    return bool(matches) and all(bool(match.get("requires_human_review")) for match in matches)
+
+
+def _has_quoteable_match(matches: Sequence[Mapping[str, Any]]) -> bool:
+    return any(not bool(match.get("requires_human_review")) for match in matches)
 
 
 def _provider_name(env: Mapping[str, str]) -> str:

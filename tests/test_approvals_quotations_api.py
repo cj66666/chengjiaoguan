@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 FastAPI TestClient、SQLite 会话夹具、Decimal、app.agent_tools 与 app.models
  * [OUTPUT]: 验证 approval patch/approve/reject、quotation detail/patch/send、底价报价发送审批、PI 审批执行与文本/PDF 文件产物
  * [POS]: tests 的审批报价接口证明文件，锁住人工审批与报价 API 的安全成交路径
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 
@@ -137,6 +137,20 @@ def test_quotation_send_floor_hit_creates_approval_then_approve_sends(client, db
     assert db_session.get(models.Quotation, quote["quotation_id"]).status == "sent"
 
 
+def test_quotation_send_hard_minimum_returns_conflict_without_approval(client, db_session):
+    inquiry, _, product = _seed_conversation(db_session)
+    rule = db_session.query(models.PricingRule).filter_by(product_id=product.id).one()
+    rule.logistics_template = {"unit_cost": "0.10", "hard_min_price": "3.30"}
+    quote = agent_tools.calc_quote(db_session, 1, inquiry.id, [{"product_id": product.id, "quantity": 500}])
+
+    response = client.post(f"/api/v1/quotations/{quote['quotation_id']}/send")
+
+    assert response.status_code == 409
+    assert response.json()["error"]["code"] == "hard_minimum_price"
+    assert db_session.query(models.Approval).count() == 0
+    assert db_session.get(models.Quotation, quote["quotation_id"]).status == "draft"
+
+
 def test_generate_pi_approval_executes_through_api(client, db_session, monkeypatch, tmp_path):
     monkeypatch.setenv("CLOSER_DOCUMENT_STORAGE_DIR", str(tmp_path))
     inquiry, _, product = _seed_conversation(db_session)
@@ -159,3 +173,20 @@ def test_generate_pi_approval_executes_through_api(client, db_session, monkeypat
     assert pdf_file["filename"] == "PI-000001.pdf"
     assert detail.json()["terms"]["pi_pdf_file"]["storage_key"] == "seller_1/PI-000001.pdf"
     assert tmp_path.joinpath("seller_1", "PI-000001.pdf").exists()
+
+
+def test_pi_approval_hard_minimum_conflict_is_reported_by_api(client, db_session, monkeypatch, tmp_path):
+    monkeypatch.setenv("CLOSER_DOCUMENT_STORAGE_DIR", str(tmp_path))
+    inquiry, _, product = _seed_conversation(db_session)
+    quote = agent_tools.calc_quote(db_session, 1, inquiry.id, [{"product_id": product.id, "quantity": 500}])
+    pending = agent_tools.generate_pi(db_session, 1, quote["quotation_id"])
+    rule = db_session.query(models.PricingRule).filter_by(product_id=product.id).one()
+    rule.logistics_template = {"unit_cost": "0.10", "hard_min_price": "3.30"}
+    db_session.flush()
+
+    approved = client.post(f"/api/v1/approvals/{pending['approval_id']}/approve")
+
+    assert approved.status_code == 409
+    assert approved.json()["error"]["code"] == "hard_minimum_price"
+    assert db_session.get(models.Approval, pending["approval_id"]).status == "pending"
+    assert db_session.get(models.Quotation, quote["quotation_id"]).is_pi is False

@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 Python email 标准库与 schemas.ChannelContact/InboundMessage
  * [OUTPUT]: 对外提供 OutboundEmail 与 EmailAdapter
  * [POS]: services 的 email 渠道边界，负责原始邮件标准化与 SMTP 文本消息组合
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

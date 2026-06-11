@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 Pydantic Graph BaseNode/End、app.agent_tools、app.agent.types 与 graph_domain.support/policy
  * [OUTPUT]: 对外提供 ReceiveInquiry、QualifyInquiry、UnderstandRequirement、ReplyWithQuote、NegotiateAndAnswer、ScheduleFollowup、RequestHumanHandoff、PersistMemory
  * [POS]: app/agent/graph_domain 的节点层，只表达节点跳转、工具调用、policy 消费与状态写入
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 catalog_domain 的 products、imports、pricing、channels、dashboard 模块
  * [OUTPUT]: 对外汇总产品 CRUD、导入报告、价格规则、价格规则版本、汇率缓存刷新确认、汇率定时刷新、渠道账号、凭据轮换与 dashboard metrics 服务
  * [POS]: services/catalog_domain 的稳定包入口，被 app.services.catalog 兼容门面重导出
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

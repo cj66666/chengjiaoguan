@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 PydanticAI Agent、SQLAlchemy Session、app.agent.model_config、app.agent.types 与 app.agent.tools
  * [OUTPUT]: 对外提供 build_closer_agent、closer_agent、run_closer_agent，运行时可用显式 model 或 CLOSER_AGENT_MODEL
  * [POS]: app/agent 的 PydanticAI 组合根，负责模型运行入口和模型选择，不承载图节点逻辑
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 

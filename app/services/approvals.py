@@ -6,7 +6,7 @@
  * [INPUT]: 依赖 SQLAlchemy Session、app.models、approval_execution.execute_approval 与 notifications 服务
  * [OUTPUT]: 对外提供 list_approvals、request_handoff、patch_approval、approve_approval、reject_approval
  * [POS]: services 的人工审批队列状态核心，把具体副作用交给 approval_execution
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
 """
 
