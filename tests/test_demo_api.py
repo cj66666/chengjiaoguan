@@ -4,7 +4,7 @@
 /* ========================================================================== */
 /**
  * [INPUT]: 依赖 FastAPI TestClient、SQLite 会话夹具与 app.models
- * [OUTPUT]: 验证 /api/v1/demo/seed 可创建确定性演示主链路、护栏审批和跟进，并保持幂等与租户隔离
+ * [OUTPUT]: 验证 /api/v1/demo/seed 可创建确定性演示主链路，并验证 /api/v1/demo/wave3 提交 manifest
  * [POS]: tests 的 Demo 主链路证明文件，锁住兜底假数据入口不会绕过业务服务
  * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
@@ -55,3 +55,36 @@ def test_demo_seed_is_tenant_scoped(client, db_session):
     assert db_session.query(models.Product).filter_by(seller_id=2, sku=DEMO_PRODUCT_SKU).count() == 1
     assert db_session.query(models.Product).filter_by(seller_id=1).count() == len(DEMO_PRODUCT_FIXTURES)
     assert db_session.query(models.Product).filter_by(seller_id=2).count() == len(DEMO_PRODUCT_FIXTURES)
+
+
+def test_wave3_manifest_exposes_agent_skills_and_demo(client):
+    response = client.get("/api/v1/demo/wave3")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["stage"] == "semifinal_wave_3"
+    assert payload["agent"]["name"] == "Closer Operating Agent"
+    assert payload["agent"]["workflow"] == [
+        "receive",
+        "qualify",
+        "understand",
+        "quote",
+        "answer",
+        "followup",
+        "handoff",
+        "persist",
+    ]
+    assert "hard minimum price fuse" in payload["agent"]["guardrails"]
+    assert len(payload["skills"]) == 8
+    assert {skill["id"] for skill in payload["skills"]} == {
+        "inquiry-intake",
+        "inquiry-qualification",
+        "customer-crm",
+        "product-knowledge-match",
+        "quotation-pi-draft",
+        "approval-guardrails",
+        "delivery-followup",
+        "ops-readiness",
+    }
+    assert payload["demo"]["primary_entrypoint"] == "POST /api/v1/demo/seed"
+    assert "scripts/demo_flow.py" in payload["demo"]["script"]

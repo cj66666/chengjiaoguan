@@ -1,8 +1,8 @@
-# Wave 2 Skills
+# Wave 3 Agent Skills
 <!--
 /**
- * [INPUT]: 依赖 docs/SPECS.md、docs/WAVE2_SUBMISSION.md、app/agent_tools.py、scripts/demo_flow.py 与当前测试证据
- * [OUTPUT]: 对外提供复赛 Wave 2 可评审 Skills 索引，说明技能顺序、运行入口、验证命令与公开提交范围
+ * [INPUT]: 依赖 docs/SPECS.md、docs/WAVE3_SUBMISSION.md、app/agent_tools.py、scripts/demo_flow.py 与当前测试证据
+ * [OUTPUT]: 对外提供半决赛 Wave 3 可评审 Skills 索引，说明技能顺序、Agent 集成、运行入口与验证命令
  * [POS]: skills 的组合根，把供应链询盘核心能力拆成可审查、可运行、可测试的 Skill 交付物
  * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
@@ -10,7 +10,7 @@
 
 ## 目标
 
-本目录是复赛 Wave 2 的 Skills 交付物。它把成交官 Closer 的供应链询盘闭环拆成 8 个可评审技能，每个技能都明确：
+本目录是半决赛 Wave 3 的 Skills 交付物。它把成交官 Closer 的供应链询盘闭环拆成 8 个可评审技能，并由 Closer Operating Agent 串联执行。每个技能都明确：
 
 - 要解决的业务问题。
 - 输入与输出。
@@ -44,6 +44,22 @@ inquiry-intake
   -> ops-readiness
 ```
 
+## Agent 集成
+
+Agent 入口：
+
+- `app.agent.runtime.run_closer_agent`
+- `app.agent.graph.run_closer_graph`
+- `GET /api/v1/demo/wave3`
+
+工作流：
+
+```text
+receive -> qualify -> understand -> quote -> answer -> followup -> handoff -> persist
+```
+
+评审可以先调用 `/api/v1/demo/wave3` 获取 Agent、Skills、Demo 和验证命令的机器可读 manifest，再通过工作台或脚本跑完整演示。
+
 公开 API 演示：
 
 ```powershell
@@ -74,12 +90,12 @@ npm run build
 npm run test:e2e
 ```
 
-2026-06-11 本地验证结果：
+2026-06-14 本地验证结果：
 
-- `python -m pytest`: 180 passed, 1 warning
+- `python -m pytest`: 182 passed, 1 warning
 - `cd frontend && npm run build`: passed
 - `cd frontend && npm run test:e2e`: 2026-06-04 historical run, 12 passed
 
 ## 公开提交说明
 
-Wave 2 评审时应公开本目录、`docs/SPECS.md`、`docs/WAVE2_SUBMISSION.md`、源码、测试和 demo 脚本。公开前按 `docs/PUBLIC_REVIEW_CHECKLIST.md` 移除或脱敏原始 docx/xlsx/html、凭据、本地数据库和构建产物。
+Wave 3 评审时应公开本目录、`docs/SPECS.md`、`docs/WAVE3_SUBMISSION.md`、源码、测试和 demo 脚本。公开前按 `docs/PUBLIC_REVIEW_CHECKLIST.md` 移除或脱敏原始 docx/xlsx/html、凭据、本地数据库和构建产物。

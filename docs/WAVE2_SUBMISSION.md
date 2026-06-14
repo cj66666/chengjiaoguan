@@ -1,7 +1,7 @@
 # Wave 2 Submission
 <!--
 /**
- * [INPUT]: 依赖用户提供的复赛 Wave 2 规则、README.md、DEMO_RUNBOOK.md、COMPLETION_AUDIT.md、IMPLEMENTATION_AUDIT.md 与 2026-06-11 本地验证结果
+ * [INPUT]: 依赖用户提供的复赛 Wave 2 规则、README.md、DEMO_RUNBOOK.md、COMPLETION_AUDIT.md、IMPLEMENTATION_AUDIT.md 与 2026-06-14 本地验证结果
  * [OUTPUT]: 对外提供复赛阶段提交包，映射赛道、关键 Skills、Prototype、AI 评测入口与交叉评审准备
  * [POS]: docs 的 Wave 2 评测镜像，把供应链询盘产品能力折叠成可运行的 Specs/Skills/Prototype 提交说明
  * [PROTOCOL]: 变更时同步更新相关测试与公开文档
@@ -208,9 +208,9 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 python scripts/demo_flow.py --base-url http://127.0.0.1:8000 --approve --run-workers --json
 ```
 
-2026-06-11 本地结果：
+2026-06-14 本地结果：
 
-- `python -m pytest`: 180 passed，1 warning
+- `python -m pytest`: 182 passed，1 warning
 - `cd frontend && npm run build`: passed
 - `cd frontend && npm run test:e2e`: 2026-06-04 浏览器回归记录为 12 passed
 

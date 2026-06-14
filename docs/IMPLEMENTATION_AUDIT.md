@@ -53,7 +53,7 @@
 .venv/bin/python -m pytest
 ```
 
-当前结果：`180 passed`，1 个 pydantic_ai event loop deprecation warning。
+当前结果：`182 passed`，1 个 pydantic_ai event loop deprecation warning。
 
 前端结果：`npm run build` 通过，`npm run test:e2e` 2026-06-04 浏览器回归记录为 12 passed。
 

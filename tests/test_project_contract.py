@@ -3,7 +3,7 @@
 /* GEB L3: 项目契约测试                                                       */
 /* ========================================================================== */
 /**
- * [INPUT]: 依赖 pathlib 与公开文档 docs/IMPLEMENTATION_AUDIT.md、docs/END_TO_END_EVIDENCE.md、docs/EXECUTION_PLAN.md
+ * [INPUT]: 依赖 pathlib 与公开文档 docs/IMPLEMENTATION_AUDIT.md、docs/END_TO_END_EVIDENCE.md、docs/WAVE3_SUBMISSION.md、docs/EXECUTION_PLAN.md
  * [OUTPUT]: 验证项目文档捕捉 API、租户、任务与工具契约
  * [POS]: tests 的语义相守门文件，防止项目协作约定从文档中消失
  * [PROTOCOL]: 变更时同步更新相关测试与公开文档
@@ -29,6 +29,19 @@ def test_public_docs_capture_backend_contract():
     assert "X-Seller-Id" in text
     assert "workers/run-due" in text
     assert "send_message" in text
+
+
+def test_wave3_submission_tracks_agent_skills_and_demo():
+    text = (ROOT / "docs" / "WAVE3_SUBMISSION.md").read_text(encoding="utf-8")
+
+    assert "半决赛 Wave 3" in text
+    assert "Closer Operating Agent" in text
+    assert "PydanticAI" in text
+    assert "receive -> qualify -> understand -> quote -> answer -> followup -> handoff -> persist" in text
+    assert "8 个" in text
+    assert "/api/v1/demo/wave3" in text
+    assert "/api/v1/demo/seed" in text
+    assert "scripts/demo_flow.py" in text
 
 
 def test_execution_plan_tracks_all_a_tasks():

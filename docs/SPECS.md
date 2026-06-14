@@ -91,9 +91,9 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 python scripts/demo_flow.py --base-url http://127.0.0.1:8000 --approve --run-workers --json
 ```
 
-2026-06-11 本地验证结果：
+2026-06-14 本地验证结果：
 
-- `python -m pytest`: 180 passed，1 warning
+- `python -m pytest`: 182 passed，1 warning
 - `cd frontend && npm run build`: passed
 - `cd frontend && npm run test:e2e`: 2026-06-04 浏览器回归记录为 12 passed
 

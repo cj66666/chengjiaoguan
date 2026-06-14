@@ -4,7 +4,7 @@
 /* ========================================================================== */
 /**
  * [INPUT]: 依赖 SQLAlchemy Session、channel_gateway、agent_tools、knowledge 与 models
- * [OUTPUT]: 对外提供 seed_demo_scenario，创建或复用演示产品、价格规则、知识、询盘、报价、审批和跟进
+ * [OUTPUT]: 对外提供 seed_demo_scenario、wave3_submission_manifest，创建演示主链路并公开 Wave 3 提交说明
  * [POS]: services 的演示数据编排边界，用确定性数据证明 MVP 主链路，不拥有业务规则本身
  * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
@@ -79,6 +79,117 @@ DEMO_KNOWLEDGE_REF = "demo-lamp-faq"
 DEMO_CHANNEL_MESSAGE_ID = "demo-site-form-001"
 DEMO_INQUIRY_CONTENT = "Hi, we need 5000 LED desk lamps shipped to US. Please quote CIF and payment terms."
 DEMO_RISKY_REPLY = "We can offer USD 2.80 per unit and guarantee delivery with net 30 payment terms."
+
+WAVE3_SKILLS = [
+    {
+        "id": "inquiry-intake",
+        "name": "多渠道询盘接入",
+        "path": "skills/inquiry-intake/SKILL.md",
+        "entrypoint": "POST /api/v1/webhooks/site_form",
+        "proof": "creates customer, inquiry, conversation and inbound message records",
+    },
+    {
+        "id": "inquiry-qualification",
+        "name": "询盘甄别评分",
+        "path": "skills/inquiry-qualification/SKILL.md",
+        "entrypoint": "score_inquiry",
+        "proof": "grades inquiries A/B/C with intent, quantity, budget and risk signals",
+    },
+    {
+        "id": "customer-crm",
+        "name": "客户画像与 CRM 建档",
+        "path": "skills/customer-crm/SKILL.md",
+        "entrypoint": "get_customer",
+        "proof": "aggregates customer profile, inquiries, conversations, quotations and followups",
+    },
+    {
+        "id": "product-knowledge-match",
+        "name": "产品匹配与知识检索",
+        "path": "skills/product-knowledge-match/SKILL.md",
+        "entrypoint": "match_product + search_knowledge",
+        "proof": "returns grounded product matches, confidence and knowledge evidence",
+    },
+    {
+        "id": "quotation-pi-draft",
+        "name": "报价与 PI 草稿",
+        "path": "skills/quotation-pi-draft/SKILL.md",
+        "entrypoint": "calc_quote + generate_pi",
+        "proof": "calculates MOQ, tiers, logistics, exchange rates, floor and hard minimum price",
+    },
+    {
+        "id": "approval-guardrails",
+        "name": "风险护栏与人工审批",
+        "path": "skills/approval-guardrails/SKILL.md",
+        "entrypoint": "send_message + request_handoff",
+        "proof": "blocks risky outbound actions until explicit approval",
+    },
+    {
+        "id": "delivery-followup",
+        "name": "投递记录、重试与跟进",
+        "path": "skills/delivery-followup/SKILL.md",
+        "entrypoint": "create_followup + POST /api/v1/workers/run-due",
+        "proof": "records delivery attempts and schedules follow-up tasks",
+    },
+    {
+        "id": "ops-readiness",
+        "name": "原型运维就绪检查",
+        "path": "skills/ops-readiness/SKILL.md",
+        "entrypoint": "GET /api/v1/ops/readiness",
+        "proof": "surfaces LLM, channel, credential, worker and provider readiness",
+    },
+]
+
+
+def wave3_submission_manifest() -> dict[str, Any]:
+    return {
+        "stage": "semifinal_wave_3",
+        "goal": "提交可交付最终结果的智能体，整合 Skills 技能，进行产品演示 Demo。",
+        "agent": {
+            "name": "Closer Operating Agent",
+            "runtime": "PydanticAI runtime + Pydantic Graph operating workflow",
+            "entrypoints": [
+                "app.agent.runtime.run_closer_agent",
+                "app.agent.graph.run_closer_graph",
+                "POST /api/v1/demo/seed",
+            ],
+            "workflow": [
+                "receive",
+                "qualify",
+                "understand",
+                "quote",
+                "answer",
+                "followup",
+                "handoff",
+                "persist",
+            ],
+            "guardrails": [
+                "floor price approval",
+                "hard minimum price fuse",
+                "sensitive commitment approval",
+                "large order approval",
+                "low confidence product match handoff",
+                "PI generation permission check",
+            ],
+        },
+        "skills": WAVE3_SKILLS,
+        "demo": {
+            "browser_url": "http://127.0.0.1:5173/",
+            "primary_entrypoint": "POST /api/v1/demo/seed",
+            "script": "python scripts/demo_flow.py --base-url http://127.0.0.1:8000 --approve --run-workers --json",
+            "review_flow": [
+                "Click Demo Seed on the dashboard.",
+                "Open 询盘收件箱 and inspect the A-grade inquiry.",
+                "Show the guardrail card and pending human approval.",
+                "Approve the outbound message and inspect delivery/follow-up state.",
+                "Open 产品库、报价规则、设置 and readiness to show productization boundaries.",
+            ],
+        },
+        "verification": {
+            "backend": "python -m pytest",
+            "frontend_build": "cd frontend && npm run build",
+            "frontend_e2e": "cd frontend && npm run test:e2e",
+        },
+    }
 
 
 def seed_demo_scenario(session: Session, seller_id: int) -> dict[str, Any]:

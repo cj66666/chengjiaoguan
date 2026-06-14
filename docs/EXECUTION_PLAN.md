@@ -22,7 +22,7 @@
 ## Current Evidence
 
 - 验证命令：`.venv/bin/python -m pytest`
-- 当前结果：`180 passed`
+- 当前结果：`182 passed`
 - 前端验证：`cd frontend && npm run build` 当前通过；`npm run test:e2e` 2026-06-04 浏览器回归记录为 `12 passed`
 - 视觉 QA：`docs/VISUAL_QA.md` 记录桌面 1280x900、移动 390x844 截图与无横向溢出指标
 - 环境配置：`docs/ENVIRONMENT.md` 汇总所有生产 provider、投递、存储、汇率、监控、演示与 E2E 环境变量

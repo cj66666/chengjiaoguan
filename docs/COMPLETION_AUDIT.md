@@ -32,7 +32,7 @@
 | 配置与运维面 | API 契约配置项、T29-T31 | products、pricing rules、channels、settings、dashboard、readiness、alerts、monitoring sink、production check 脚本 | 边界完成 | 接真实 monitoring webhook、生产 provider 与部署平台 |
 | 前端工作台 | 产品设计文档 M1-M10、T20-T28 | React/Vite 工作台、build、Playwright desktop/mobile E2E、视觉 QA 截图与无横向溢出指标 | 本地已完成 | 真实线上域名和生产 API 组合仍需视觉复核 |
 | Demo 主链路 | T30/T31 | `/demo/seed`、`scripts/demo_flow.py`、`DEMO_RUNBOOK.md`、前端 Demo 操作与 E2E | 本地已完成 | 用真实部署执行最后生产彩排 |
-| 测试证明 | 工程规则 | 2026-06-11 `python -m pytest` 记录为 `180 passed`，`npm run build` 通过；`npm run test:e2e` 2026-06-04 浏览器回归记录为 `12 passed`；`npm audit --json` 历史记录 0 漏洞 | 已完成 | 修改前端交互后继续复跑浏览器 E2E |
+| 测试证明 | 工程规则 | 2026-06-14 `python -m pytest` 记录为 `182 passed`，`npm run build` 通过；`npm run test:e2e` 2026-06-04 浏览器回归记录为 `12 passed`；`npm audit --json` 历史记录 0 漏洞 | 已完成 | 修改前端交互后继续复跑浏览器 E2E |
 | 分形文档同构 | GEB 协议 | L1/L2/L3 文档已覆盖 `app`、`tests`、`docs`、`scripts`、`frontend`；GEB 扫描作为复核命令 | 已完成 | 每次文件职责变化继续更新公开文档与相关测试 |
 
 ## 外部阻塞清单

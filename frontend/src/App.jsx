@@ -75,6 +75,7 @@ export default function App() {
     channels: EMPTY,
     notifications: EMPTY,
     readiness: {},
+    wave3: null,
     settings: null,
     messages: EMPTY,
   });
@@ -85,7 +86,7 @@ export default function App() {
     setLoading(true);
     setError("");
     try {
-      const [metrics, inquiries, approvals, customers, products, pricingRules, channels, notifications, readiness, settings] = await Promise.all([
+      const [metrics, inquiries, approvals, customers, products, pricingRules, channels, notifications, readiness, wave3, settings] = await Promise.all([
         api.get("/api/v1/dashboard/metrics"),
         api.get(`/api/v1/inquiries?page_size=${LIST_PAGE_SIZE}`),
         api.get("/api/v1/approvals"),
@@ -95,9 +96,10 @@ export default function App() {
         api.get("/api/v1/channels"),
         api.get(`/api/v1/notifications?status=unread&page_size=${LIST_PAGE_SIZE}`),
         api.get("/api/v1/ops/readiness"),
+        safeGet(api, "/api/v1/demo/wave3", null),
         safeGet(api, "/api/v1/settings", null),
       ]);
-      setData((current) => ({ ...current, metrics, inquiries, approvals, customers, products, pricingRules, channels, notifications, readiness, settings }));
+      setData((current) => ({ ...current, metrics, inquiries, approvals, customers, products, pricingRules, channels, notifications, readiness, wave3, settings }));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -435,6 +437,7 @@ function Dashboard({ data, demo, runWorkers, runDemoSeed, approveDemo, loading, 
   const delivery = metrics.delivery || {};
   const followup = metrics.followup || {};
   const pipeline = metrics.pipeline || {};
+  const wave3 = data.wave3 || {};
   const pendingApprovals = data.approvals?.items?.slice(0, 3) || [];
   const inquiryStream = data.inquiries?.items?.slice(0, 5) || [];
   return (
@@ -462,6 +465,27 @@ function Dashboard({ data, demo, runWorkers, runDemoSeed, approveDemo, loading, 
           </button>
         </div>
       </div>
+
+      <Panel title="Wave 3 Agent Demo" subtitle="半决赛提交包：Agent + Skills + Demo" action={<Bot size={17} />}>
+        <StatusRows
+          rows={[
+            ["阶段", wave3.stage || "semifinal_wave_3"],
+            ["Agent", wave3.agent?.name || "Closer Operating Agent"],
+            ["Skills", `${wave3.skills?.length || 8} 个已整合`],
+            ["Demo", wave3.demo?.primary_entrypoint || "POST /api/v1/demo/seed"],
+          ]}
+        />
+        <div className="inline-actions">
+          <button className="btn btn-pri btn-sm" onClick={runDemoSeed} disabled={loading}>
+            <Play size={15} />
+            运行演示
+          </button>
+          <button className="btn btn-sec btn-sm" onClick={() => go("settings")}>
+            <ShieldCheck size={15} />
+            查看就绪
+          </button>
+        </div>
+      </Panel>
 
       <div className="metrics kpi-grid">
         <Metric

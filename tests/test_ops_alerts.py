@@ -77,7 +77,7 @@ def _seed_alert_facts(db_session):
                 logistics_template={
                     "exchange_rate_cache": {
                         "confirmed": True,
-                        "expires_at": (date.today() - timedelta(days=1)).isoformat(),
+                        "expires_at": (date.today() - timedelta(days=2)).isoformat(),
                         "rates": {"USD": {"EUR": "0.90"}},
                     }
                 },
