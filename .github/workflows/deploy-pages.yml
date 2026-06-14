@@ -16,6 +16,8 @@ concurrency:
 
 jobs:
   build:
+    # Synnovator/Forgejo mirrors this workflow but does not provide GitHub Pages.
+    if: ${{ github.server_url == 'https://github.com' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -46,6 +48,7 @@ jobs:
           path: frontend/dist
 
   deploy:
+    if: ${{ github.server_url == 'https://github.com' }}
     needs: build
     runs-on: ubuntu-latest
     environment:
