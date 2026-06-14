@@ -28,7 +28,13 @@ cd frontend
 npm run dev -- --port 5173
 ```
 
-打开 `http://127.0.0.1:5173/`，点击 `Demo Seed` 后依次查看：
+在线 Demo 可直接打开：
+
+```text
+https://cj66666.github.io/chengjiaoguan/
+```
+
+线上版本使用 GitHub Pages 静态托管和浏览器内置 mock 数据，保留 Wave 3 评审所需的主交互。完整后端验证打开 `http://127.0.0.1:5173/`，点击 `Demo Seed` 后依次查看：
 
 1. 工作台指标与待审批提醒。
 2. 询盘收件箱中的 A 级询盘。

@@ -69,6 +69,16 @@ python scripts/demo_flow.py --base-url http://127.0.0.1:8000 --approve --run-wor
 
 Prototype：
 
+在线 Demo：
+
+```text
+https://cj66666.github.io/chengjiaoguan/
+```
+
+线上版本使用 GitHub Pages 静态托管和 `VITE_DEMO_MODE=mock`，可直接演示 8 个 Skills 串联后的工作台主流程。
+
+本地完整后端 Prototype：
+
 ```powershell
 cd frontend
 npm install

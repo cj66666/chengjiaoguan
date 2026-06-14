@@ -33,7 +33,7 @@
 
 ## 仍需外部材料
 
-- Hosted demo URL：需要部署平台后填写；本地入口仍为 `http://127.0.0.1:5173/`。
+- Hosted demo URL：已上线 GitHub Pages，地址为 `https://cj66666.github.io/chengjiaoguan/`；本地完整后端入口仍为 `http://127.0.0.1:5173/`。
 - 30 秒录屏：按 `docs/DATA_OPERATIONS.md` 的脚本录制，不应提交大视频文件到仓库。
 - 真实渠道心跳：当前 readiness/alerts 不主动访问外部网络；生产环境可在 scheduler 中接入 WhatsApp/IMAP 轻量探针，并把结果写入 channel status 或 monitoring sink。
 
