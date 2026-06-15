@@ -2,6 +2,38 @@
 
 > 跨境 B2B 中小卖家的 AI 询盘成交操作系统
 
+## 在线 Demo
+
+评审可直接打开 GitHub Pages 在线演示：
+
+```text
+https://cj66666.github.io/chengjiaoguan/
+```
+
+说明：如果比赛页或镜像仓库页面仍显示 `.git` 仓库地址，请以上面的 GitHub Pages 地址为准。线上版本是只读/静态演示，使用浏览器内置 mock 数据，打开后点击 `Demo Seed` 即可体验工作台、询盘收件箱、审批护栏、产品库、报价规则和 readiness。完整 FastAPI/PydanticAI 后端仍可按下方命令本地运行验证。
+
+### 在线截图
+
+工作台 Demo Seed 和 Agent/Skills 主链路：
+
+![Closer 在线 Demo 工作台](docs/assets/online-demo-workbench.png)
+
+询盘收件箱中的 A 级询盘、评分结果和审批护栏：
+
+![Closer 在线 Demo 询盘收件箱](docs/assets/online-demo-inbox.png)
+
+产品库、SKU 和价格规则维护入口：
+
+![Closer 在线 Demo 产品库](docs/assets/online-demo-products.png)
+
+### 最短本地验证
+
+```powershell
+python -m pytest
+cd frontend
+npm run build
+```
+
 ## 一句话定义
 
 从多渠道询盘进入 -> 客户建档 -> 询盘评分 -> 产品匹配 -> 报价/PI -> 风险审批 -> 投递跟进 -> 复盘运维，AI 陪伴每一步成交判断，让小团队也能像成熟外贸销售组织一样稳定接住高价值询盘。
