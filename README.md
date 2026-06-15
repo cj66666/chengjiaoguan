@@ -4,13 +4,14 @@
 
 ## 在线 Demo
 
-评审可直接打开 GitHub Pages 在线演示：
+评审可直接打开在线演示：
 
 ```text
-https://cj66666.github.io/chengjiaoguan/
+Ubuntu 全栈 Demo: http://223.167.74.11:8090/
+GitHub Pages 在线 Demo: https://cj66666.github.io/chengjiaoguan/
 ```
 
-说明：如果比赛页或镜像仓库页面仍显示 `.git` 仓库地址，请以上面的 GitHub Pages 地址为准。线上版本是只读/静态演示，使用浏览器内置 mock 数据，打开后点击 `Demo Seed` 即可体验工作台、询盘收件箱、审批护栏、产品库、报价规则和 readiness。完整 FastAPI/PydanticAI 后端仍可按下方命令本地运行验证。
+说明：如果比赛页或镜像仓库页面仍显示 `.git` 仓库地址，请以上面的在线地址为准。Ubuntu Demo 是真实 FastAPI 后端 + nginx 静态前端，打开后点击 `Demo Seed` 即可体验工作台、询盘收件箱、审批护栏、产品库、报价规则和 readiness。GitHub Pages 版本是只读/静态演示，使用浏览器内置 mock 数据，适合在服务器维护时作为备用入口。
 
 ### 在线截图
 
