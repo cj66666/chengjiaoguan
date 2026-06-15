@@ -27,6 +27,25 @@ GitHub Pages 在线 Demo: https://cj66666.github.io/chengjiaoguan/
 
 ![Closer 在线 Demo 产品库](docs/assets/online-demo-products.png)
 
+### 脱敏端到端样例
+
+评审可在 Ubuntu Demo 中点击 `Demo Seed` 复现下面这条脱敏链路：
+
+| 步骤 | 脱敏输入/动作 | 系统输出 | 决策边界 |
+| --- | --- | --- | --- |
+| 原始询盘 | `ACME Trading` 从站点表单提交：`We need 5000 LED desk lamps shipped to US. Please quote CIF and payment terms.` | 创建 customer、inquiry、conversation、message | 规则/API |
+| 客户评分 | 公司、企业邮箱、目的国、数量、产品关键词 | A 级，score 100，signals: `real_company`、`verified_domain`、`specific_quantity`、`specific_product`、`destination_known` | 规则优先 |
+| 产品匹配 | `LED desk lamps`、`5000`、`US` | 匹配 `LED Desk Lamp 10W`，返回 confidence、matched fields 和备选品 | 规则/检索；低置信度转人工 |
+| 报价草稿 | MOQ 500、数量 5000、底价 USD 3.00、阶梯价 USD 3.30 | 生成 USD 16500 报价草稿和有效期 | 确定性报价引擎 |
+| 风险审批 | 客户要求 CIF + payment terms，回复涉及敏感承诺；若触碰 `floor_price` 或 `hard_min_price` | 创建 `message_send` approval；硬底价触碰时后端直接阻断 | 人工确认/后端硬护栏 |
+| 跟进任务 | 报价生成后 24 小时 | 创建 follow-up，记录 next run time、attempt 和 message | 规则调度 |
+
+规则、LLM 与人工确认的边界：
+
+- **规则完成**：认证、租户隔离、询盘入库、A/B/C 评分、产品匹配 confidence、报价计算、底价/硬底价校验、审批创建、投递记录、跟进调度、readiness/alerts。
+- **LLM/provider 可增强**：非结构化询盘理解、多语言表达、Graph decision、知识检索/embedding 和回复润色；本地与线上 Demo 保留 deterministic/rule-based 最小路径。
+- **必须人工确认**：低于软底价、触碰敏感承诺、大额合同条款、未匹配产品、PI 生成、需要销售接管的会话。`hard_min_price` 触碰时即使人工审批也不能绕过。
+
 ### 最短本地验证
 
 ```powershell
