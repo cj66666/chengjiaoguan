@@ -133,6 +133,28 @@ def test_workers_run_due_endpoint_is_tenant_scoped(client, db_session, monkeypat
     assert response.json()["agent_runs"]["total"] == 0
 
 
+def test_run_due_jobs_zero_limits_skip_optional_boundaries(db_session, monkeypatch):
+    _seed_due_jobs(db_session, monkeypatch)
+
+    result = run_due_jobs(
+        db_session,
+        1,
+        followup_limit=0,
+        delivery_retry_limit=0,
+        email_channel_limit=0,
+        email_message_limit=0,
+        agent_inquiry_limit=0,
+        pricing_exchange_rate_limit=0,
+    )
+
+    assert result["followups"]["total"] == 0
+    assert result["delivery_retries"]["total"] == 0
+    assert result["pricing_exchange_rate_refreshes"]["total"] == 0
+    assert result["email_polls"]["total"] == 0
+    assert result["agent_runs"]["total"] == 0
+    assert result["total_jobs"] == 0
+
+
 def test_run_due_jobs_reports_pricing_refresh_failures_without_stopping(db_session):
     seller = models.Seller(id=1, name="Demo Exporter", email="owner@example.com")
     bad_rule = models.PricingRule(

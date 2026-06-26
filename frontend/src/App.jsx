@@ -175,10 +175,10 @@ export default function App() {
     });
   }
 
-  async function runWorkers() {
+  async function runWorkers(query = "email_message_limit=2&agent_inquiry_limit=1") {
     let result = null;
     await runAction("Workers 已运行", async () => {
-      const workers = await api.post("/api/v1/workers/run-due");
+      const workers = await api.post(`/api/v1/workers/run-due?${query}`);
       result = workers;
       setDemo((current) => ({ ...(current || {}), workers }));
       await loadAll();
@@ -1116,8 +1116,8 @@ function SettingsPanel({ readiness, notifications, channels, settings, createCha
   const checks = readiness.checks || [];
   const [lastWorkers, setLastWorkers] = useState(null);
 
-  async function runAndRememberWorkers() {
-    const result = await runWorkers();
+  async function runAndRememberWorkers(query) {
+    const result = await runWorkers(query);
     setLastWorkers(result || null);
   }
 
@@ -1167,10 +1167,16 @@ function SettingsPanel({ readiness, notifications, channels, settings, createCha
               </div>
             )}
           />
-          <button onClick={runAndRememberWorkers}>
-            <Send size={17} />
-            运行调度入口
-          </button>
+          <div className="inline-actions">
+            <button onClick={() => runAndRememberWorkers("email_message_limit=3&agent_inquiry_limit=0&followup_limit=0&delivery_retry_limit=0&pricing_exchange_rate_limit=0")}>
+              <InboxIcon size={17} />
+              收取邮件
+            </button>
+            <button onClick={() => runAndRememberWorkers("email_channel_limit=0&email_message_limit=0&agent_inquiry_limit=1&followup_limit=0&delivery_retry_limit=0&pricing_exchange_rate_limit=0")}>
+              <Bot size={17} />
+              处理 1 条询盘
+            </button>
+          </div>
           {lastWorkers && <StatusRows rows={workerSummaryRows(lastWorkers)} />}
         </Panel>
         <Panel title="卖家设置" span="list">

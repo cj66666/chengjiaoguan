@@ -42,12 +42,16 @@ def run_due_jobs(
     pricing_exchange_rate_limit: int = 20,
     email_client_factory: EmailClientFactory | None = None,
 ) -> dict[str, Any]:
-    followups = run_due_followups(session, seller_id=seller_id, limit=followup_limit)
-    delivery_retries = run_due_delivery_retries(session, seller_id, limit=delivery_retry_limit)
-    pricing_exchange_rate_refreshes = run_due_pricing_rule_exchange_rate_refreshes(
-        session,
-        seller_id,
-        limit=pricing_exchange_rate_limit,
+    followups = run_due_followups(session, seller_id=seller_id, limit=followup_limit) if followup_limit > 0 else []
+    delivery_retries = run_due_delivery_retries(session, seller_id, limit=delivery_retry_limit) if delivery_retry_limit > 0 else []
+    pricing_exchange_rate_refreshes = (
+        run_due_pricing_rule_exchange_rate_refreshes(
+            session,
+            seller_id,
+            limit=pricing_exchange_rate_limit,
+        )
+        if pricing_exchange_rate_limit > 0
+        else []
     )
     email_polls = _run_email_polls(
         session,
@@ -56,7 +60,7 @@ def run_due_jobs(
         message_limit=email_message_limit,
         client_factory=email_client_factory,
     )
-    agent_runs = run_new_inquiry_agent_jobs(session, seller_id, limit=agent_inquiry_limit)
+    agent_runs = run_new_inquiry_agent_jobs(session, seller_id, limit=agent_inquiry_limit) if agent_inquiry_limit > 0 else []
     return {
         "followups": _bucket(followups),
         "delivery_retries": _bucket(delivery_retries),
@@ -81,6 +85,8 @@ def _run_email_polls(
     message_limit: int,
     client_factory: EmailClientFactory | None,
 ) -> list[dict[str, Any]]:
+    if channel_limit <= 0 or message_limit <= 0:
+        return []
     results = []
     for account in _connected_email_channels(session, seller_id, channel_limit):
         try:
@@ -95,6 +101,8 @@ def _run_email_polls(
 
 
 def _connected_email_channels(session: Session, seller_id: int, limit: int) -> list[models.ChannelAccount]:
+    if limit <= 0:
+        return []
     return session.scalars(
         select(models.ChannelAccount)
         .where(models.ChannelAccount.seller_id == seller_id)
