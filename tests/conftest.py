@@ -10,6 +10,10 @@
  */
 """
 
+import os
+
+os.environ.setdefault("CLOSER_SKIP_DOTENV", "1")
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine

@@ -18,6 +18,7 @@ frontend/test-results/
 *.db
 .env
 .env.*
+!.env.example
 *.log
 tmp/
 temp/

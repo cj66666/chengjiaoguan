@@ -12,6 +12,8 @@
 
 不要提交 `.env`、密钥、token 或本地数据库。本文只记录变量名、用途和默认行为；真实值必须由部署平台或本机 secret 管理注入。
 
+本地开发会自动读取项目根目录的 `.env.local` 与 `.env`。仓库只提交 `.env.example` 模板；`.env.local` 必须留在本机并由 `.gitignore` 忽略。若需要完全禁用本地 env 文件加载，设置 `CLOSER_SKIP_DOTENV=1`。
+
 ## 基础运行
 
 | 变量 | 默认 | 用途 |
@@ -25,7 +27,7 @@
 | `CLOSER_AGENT_MODEL` | 未配置 | PydanticAI runtime 使用的模型名；未配置时 readiness 警告，运行时必须显式传 model。 |
 | `CLOSER_AGENT_API_KEY_ENV` | provider 默认 | 指向真实模型 API key 的环境变量名；OpenAI provider 默认读取 `OPENAI_API_KEY`。 |
 | `OPENAI_API_KEY` | 未配置 | OpenAI-compatible Agent、Graph decision 与 embedding provider 的默认 key 变量。 |
-| `OPENAI_BASE_URL` | OpenAI 默认 | OpenAI-compatible Agent base URL；MiniMax 使用 `https://api.minimax.io/v1`。 |
+| `OPENAI_BASE_URL` | OpenAI 默认 | OpenAI-compatible Agent base URL；MiniMax 中国区使用 `https://api.minimaxi.com/v1`。 |
 | `CLOSER_GRAPH_DECISION_PROVIDER` | `rule_based` | Graph 决策 provider；生产可用 `http`/`webhook`/`remote` 或 `openai`/`llm`。 |
 | `CLOSER_GRAPH_DECISION_ENDPOINT` | 未配置 | HTTP 决策 provider endpoint。 |
 | `CLOSER_GRAPH_DECISION_AUTH_TOKEN` | 未配置 | HTTP 决策 provider Bearer token。 |
@@ -57,7 +59,7 @@
 
 | 变量 | 默认 | 用途 |
 | --- | --- | --- |
-| `CLOSER_DELIVERY_MODE` | `payload_only` | `live` 才触发 SMTP/WhatsApp Cloud 真实外部发送。 |
+| `CLOSER_DELIVERY_MODE` | `payload_only` | `live` 才触发 SMTP/WhatsApp Cloud 真实外部发送；开启前必须人工确认测试收件人和发送内容。 |
 | `CLOSER_CREDENTIALS_SECRET` | 开发默认密钥 | 渠道凭据封存 HMAC/加密根密钥；生产必须配置。 |
 | `CLOSER_CREDENTIALS_PREVIOUS_SECRETS` | 未配置 | 轮换期读取旧封存凭据，多个值用逗号分隔。 |
 | `CLOSER_DOCUMENT_STORAGE_BACKEND` | `local` | PI 文件存储 backend；可用 `local` 或 `http`/`remote`/`s3`/`r2`/`oss` 别名。 |

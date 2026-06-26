@@ -17,6 +17,11 @@ from datetime import UTC, datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
+from app.env import load_local_env
+
+
+load_local_env()
+
 
 DEFAULT_DATABASE_URL = "sqlite:///./closer.db"
 DATABASE_URL_ENV = "CLOSER_DATABASE_URL"

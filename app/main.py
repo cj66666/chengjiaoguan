@@ -15,6 +15,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from app.database import Base, engine
+from app.env import load_local_env
 from app.errors import add_error_handlers
 from app.routers import (
     approvals,
@@ -37,6 +38,8 @@ from app.routers import (
 
 
 def create_app(create_db_on_startup: bool = True) -> FastAPI:
+    load_local_env()
+
     @asynccontextmanager
     async def lifespan(_: FastAPI):
         if create_db_on_startup:
