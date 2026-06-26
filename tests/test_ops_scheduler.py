@@ -36,6 +36,7 @@ def test_run_scheduled_operations_emits_monitoring_event(db_session, monkeypatch
             "delivery_retries": {"items": [], "total": 0},
             "pricing_exchange_rate_refreshes": {"items": [], "total": 0},
             "email_polls": {"items": [], "total": 0},
+            "agent_runs": {"items": [], "total": 0},
             "total_jobs": 0,
         },
     )
@@ -58,6 +59,7 @@ def test_run_scheduled_operations_emits_monitoring_event(db_session, monkeypatch
     assert sink.events[0]["event_type"] == "ops_scheduler_run"
     assert sink.events[0]["seller_id"] == 1
     assert sink.events[0]["jobs"]["total_jobs"] == 0
+    assert sink.events[0]["jobs"]["agent_runs"] == 0
 
 
 def test_run_scheduled_operations_marks_failed_job_as_critical(db_session, monkeypatch):
@@ -70,6 +72,7 @@ def test_run_scheduled_operations_marks_failed_job_as_critical(db_session, monke
             "delivery_retries": {"items": [{"status": "failed"}], "total": 1},
             "pricing_exchange_rate_refreshes": {"items": [], "total": 0},
             "email_polls": {"items": [], "total": 0},
+            "agent_runs": {"items": [], "total": 0},
             "total_jobs": 1,
         },
     )
@@ -95,6 +98,7 @@ def test_ops_scheduler_endpoint_uses_single_operational_entry(client, db_session
         assert seller_id == 1
         assert kwargs["email_message_limit"] == 5
         assert kwargs["pricing_exchange_rate_limit"] == 7
+        assert kwargs["agent_inquiry_limit"] == 3
         assert kwargs["emit_monitoring"] is False
         return {
             "status": "ok",
@@ -109,7 +113,7 @@ def test_ops_scheduler_endpoint_uses_single_operational_entry(client, db_session
 
     response = client.post(
         "/api/v1/ops/scheduler/run",
-        params={"email_message_limit": 5, "pricing_exchange_rate_limit": 7, "emit_monitoring": False},
+        params={"email_message_limit": 5, "pricing_exchange_rate_limit": 7, "agent_inquiry_limit": 3, "emit_monitoring": False},
     )
 
     assert response.status_code == 200

@@ -30,6 +30,7 @@ def run_due_workers(
     delivery_retry_limit: int = 50,
     email_channel_limit: int = 20,
     email_message_limit: int = 20,
+    agent_inquiry_limit: int = 20,
     pricing_exchange_rate_limit: int = 20,
     seller_id: int = Depends(get_seller_id),
     session: Session = Depends(get_session),
@@ -41,6 +42,7 @@ def run_due_workers(
         delivery_retry_limit=delivery_retry_limit,
         email_channel_limit=email_channel_limit,
         email_message_limit=email_message_limit,
+        agent_inquiry_limit=agent_inquiry_limit,
         pricing_exchange_rate_limit=pricing_exchange_rate_limit,
     )
     session.commit()
@@ -53,6 +55,7 @@ def run_ops_scheduler(
     delivery_retry_limit: int = 50,
     email_channel_limit: int = 20,
     email_message_limit: int = 20,
+    agent_inquiry_limit: int = 20,
     pricing_exchange_rate_limit: int = 20,
     alert_limit: int = 100,
     emit_monitoring: bool = True,
@@ -66,6 +69,7 @@ def run_ops_scheduler(
         delivery_retry_limit=delivery_retry_limit,
         email_channel_limit=email_channel_limit,
         email_message_limit=email_message_limit,
+        agent_inquiry_limit=agent_inquiry_limit,
         pricing_exchange_rate_limit=pricing_exchange_rate_limit,
         alert_limit=alert_limit,
         emit_monitoring=emit_monitoring,

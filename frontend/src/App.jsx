@@ -176,11 +176,14 @@ export default function App() {
   }
 
   async function runWorkers() {
+    let result = null;
     await runAction("Workers 已运行", async () => {
       const workers = await api.post("/api/v1/workers/run-due");
+      result = workers;
       setDemo((current) => ({ ...(current || {}), workers }));
       await loadAll();
     });
+    return result;
   }
 
   async function createProduct(form) {
@@ -460,6 +463,7 @@ function Dashboard({ data, demo, runWorkers, runDemoSeed, approveDemo, loading, 
   const followup = metrics.followup || {};
   const pipeline = metrics.pipeline || {};
   const wave3 = data.wave3 || {};
+  const workerRows = workerSummaryRows(demo?.workers);
   const pendingApprovals = data.approvals?.items?.slice(0, 3) || [];
   const inquiryStream = data.inquiries?.items?.slice(0, 5) || [];
   return (
@@ -614,6 +618,7 @@ function Dashboard({ data, demo, runWorkers, runDemoSeed, approveDemo, loading, 
             <Send size={17} />
             Run Workers
           </button>
+          {workerRows.length > 0 && <StatusRows rows={workerRows} />}
           {demo && <CodeBlock value={{ inquiry_id: demo.inquiry_id, conversation_id: demo.conversation_id, approval: demo.approval }} />}
         </div>
       </Panel>
@@ -1109,6 +1114,13 @@ function Approvals({ approvals, approveApproval, openQuotation, quoteDetail, sen
 
 function SettingsPanel({ readiness, notifications, channels, settings, createChannel, rotateChannel, pollEmailChannel, testChannelDelivery, saveSettings, markNotification, runWorkers }) {
   const checks = readiness.checks || [];
+  const [lastWorkers, setLastWorkers] = useState(null);
+
+  async function runAndRememberWorkers() {
+    const result = await runWorkers();
+    setLastWorkers(result || null);
+  }
+
   return (
     <section className="split">
       <div className="stack">
@@ -1155,10 +1167,11 @@ function SettingsPanel({ readiness, notifications, channels, settings, createCha
               </div>
             )}
           />
-          <button onClick={runWorkers}>
+          <button onClick={runAndRememberWorkers}>
             <Send size={17} />
             运行调度入口
           </button>
+          {lastWorkers && <StatusRows rows={workerSummaryRows(lastWorkers)} />}
         </Panel>
         <Panel title="卖家设置" span="list">
           <ApiForm testId="settings-form" onSubmit={saveSettings} submitLabel="保存设置" key={settings?.id || "empty"}>
@@ -1182,6 +1195,31 @@ function SettingsPanel({ readiness, notifications, channels, settings, createCha
       </div>
     </section>
   );
+}
+
+function workerSummaryRows(workers) {
+  if (!workers) return [];
+  return [
+    ["总任务", workers.total_jobs ?? workers.processed ?? 0],
+    ["邮件轮询", bucketTotal(workers.email_polls)],
+    ["Agent 处理", bucketTotal(workers.agent_runs)],
+    ["待审批草稿", bucketMatches(workers.agent_runs, (item) => item.requires_human_review || item.approval_id)],
+    ["失败", workerFailures(workers)],
+  ];
+}
+
+function bucketTotal(bucket) {
+  return bucket?.total ?? bucket?.items?.length ?? 0;
+}
+
+function bucketMatches(bucket, predicate) {
+  return (bucket?.items || []).filter(predicate).length;
+}
+
+function workerFailures(workers) {
+  return ["followups", "delivery_retries", "pricing_exchange_rate_refreshes", "email_polls", "agent_runs"].reduce((count, key) => {
+    return count + bucketMatches(workers[key], (item) => item.status === "failed");
+  }, 0);
 }
 
 function ChannelConsole({ channels, createChannel, rotateChannel, pollEmailChannel, testChannelDelivery }) {

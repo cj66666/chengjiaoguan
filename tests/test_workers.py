@@ -34,7 +34,7 @@ def _seed_due_jobs(db_session, monkeypatch):
     customer = models.Customer(seller_id=1, email="buyer@example.com", status="active")
     db_session.add_all([seller, customer])
     db_session.flush()
-    inquiry = models.Inquiry(seller_id=1, customer_id=customer.id, raw_content="Need lamps", status="new")
+    inquiry = models.Inquiry(seller_id=1, customer_id=customer.id, raw_content="Need lamps", status="responded")
     db_session.add(inquiry)
     db_session.flush()
     conversation = models.Conversation(
@@ -105,7 +105,9 @@ def test_run_due_jobs_executes_all_due_boundaries(db_session, monkeypatch):
     assert result["delivery_retries"]["total"] == 1
     assert result["pricing_exchange_rate_refreshes"]["total"] == 1
     assert result["email_polls"]["total"] == 1
-    assert result["total_jobs"] == 4
+    assert result["agent_runs"]["total"] == 1
+    assert result["total_jobs"] == 5
+    assert result["agent_runs"]["items"][0]["inquiry_id"] == result["email_polls"]["items"][0]["items"][0]["inquiry_id"]
     assert result["pricing_exchange_rate_refreshes"]["items"][0]["status"] == "refreshed"
     assert db_session.get(models.PricingRule, pricing_rule.id).logistics_template["exchange_rate_cache"]["rates"] == {
         "USD": {"EUR": "0.90"}
@@ -128,6 +130,7 @@ def test_workers_run_due_endpoint_is_tenant_scoped(client, db_session, monkeypat
     assert response.json()["delivery_retries"]["total"] == 0
     assert response.json()["pricing_exchange_rate_refreshes"]["total"] == 0
     assert response.json()["email_polls"]["total"] == 0
+    assert response.json()["agent_runs"]["total"] == 0
 
 
 def test_run_due_jobs_reports_pricing_refresh_failures_without_stopping(db_session):
@@ -163,6 +166,7 @@ def test_run_due_jobs_reports_pricing_refresh_failures_without_stopping(db_sessi
 
     items = result["pricing_exchange_rate_refreshes"]["items"]
     assert result["pricing_exchange_rate_refreshes"]["total"] == 2
+    assert result["agent_runs"]["total"] == 0
     assert result["total_jobs"] == 2
     assert items[0]["status"] == "failed"
     assert "USD->EUR" in items[0]["error"]
@@ -179,11 +183,13 @@ def test_workers_run_due_endpoint_uses_single_operational_entry(client, db_sessi
         assert seller_id == 1
         assert kwargs["email_message_limit"] == 5
         assert kwargs["pricing_exchange_rate_limit"] == 7
+        assert kwargs["agent_inquiry_limit"] == 3
         return {
             "followups": {"items": [], "total": 0},
             "delivery_retries": {"items": [], "total": 0},
             "pricing_exchange_rate_refreshes": {"items": [], "total": 0},
             "email_polls": {"items": [{"status": "ok", "channel_account_id": channel.id}], "total": 1},
+            "agent_runs": {"items": [], "total": 0},
             "total_jobs": 1,
         }
 
@@ -191,7 +197,7 @@ def test_workers_run_due_endpoint_uses_single_operational_entry(client, db_sessi
 
     response = client.post(
         "/api/v1/workers/run-due",
-        params={"email_message_limit": 5, "pricing_exchange_rate_limit": 7},
+        params={"email_message_limit": 5, "pricing_exchange_rate_limit": 7, "agent_inquiry_limit": 3},
     )
 
     assert response.status_code == 200

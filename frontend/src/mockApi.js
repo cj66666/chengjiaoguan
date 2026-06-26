@@ -407,7 +407,29 @@ function appendHumanMessage(state, conversationId, body) {
 }
 
 function runWorkers(state) {
-  state.workers = { due: 0, processed: 1, status: "completed", ran_at: nowIso() };
+  state.workers = {
+    followups: { items: [], total: 0 },
+    delivery_retries: { items: [], total: 0 },
+    pricing_exchange_rate_refreshes: { items: [], total: 0 },
+    email_polls: { items: [{ status: "ok", channel_account_id: 902, fetched: 0, ingested: 0, duplicates: 0 }], total: 1 },
+    agent_runs: {
+      items: [
+        {
+          status: "ok",
+          inquiry_id: state.inquiries[0]?.id,
+          conversation_id: 601,
+          inquiry_status: state.inquiries[0]?.status,
+          requires_human_review: true,
+          approval_id: state.approvals[0]?.id,
+          quotation_id: state.quotations[0]?.id,
+        },
+      ],
+      total: 1,
+    },
+    total_jobs: 2,
+    status: "completed",
+    ran_at: nowIso(),
+  };
   return clone(state.workers);
 }
 

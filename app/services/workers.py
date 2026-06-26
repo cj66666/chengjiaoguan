@@ -3,8 +3,8 @@
 /* GEB L3: 后台任务统一调度边界                                               */
 /* ========================================================================== */
 /**
- * [INPUT]: 依赖 SQLAlchemy Session、ChannelAccount、credentials、followups、delivery_attempts、email_polling 与 pricing 服务
- * [OUTPUT]: 对外提供 run_due_jobs，统一执行到期 follow-up、投递重试、显式启用的 email 轮询与价格规则汇率刷新
+ * [INPUT]: 依赖 SQLAlchemy Session、ChannelAccount、credentials、followups、delivery_attempts、email_polling、inquiry_automation 与 pricing 服务
+ * [OUTPUT]: 对外提供 run_due_jobs，统一执行到期 follow-up、投递重试、email 轮询、新询盘 agent 处理与价格规则汇率刷新
  * [POS]: services 的 deterministic worker 薄层，给外部 cron/queue/API 一个稳定入口
  * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
@@ -24,6 +24,7 @@ from app.services.credentials import reveal_credentials
 from app.services.delivery_attempts import run_due_delivery_retries
 from app.services.email_polling import EmailInboxClient, poll_email_channel
 from app.services.followups import run_due_followups
+from app.services.inquiry_automation import run_new_inquiry_agent_jobs
 
 
 EmailClientFactory = Callable[[models.ChannelAccount], EmailInboxClient | None]
@@ -37,6 +38,7 @@ def run_due_jobs(
     delivery_retry_limit: int = 50,
     email_channel_limit: int = 20,
     email_message_limit: int = 20,
+    agent_inquiry_limit: int = 20,
     pricing_exchange_rate_limit: int = 20,
     email_client_factory: EmailClientFactory | None = None,
 ) -> dict[str, Any]:
@@ -54,12 +56,20 @@ def run_due_jobs(
         message_limit=email_message_limit,
         client_factory=email_client_factory,
     )
+    agent_runs = run_new_inquiry_agent_jobs(session, seller_id, limit=agent_inquiry_limit)
     return {
         "followups": _bucket(followups),
         "delivery_retries": _bucket(delivery_retries),
         "pricing_exchange_rate_refreshes": _bucket(pricing_exchange_rate_refreshes),
         "email_polls": _bucket(email_polls),
-        "total_jobs": len(followups) + len(delivery_retries) + len(pricing_exchange_rate_refreshes) + len(email_polls),
+        "agent_runs": _bucket(agent_runs),
+        "total_jobs": (
+            len(followups)
+            + len(delivery_retries)
+            + len(pricing_exchange_rate_refreshes)
+            + len(email_polls)
+            + len(agent_runs)
+        ),
     }
 
 

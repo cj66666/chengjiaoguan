@@ -30,6 +30,7 @@ def run_scheduled_operations(
     delivery_retry_limit: int = 50,
     email_channel_limit: int = 20,
     email_message_limit: int = 20,
+    agent_inquiry_limit: int = 20,
     pricing_exchange_rate_limit: int = 20,
     alert_limit: int = 100,
     emit_monitoring: bool = True,
@@ -42,6 +43,7 @@ def run_scheduled_operations(
         delivery_retry_limit=delivery_retry_limit,
         email_channel_limit=email_channel_limit,
         email_message_limit=email_message_limit,
+        agent_inquiry_limit=agent_inquiry_limit,
         pricing_exchange_rate_limit=pricing_exchange_rate_limit,
     )
     readiness = get_readiness(session, seller_id)
@@ -97,7 +99,7 @@ def _status(jobs: dict[str, Any], readiness: dict[str, Any], alerts: dict[str, A
 
 
 def _has_failed_job(jobs: dict[str, Any]) -> bool:
-    for bucket in ["followups", "delivery_retries", "pricing_exchange_rate_refreshes", "email_polls"]:
+    for bucket in ["followups", "delivery_retries", "pricing_exchange_rate_refreshes", "email_polls", "agent_runs"]:
         items = (jobs.get(bucket) or {}).get("items") or []
         if any(item.get("status") == "failed" for item in items if isinstance(item, dict)):
             return True
@@ -111,6 +113,7 @@ def _job_summary(jobs: dict[str, Any]) -> dict[str, Any]:
         "delivery_retries": _bucket_total(jobs, "delivery_retries"),
         "pricing_exchange_rate_refreshes": _bucket_total(jobs, "pricing_exchange_rate_refreshes"),
         "email_polls": _bucket_total(jobs, "email_polls"),
+        "agent_runs": _bucket_total(jobs, "agent_runs"),
     }
 
 
