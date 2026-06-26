@@ -38,8 +38,8 @@ class SmtpDeliveryClient:
     name = "smtp"
 
     def send(self, payload: dict[str, Any], credentials: dict[str, Any]) -> dict[str, Any]:
-        host = _required(credentials, "host")
-        port = int(credentials.get("port") or 465)
+        host = _required_any(credentials, "smtp_host", "host")
+        port = int(credentials.get("smtp_port") or credentials.get("port") or 465)
         timeout = float(credentials.get("timeout_seconds") or 10)
         message = _email_message(payload)
         if credentials.get("use_ssl", True):
@@ -113,3 +113,11 @@ def _required(credentials: dict[str, Any], key: str) -> str:
     if value in (None, ""):
         raise ValueError(f"{key} credential is required")
     return str(value)
+
+
+def _required_any(credentials: dict[str, Any], *keys: str) -> str:
+    for key in keys:
+        value = credentials.get(key)
+        if value not in (None, ""):
+            return str(value)
+    raise ValueError(f"{keys[0]} credential is required")

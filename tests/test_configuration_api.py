@@ -81,6 +81,12 @@ def test_product_pricing_channel_and_dashboard_api(client, db_session):
     assert channel_response.status_code == 201
     assert channel_response.json()["credentials_configured"] is True
     assert channel_response.json()["credentials_key_status"] == "current"
+    assert channel_response.json()["operations"] == {
+        "inbound": "imap_poll",
+        "outbound": "smtp",
+        "poll_enabled": False,
+        "mailbox": "INBOX",
+    }
     stored_channel = db_session.get(models.ChannelAccount, channel_response.json()["id"])
     assert stored_channel.credentials["_sealed"] == SEAL_VERSION
     assert "imap.example.com" not in str(stored_channel.credentials)

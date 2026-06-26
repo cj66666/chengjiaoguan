@@ -31,7 +31,7 @@ from app.services.object_storage import get_document_storage_config
 from app.services.ops_monitoring import get_monitoring_sink_config
 
 
-REQUIRED_EMAIL_KEYS = ("host", "username", "password")
+REQUIRED_EMAIL_KEYS = ("username", "password")
 REQUIRED_WHATSAPP_KEYS = ("access_token", "phone_number_id")
 
 
@@ -168,7 +168,13 @@ def _channel_detail(channel: models.ChannelAccount) -> dict[str, Any]:
     if channel.channel_type == "email":
         return _with_credential_key_status(
             channel,
-            _credential_detail(channel, credentials, REQUIRED_EMAIL_KEYS, poll_enabled=_polling_enabled(credentials)),
+            _credential_detail(
+                channel,
+                credentials,
+                REQUIRED_EMAIL_KEYS,
+                poll_enabled=_polling_enabled(credentials),
+                aliases={"imap_host": ("imap_host", "host"), "smtp_host": ("smtp_host", "host")},
+            ),
         )
     if channel.channel_type == "whatsapp":
         return _with_credential_key_status(channel, _credential_detail(channel, credentials, REQUIRED_WHATSAPP_KEYS))
@@ -189,8 +195,12 @@ def _credential_detail(
     required_keys: tuple[str, ...],
     *,
     poll_enabled: bool = False,
+    aliases: dict[str, tuple[str, ...]] | None = None,
 ) -> dict[str, Any]:
     missing = [key for key in required_keys if credentials.get(key) in (None, "")]
+    for label, keys in (aliases or {}).items():
+        if not any(credentials.get(key) not in (None, "") for key in keys):
+            missing.append(label)
     live = _delivery_mode() == "live"
     if missing and (live or poll_enabled):
         status = "failed"

@@ -23,7 +23,7 @@ from app.database import utcnow
 from app.services.credentials import CredentialsError, credentials_key_status, reveal_credentials
 
 
-REQUIRED_EMAIL_KEYS = ("host", "username", "password")
+REQUIRED_EMAIL_KEYS = ("username", "password")
 REQUIRED_WHATSAPP_KEYS = ("access_token", "phone_number_id")
 
 
@@ -195,7 +195,12 @@ def _channel_alerts(channel: models.ChannelAccount, now: datetime) -> list[dict[
 
 def _missing_required_credentials(channel: models.ChannelAccount, credentials: dict[str, Any]) -> list[str]:
     if channel.channel_type == "email":
-        required = REQUIRED_EMAIL_KEYS
+        missing = [key for key in REQUIRED_EMAIL_KEYS if credentials.get(key) in (None, "")]
+        if not any(credentials.get(key) not in (None, "") for key in ("imap_host", "host")):
+            missing.append("imap_host")
+        if not any(credentials.get(key) not in (None, "") for key in ("smtp_host", "host")):
+            missing.append("smtp_host")
+        return missing
     elif channel.channel_type == "whatsapp":
         required = REQUIRED_WHATSAPP_KEYS
     else:

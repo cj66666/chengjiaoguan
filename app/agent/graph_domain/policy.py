@@ -381,7 +381,7 @@ def _decision_from_openai_response(payload: Any) -> GraphPolicyDecision:
     try:
         value = json.loads(content)
     except json.JSONDecodeError as exc:
-        raise ValueError("Graph decision LLM response content must be valid JSON") from exc
+        value = _json_object_from_text(content)
     if isinstance(value, Mapping) and isinstance(value.get("decision"), Mapping):
         value = value["decision"]
     return _decision_from_mapping(value)
@@ -407,6 +407,20 @@ def _openai_message_content(payload: Any) -> str:
         if text:
             return text
     raise ValueError("Graph decision LLM message content must be text")
+
+
+def _json_object_from_text(content: str) -> Mapping[str, Any]:
+    decoder = json.JSONDecoder()
+    for index, char in enumerate(content):
+        if char != "{":
+            continue
+        try:
+            value, _ = decoder.raw_decode(content[index:])
+        except json.JSONDecodeError:
+            continue
+        if isinstance(value, Mapping):
+            return value
+    raise ValueError("Graph decision LLM response content must contain a JSON object")
 
 
 def _decision_from_mapping(value: Any) -> GraphPolicyDecision:

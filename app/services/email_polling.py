@@ -133,7 +133,7 @@ def poll_email_channel(
 
 
 def _imap_connection(credentials: dict[str, Any]):
-    host = _required(credentials, "host")
+    host = _required_any(credentials, "imap_host", "host")
     port = int(credentials.get("port") or 993)
     username = _required(credentials, "username")
     password = _required(credentials, "password")
@@ -167,3 +167,11 @@ def _required(credentials: dict[str, Any], key: str) -> str:
     if value in (None, ""):
         raise ValueError(f"{key} credential is required")
     return str(value)
+
+
+def _required_any(credentials: dict[str, Any], *keys: str) -> str:
+    for key in keys:
+        value = credentials.get(key)
+        if value not in (None, ""):
+            return str(value)
+    raise ValueError(f"{keys[0]} credential is required")

@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from app import models
 from app.errors import api_error
-from app.services.credentials import credentials_key_status, is_credentials_configured
+from app.services.credentials import credentials_key_status, is_credentials_configured, reveal_credentials
 
 
 def require_inquiry(session: Session, seller_id: int, inquiry_id: int) -> models.Inquiry:
@@ -188,6 +188,7 @@ def pricing_rule_version_item(version: models.PricingRuleVersion) -> dict:
 
 
 def channel_item(channel: models.ChannelAccount) -> dict:
+    credentials = reveal_credentials(channel.credentials) if is_credentials_configured(channel.credentials) else {}
     return {
         "id": channel.id,
         "channel_type": channel.channel_type,
@@ -195,7 +196,23 @@ def channel_item(channel: models.ChannelAccount) -> dict:
         "status": channel.status,
         "credentials_configured": is_credentials_configured(channel.credentials),
         "credentials_key_status": credentials_key_status(channel.credentials),
+        "operations": _channel_operations(channel, credentials),
     }
+
+
+def _channel_operations(channel: models.ChannelAccount, credentials: dict) -> dict:
+    if channel.channel_type == "email":
+        return {
+            "inbound": "imap_poll",
+            "outbound": "smtp",
+            "poll_enabled": bool(credentials.get("poll_enabled") or credentials.get("polling_enabled")),
+            "mailbox": credentials.get("mailbox") or "INBOX",
+        }
+    if channel.channel_type == "whatsapp":
+        return {"inbound": "webhook", "outbound": "whatsapp_cloud", "poll_enabled": False}
+    if channel.channel_type == "site_form":
+        return {"inbound": "webhook", "outbound": "none", "poll_enabled": False}
+    return {"inbound": "manual", "outbound": "payload_only", "poll_enabled": False}
 
 
 def approval_item(approval: models.Approval) -> dict:

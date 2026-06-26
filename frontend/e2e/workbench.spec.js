@@ -185,6 +185,7 @@ test("workbench settings notification flow", async ({ page }, testInfo) => {
   await page.getByRole("button", { name: "设置", exact: true }).click();
   await expect(page.getByRole("heading", { name: "生产就绪" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "通知与调度" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "外部通道" })).toBeVisible();
 
   const settingsForm = page.getByTestId("settings-form");
   await expect(settingsForm).toBeVisible();
@@ -193,6 +194,27 @@ test("workbench settings notification flow", async ({ page }, testInfo) => {
   await settingsForm.locator('input[name="large_order_approval_threshold"]').fill("12000");
   await page.getByTestId("settings-form-submit").click();
   await expect(page.getByText("设置已保存")).toBeVisible();
+
+  const channelForm = page.getByTestId("settings-channel-form");
+  await expect(channelForm).toBeVisible();
+  await channelForm.locator('input[name="name"]').fill(`E2E Sales Inbox ${sellerId}`);
+  await channelForm.locator('input[name="imap_host"]').fill("imap.example.com");
+  await channelForm.locator('input[name="smtp_host"]').fill("smtp.example.com");
+  await channelForm.locator('input[name="username"]').fill("sales@example.com");
+  await channelForm.locator('input[name="password"]').fill("secret");
+  await page.getByTestId("settings-channel-form-submit").click();
+  await expect(page.getByText("渠道已创建")).toBeVisible();
+  await expect(page.getByText(`E2E Sales Inbox ${sellerId}`)).toBeVisible();
+
+  await page.route("**/api/v1/channels/*/poll-email?limit=5", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ channel_account_id: 1, fetched: 0, ingested: 0, duplicates: 0, items: [] }),
+    });
+  });
+  await page.locator('button[data-testid^="channel-"][data-testid$="-poll"]').first().click();
+  await expect(page.getByText("邮箱轮询已执行")).toBeVisible();
 
   const archiveButton = page.locator('button[data-testid^="notification-"][data-testid$="-archive"]').first();
   await expect(archiveButton).toBeVisible();

@@ -25,6 +25,7 @@ import {
   Package,
   Paperclip,
   Play,
+  RefreshCw,
   Send,
   Settings,
   ShieldCheck,
@@ -40,7 +41,7 @@ import { createApiClient } from "./api.js";
 import { Products } from "./catalog.jsx";
 import { AnalyticsPage, MobilePreviewPage, QuoteRulesPage } from "./design_pages.jsx";
 import { channelPayload, pricingPayload, productPayload, safeGet, settingsPayload } from "./forms.js";
-import { ApiForm, CodeBlock, Field, IconButton, Metric, Panel, Rows, StatusRows } from "./ui.jsx";
+import { ApiForm, CodeBlock, Field, IconButton, JsonField, Metric, Panel, Rows, StatusRows } from "./ui.jsx";
 
 const NAV = [
   { id: "dashboard", label: "工作台", testLabel: "看板", icon: BarChart3 },
@@ -220,6 +221,14 @@ export default function App() {
   async function rotateChannel(channelId) {
     await runAction("渠道凭据已轮换", async () => {
       await api.post(`/api/v1/channels/${channelId}/rotate-credentials`);
+      await loadAll();
+    });
+  }
+
+  async function pollEmailChannel(channelId) {
+    await runAction("邮箱轮询已执行", async () => {
+      const poll = await api.post(`/api/v1/channels/${channelId}/poll-email?limit=5`);
+      setDemo((current) => ({ ...(current || {}), email_poll: poll }));
       await loadAll();
     });
   }
@@ -420,7 +429,11 @@ export default function App() {
           <SettingsPanel
             readiness={data.readiness}
             notifications={data.notifications}
+            channels={data.channels}
             settings={data.settings}
+            createChannel={createChannel}
+            rotateChannel={rotateChannel}
+            pollEmailChannel={pollEmailChannel}
             saveSettings={saveSettings}
             markNotification={markNotification}
             runWorkers={runWorkers}
@@ -1085,73 +1098,165 @@ function Approvals({ approvals, approveApproval, openQuotation, quoteDetail, sen
   );
 }
 
-function SettingsPanel({ readiness, notifications, settings, saveSettings, markNotification, runWorkers }) {
+function SettingsPanel({ readiness, notifications, channels, settings, createChannel, rotateChannel, pollEmailChannel, saveSettings, markNotification, runWorkers }) {
   const checks = readiness.checks || [];
   return (
     <section className="split">
-      <Panel title="生产就绪">
-        <Rows
-          items={checks}
-          empty="暂无 readiness 数据。"
-          render={(check) => (
-            <div className="row-main">
-              <span className={`dot ${check.status}`}></span>
-              <div>
-                <strong>{check.name}</strong>
-                <p>{check.message}</p>
+      <div className="stack">
+        <Panel title="生产就绪" subtitle={`当前状态：${readiness.status || "unknown"}`}>
+          <Rows
+            items={checks}
+            empty="暂无 readiness 数据。"
+            render={(check) => (
+              <div className="readiness-row">
+                <span className={`dot ${check.status}`}></span>
+                <div>
+                  <strong>{check.name}</strong>
+                  <p>{check.message}</p>
+                  {check.details && Object.keys(check.details).length > 0 && <CodeBlock value={check.details} />}
+                </div>
+                <small>{check.status}</small>
               </div>
-              <small>{check.status}</small>
+            )}
+          />
+        </Panel>
+        <ChannelConsole channels={channels} createChannel={createChannel} rotateChannel={rotateChannel} pollEmailChannel={pollEmailChannel} />
+      </div>
+      <div className="stack">
+        <Panel title="通知与调度">
+          <Rows
+            items={notifications.items}
+            empty="暂无未读通知。"
+            render={(item) => (
+              <div className="approval-row">
+                <div>
+                  <strong>{item.title}</strong>
+                  <p>{item.body || item.severity}</p>
+                </div>
+                <div className="inline-actions">
+                  <button data-testid={`notification-${item.id}-read`} onClick={() => markNotification(item.id, "read")}>
+                    <Check size={17} />
+                    已读
+                  </button>
+                  <button data-testid={`notification-${item.id}-archive`} onClick={() => markNotification(item.id, "archived")}>
+                    <Archive size={17} />
+                    归档
+                  </button>
+                </div>
+              </div>
+            )}
+          />
+          <button onClick={runWorkers}>
+            <Send size={17} />
+            运行调度入口
+          </button>
+        </Panel>
+        <Panel title="卖家设置" span="list">
+          <ApiForm testId="settings-form" onSubmit={saveSettings} submitLabel="保存设置" key={settings?.id || "empty"}>
+            <Field name="name" label="名称" defaultValue={settings?.name || "Demo Exporter"} required />
+            <div className="form-grid">
+              <Field name="phone" label="电话" defaultValue={settings?.phone || ""} />
+              <Field name="plan" label="方案" defaultValue={settings?.plan || "mvp"} required />
+              <Field
+                name="large_order_approval_threshold"
+                label="大额阈值"
+                type="number"
+                defaultValue={settings?.settings?.large_order_approval_threshold || "10000"}
+              />
             </div>
-          )}
-        />
-      </Panel>
-      <Panel title="通知与调度">
-        <Rows
-          items={notifications.items}
-          empty="暂无未读通知。"
-          render={(item) => (
-            <div className="approval-row">
-              <div>
-                <strong>{item.title}</strong>
-                <p>{item.body || item.severity}</p>
-              </div>
-              <div className="inline-actions">
-                <button data-testid={`notification-${item.id}-read`} onClick={() => markNotification(item.id, "read")}>
-                  <Check size={17} />
-                  已读
-                </button>
-                <button data-testid={`notification-${item.id}-archive`} onClick={() => markNotification(item.id, "archived")}>
-                  <Archive size={17} />
-                  归档
-                </button>
-              </div>
-            </div>
-          )}
-        />
-        <button onClick={runWorkers}>
-          <Send size={17} />
-          运行调度入口
-        </button>
-      </Panel>
-      <Panel title="卖家设置" span="list">
-        <ApiForm testId="settings-form" onSubmit={saveSettings} submitLabel="保存设置" key={settings?.id || "empty"}>
-          <Field name="name" label="名称" defaultValue={settings?.name || "Demo Exporter"} required />
-          <div className="form-grid">
-            <Field name="phone" label="电话" defaultValue={settings?.phone || ""} />
-            <Field name="plan" label="方案" defaultValue={settings?.plan || "mvp"} required />
-            <Field
-              name="large_order_approval_threshold"
-              label="大额阈值"
-              type="number"
-              defaultValue={settings?.settings?.large_order_approval_threshold || "10000"}
-            />
-          </div>
-          <label className="check-field">
-            <input name="ai_disclosure" type="checkbox" defaultChecked={settings?.ai_disclosure !== false} />
-            <span>AI disclosure</span>
-          </label>
-        </ApiForm>
-      </Panel>
+            <label className="check-field">
+              <input name="ai_disclosure" type="checkbox" defaultChecked={settings?.ai_disclosure !== false} />
+              <span>AI disclosure</span>
+            </label>
+          </ApiForm>
+        </Panel>
+      </div>
     </section>
+  );
+}
+
+function ChannelConsole({ channels, createChannel, rotateChannel, pollEmailChannel }) {
+  const [channelType, setChannelType] = useState("email");
+  return (
+    <Panel title="外部通道" subtitle="把邮箱、WhatsApp、站点表单接进同一个询盘队列">
+      <Rows
+        items={channels.items}
+        empty="暂无外部通道。先连接一个邮箱或 WhatsApp。"
+        render={(channel) => (
+          <div className="channel-row">
+            <span className={`channel-icon ${channel.channel_type}`}>{channel.channel_type.slice(0, 2).toUpperCase()}</span>
+            <div>
+              <strong>{channel.name || channel.channel_type}</strong>
+              <p>
+                {channel.status} · {channel.operations?.inbound || "manual"} / {channel.operations?.outbound || "payload_only"} · key {channel.credentials_key_status}
+              </p>
+              <small>{channel.operations?.poll_enabled ? `轮询已开启：${channel.operations?.mailbox || "INBOX"}` : "轮询未开启或无需轮询"}</small>
+            </div>
+            <div className="inline-actions">
+              {channel.channel_type === "email" && (
+                <button data-testid={`channel-${channel.id}-poll`} onClick={() => pollEmailChannel(channel.id)}>
+                  <InboxIcon size={17} />
+                  轮询
+                </button>
+              )}
+              <button data-testid={`settings-channel-${channel.id}-rotate`} onClick={() => rotateChannel(channel.id)}>
+                <RefreshCw size={17} />
+                轮换
+              </button>
+            </div>
+          </div>
+        )}
+      />
+      <ApiForm testId="settings-channel-form" onSubmit={createChannel} submitLabel="连接通道">
+        <label className="field">
+          <span>类型</span>
+          <select name="channel_type" value={channelType} onChange={(event) => setChannelType(event.target.value)}>
+            <option value="email">email</option>
+            <option value="whatsapp">whatsapp</option>
+            <option value="site_form">site_form</option>
+          </select>
+        </label>
+        <Field name="name" label="名称" defaultValue={channelType === "whatsapp" ? "WhatsApp Cloud" : "Sales inbox"} />
+        {channelType === "email" && <EmailChannelFields />}
+        {channelType === "whatsapp" && <WhatsAppChannelFields />}
+        {channelType === "site_form" && <JsonField name="credentials" label="凭据 JSON" defaultValue={{ source: "website", webhook: "/api/v1/webhooks/site_form" }} />}
+      </ApiForm>
+    </Panel>
+  );
+}
+
+function EmailChannelFields() {
+  return (
+    <>
+      <div className="form-grid">
+        <Field name="imap_host" label="IMAP 主机" defaultValue="imap.gmail.com" required />
+        <Field name="imap_port" label="IMAP 端口" type="number" defaultValue="993" />
+        <Field name="mailbox" label="邮箱目录" defaultValue="INBOX" />
+      </div>
+      <div className="form-grid">
+        <Field name="smtp_host" label="SMTP 主机" defaultValue="smtp.gmail.com" required />
+        <Field name="smtp_port" label="SMTP 端口" type="number" defaultValue="465" />
+        <Field name="username" label="账号" defaultValue="sales@example.com" required />
+      </div>
+      <Field name="password" label="授权码/密码" type="password" required />
+      <label className="check-field">
+        <input name="poll_enabled" type="checkbox" defaultChecked />
+        <span>开启 IMAP 轮询，让 workers 自动收取新询盘</span>
+      </label>
+      <label className="check-field">
+        <input name="use_ssl" type="checkbox" defaultChecked />
+        <span>SSL 连接</span>
+      </label>
+    </>
+  );
+}
+
+function WhatsAppChannelFields() {
+  return (
+    <>
+      <Field name="phone_number_id" label="Phone Number ID" required />
+      <Field name="access_token" label="Access Token" type="password" required />
+      <Field name="api_version" label="Graph API 版本" defaultValue="v20.0" />
+    </>
   );
 }

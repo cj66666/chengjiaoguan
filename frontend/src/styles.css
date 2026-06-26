@@ -177,6 +177,12 @@ button:disabled{cursor:not-allowed;opacity:.55}
 .activity{border-top:1px solid var(--border-2);gap:7px;padding-top:10px;display:grid}
 .activity:first-child{border-top:0;padding-top:0}
 .activity-row,.quote-lines div,.status-rows div{border-radius:var(--radius-sm);background:#fafbfc;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;padding:9px 10px;display:grid}
+.readiness-row,.channel-row{border-radius:var(--radius-sm);background:#fafbfc;grid-template-columns:auto minmax(0,1fr) auto;align-items:start;gap:10px;padding:10px 12px;display:grid}
+.readiness-row pre{max-height:150px;overflow:auto;margin-top:8px}
+.channel-row p,.channel-row small{color:var(--text-2);margin:3px 0 0;overflow-wrap:anywhere}
+.channel-icon{width:34px;height:34px;border-radius:9px;background:var(--primary-tint);color:var(--primary);display:grid;place-items:center;font-size:12px;font-weight:900}
+.channel-icon.whatsapp{background:var(--green-light);color:#1f7568}
+.channel-icon.site_form{background:var(--orange-light);color:#995b16}
 .quote-lines,.status-rows{gap:8px;margin-bottom:12px;display:grid}
 .quote-lines div{grid-template-columns:minmax(0,1fr) auto auto}
 .quote-message{border-left:3px solid var(--primary);border-radius:var(--radius-sm);background:var(--primary-tint);overflow-wrap:anywhere;padding:10px 12px}

@@ -41,7 +41,7 @@ export function channelPayload(form) {
   return compact({
     channel_type: text(form, "channel_type"),
     name: text(form, "name"),
-    credentials: jsonValue(form, "credentials", {}),
+    credentials: channelCredentials(form),
     status: "connected",
   });
 }
@@ -66,6 +66,33 @@ function jsonValue(form, name, fallback) {
   } catch (error) {
     throw new Error(`${name} JSON 无效: ${error.message}`);
   }
+}
+
+function channelCredentials(form) {
+  const raw = text(form, "credentials");
+  if (raw) return jsonValue(form, "credentials", {});
+  const channelType = text(form, "channel_type");
+  if (channelType === "email") {
+    return compact({
+      imap_host: text(form, "imap_host"),
+      imap_port: numberValue(form, "imap_port") || 993,
+      smtp_host: text(form, "smtp_host"),
+      smtp_port: numberValue(form, "smtp_port") || 465,
+      username: text(form, "username"),
+      password: text(form, "password"),
+      mailbox: text(form, "mailbox") || "INBOX",
+      poll_enabled: form.get("poll_enabled") === "on",
+      use_ssl: form.get("use_ssl") !== "off",
+    });
+  }
+  if (channelType === "whatsapp") {
+    return compact({
+      access_token: text(form, "access_token"),
+      phone_number_id: text(form, "phone_number_id"),
+      api_version: text(form, "api_version") || "v20.0",
+    });
+  }
+  return {};
 }
 
 function text(form, name) {

@@ -161,6 +161,41 @@ def test_openai_graph_policy_posts_chat_completion_and_parses_json_decision(monk
     assert decision.draft_response == "We can quote this order."
 
 
+def test_openai_graph_policy_extracts_json_from_reasoning_wrapped_content(monkeypatch):
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc_value, traceback):
+            return False
+
+        def read(self):
+            return json.dumps(
+                {
+                    "choices": [
+                        {
+                            "message": {
+                                "content": '<think>check schema</think>\n\n{"requires_human_review": false, "should_quote": true, "knowledge_query": "LED desk lamp"}'
+                            }
+                        }
+                    ]
+                }
+            ).encode()
+
+    monkeypatch.setattr(policy, "urlopen", lambda request, timeout: FakeResponse())
+
+    provider = policy.OpenAICompatibleGraphDecisionProvider(
+        endpoint="https://llm.example/v1/chat/completions",
+        api_key="sk-test",
+        model="reasoning-test",
+    )
+    decision = provider.decide(policy.GraphPolicyContext(stage="understand", seller_id=1, user_prompt="Need lamps"))
+
+    assert decision.requires_human_review is False
+    assert decision.should_quote is True
+    assert decision.knowledge_query == "LED desk lamp"
+
+
 def test_graph_decision_provider_config_reports_default_and_http(monkeypatch):
     monkeypatch.delenv("CLOSER_GRAPH_DECISION_PROVIDER", raising=False)
     default_config = policy.get_graph_decision_provider_config()
