@@ -16,7 +16,9 @@ from sqlalchemy.orm import Session
 from app.database import get_session
 from app.dependencies import get_seller_id
 from app.errors import api_error
+from app.schemas import ChannelDeliveryTest
 from app.services.channel_receipts import sync_channel_receipts
+from app.services.channel_test_delivery import test_channel_delivery
 from app.services.email_polling import poll_email_channel
 
 
@@ -54,4 +56,20 @@ def sync_channel_receipts_endpoint(
     except ValueError as exc:
         raise api_error(422, "invalid_delivery_receipt", str(exc)) from exc
     session.commit()
+    return result
+
+
+@router.post("/channels/{channel_account_id}/test-delivery")
+def test_channel_delivery_endpoint(
+    channel_account_id: int,
+    payload: ChannelDeliveryTest,
+    seller_id: int = Depends(get_seller_id),
+    session: Session = Depends(get_session),
+) -> dict:
+    try:
+        result = test_channel_delivery(session, seller_id, channel_account_id, payload.model_dump(by_alias=True))
+    except LookupError as exc:
+        raise api_error(404, "channel_not_found", "Channel account not found") from exc
+    except ValueError as exc:
+        raise api_error(422, "invalid_test_delivery", str(exc)) from exc
     return result

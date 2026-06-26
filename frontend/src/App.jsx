@@ -40,7 +40,7 @@ import {
 import { createApiClient } from "./api.js";
 import { Products } from "./catalog.jsx";
 import { AnalyticsPage, MobilePreviewPage, QuoteRulesPage } from "./design_pages.jsx";
-import { channelPayload, pricingPayload, productPayload, safeGet, settingsPayload } from "./forms.js";
+import { channelPayload, pricingPayload, productPayload, safeGet, settingsPayload, testDeliveryPayload } from "./forms.js";
 import { ApiForm, CodeBlock, Field, IconButton, JsonField, Metric, Panel, Rows, StatusRows } from "./ui.jsx";
 
 const NAV = [
@@ -229,6 +229,14 @@ export default function App() {
     await runAction("邮箱轮询已执行", async () => {
       const poll = await api.post(`/api/v1/channels/${channelId}/poll-email?limit=5`);
       setDemo((current) => ({ ...(current || {}), email_poll: poll }));
+      await loadAll();
+    });
+  }
+
+  async function testChannelDelivery(channelId, form) {
+    await runAction("通道测试投递已生成", async () => {
+      const deliveryTest = await api.post(`/api/v1/channels/${channelId}/test-delivery`, testDeliveryPayload(form));
+      setDemo((current) => ({ ...(current || {}), delivery_test: deliveryTest }));
       await loadAll();
     });
   }
@@ -434,6 +442,7 @@ export default function App() {
             createChannel={createChannel}
             rotateChannel={rotateChannel}
             pollEmailChannel={pollEmailChannel}
+            testChannelDelivery={testChannelDelivery}
             saveSettings={saveSettings}
             markNotification={markNotification}
             runWorkers={runWorkers}
@@ -1098,7 +1107,7 @@ function Approvals({ approvals, approveApproval, openQuotation, quoteDetail, sen
   );
 }
 
-function SettingsPanel({ readiness, notifications, channels, settings, createChannel, rotateChannel, pollEmailChannel, saveSettings, markNotification, runWorkers }) {
+function SettingsPanel({ readiness, notifications, channels, settings, createChannel, rotateChannel, pollEmailChannel, testChannelDelivery, saveSettings, markNotification, runWorkers }) {
   const checks = readiness.checks || [];
   return (
     <section className="split">
@@ -1120,7 +1129,7 @@ function SettingsPanel({ readiness, notifications, channels, settings, createCha
             )}
           />
         </Panel>
-        <ChannelConsole channels={channels} createChannel={createChannel} rotateChannel={rotateChannel} pollEmailChannel={pollEmailChannel} />
+        <ChannelConsole channels={channels} createChannel={createChannel} rotateChannel={rotateChannel} pollEmailChannel={pollEmailChannel} testChannelDelivery={testChannelDelivery} />
       </div>
       <div className="stack">
         <Panel title="通知与调度">
@@ -1175,7 +1184,7 @@ function SettingsPanel({ readiness, notifications, channels, settings, createCha
   );
 }
 
-function ChannelConsole({ channels, createChannel, rotateChannel, pollEmailChannel }) {
+function ChannelConsole({ channels, createChannel, rotateChannel, pollEmailChannel, testChannelDelivery }) {
   const [channelType, setChannelType] = useState("email");
   return (
     <Panel title="外部通道" subtitle="把邮箱、WhatsApp、站点表单接进同一个询盘队列">
@@ -1204,6 +1213,15 @@ function ChannelConsole({ channels, createChannel, rotateChannel, pollEmailChann
                 轮换
               </button>
             </div>
+            {["email", "whatsapp"].includes(channel.channel_type) && (
+              <ApiForm testId={`channel-${channel.id}-test-delivery`} onSubmit={(form) => testChannelDelivery(channel.id, form)} submitLabel="测试投递">
+                <div className="form-grid">
+                  <Field name="to" label={channel.channel_type === "email" ? "测试收件邮箱" : "测试手机号"} defaultValue={channel.channel_type === "email" ? "buyer@example.com" : "+15550001111"} required />
+                  <Field name="subject" label="主题" defaultValue="Closer channel test" />
+                  <Field name="body" label="内容" defaultValue="Closer channel test message." />
+                </div>
+              </ApiForm>
+            )}
           </div>
         )}
       />

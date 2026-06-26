@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖浏览器 FormData
- * [OUTPUT]: 对外提供 safeGet、productPayload、pricingPayload、channelPayload、settingsPayload
+ * [OUTPUT]: 对外提供 safeGet、productPayload、pricingPayload、channelPayload、testDeliveryPayload、settingsPayload
  * [POS]: frontend/src 的表单归一层，把 UI 表单值折叠成后端 schema 接受的最小 payload
  * [PROTOCOL]: 变更时同步更新相关测试与公开文档
  */
@@ -66,6 +66,15 @@ function jsonValue(form, name, fallback) {
   } catch (error) {
     throw new Error(`${name} JSON 无效: ${error.message}`);
   }
+}
+
+export function testDeliveryPayload(form) {
+  return compact({
+    to: text(form, "to"),
+    subject: text(form, "subject"),
+    body: text(form, "body"),
+    confirm_live: false,
+  });
 }
 
 function channelCredentials(form) {

@@ -216,6 +216,13 @@ test("workbench settings notification flow", async ({ page }, testInfo) => {
   await page.locator('button[data-testid^="channel-"][data-testid$="-poll"]').first().click();
   await expect(page.getByText("邮箱轮询已执行")).toBeVisible();
 
+  const testDeliveryForm = page.locator('form[data-testid^="channel-"][data-testid$="-test-delivery"]').first();
+  await expect(testDeliveryForm).toBeVisible();
+  await testDeliveryForm.locator('input[name="to"]').fill("buyer@example.com");
+  await testDeliveryForm.locator('input[name="body"]').fill("Closer dry-run test.");
+  await testDeliveryForm.locator('button[type="submit"]').click();
+  await expect(page.getByText("通道测试投递已生成")).toBeVisible();
+
   const archiveButton = page.locator('button[data-testid^="notification-"][data-testid$="-archive"]').first();
   await expect(archiveButton).toBeVisible();
   await archiveButton.click();

@@ -149,6 +149,16 @@ class ChannelAccountCreate(BaseModel):
     status: str = Field(default="connected", max_length=20)
 
 
+class ChannelDeliveryTest(BaseModel):
+    to: str | None = None
+    from_: str | None = Field(default=None, alias="from")
+    subject: str | None = None
+    body: str | None = None
+    confirm_live: bool = False
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
 class ApprovalPatch(BaseModel):
     payload: dict[str, Any] | None = None
     suggestion: str | None = None

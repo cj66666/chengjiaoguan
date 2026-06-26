@@ -31,6 +31,14 @@
 
 `--run-scheduler` 会调用 `/api/v1/ops/scheduler/run`，可能执行 due follow-up、delivery retry、价格规则汇率刷新和启用的 email polling。生产 cron/queue 只需要定时调用这一条入口；若要跳过外部监控上报，用 `--no-monitoring`。
 
+## 渠道投递测试
+
+设置页的通道测试投递默认是 dry-run，只生成 email/WhatsApp payload 并通过 `payload_only` client 返回，不会触发真实 SMTP 或 WhatsApp 发送。真实投递必须同时满足：
+
+- `CLOSER_DELIVERY_MODE=live`
+- 调用 `POST /api/v1/channels/{id}/test-delivery` 时传入 `confirm_live=true`
+- 人工确认测试收件人、内容和通道凭据无误
+
 ## Provider 核对
 
 完整环境变量地图见 `docs/ENVIRONMENT.md`。下面是上线前必须不再依赖本地默认值的关键组：
