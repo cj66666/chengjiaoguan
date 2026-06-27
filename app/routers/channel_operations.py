@@ -10,6 +10,9 @@
  */
 """
 
+import imaplib
+import socket
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -36,8 +39,12 @@ def poll_email_channel_endpoint(
         result = poll_email_channel(session, seller_id, channel_account_id, limit=limit)
     except LookupError as exc:
         raise api_error(404, "channel_not_found", "Email channel account not found") from exc
+    except imaplib.IMAP4.error as exc:
+        raise api_error(422, "email_poll_failed", _friendly_email_poll_error(exc)) from exc
+    except (OSError, socket.timeout) as exc:
+        raise api_error(422, "email_poll_failed", _friendly_email_poll_error(exc)) from exc
     except ValueError as exc:
-        raise api_error(422, "email_poll_failed", str(exc)) from exc
+        raise api_error(422, "email_poll_failed", _friendly_email_poll_error(exc)) from exc
     session.commit()
     return result
 
@@ -73,3 +80,15 @@ def test_channel_delivery_endpoint(
     except ValueError as exc:
         raise api_error(422, "invalid_test_delivery", str(exc)) from exc
     return result
+
+
+def _friendly_email_poll_error(exc: Exception) -> str:
+    message = str(exc)
+    lower = message.lower()
+    if "imap_host" in lower or "smtp_host" in lower or "username" in lower or "password" in lower or "credential is required" in lower:
+        return "邮箱通道凭据不完整，请检查 IMAP/SMTP 主机、账号和应用专用密码。"
+    if "authenticationfailed" in lower or "invalid credentials" in lower or "application-specific password" in lower or "login failed" in lower:
+        return "Gmail 登录失败。请确认 IMAP 已开启，并使用 Gmail 应用专用密码，不是普通登录密码。"
+    if "timed out" in lower or "timeout" in lower or "getaddrinfo" in lower or "network is unreachable" in lower or "name or service not known" in lower:
+        return "无法连接邮箱服务器。请确认网络可用，IMAP 主机为 imap.gmail.com、端口为 993，并已勾选 SSL。"
+    return message

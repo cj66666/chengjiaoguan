@@ -57,7 +57,7 @@ class ImapEmailInboxClient:
             connection.select(mailbox)
             status, data = connection.uid("search", None, "UNSEEN")
             _require_ok(status, "IMAP search failed")
-            uids = (data[0] or b"").decode().split()[:limit]
+            uids = _latest_unseen_uids(data[0], limit)
             messages = []
             for uid in uids:
                 fetch_status, fetched = connection.uid("fetch", uid, "(RFC822)")
@@ -148,6 +148,10 @@ def _imap_connection(credentials: dict[str, Any]):
 
 def _mailbox(credentials: dict[str, Any]) -> str:
     return str(credentials.get("mailbox") or "INBOX")
+
+
+def _latest_unseen_uids(raw_uids: bytes | None, limit: int) -> list[str]:
+    return list(reversed((raw_uids or b"").decode().split()))[:limit]
 
 
 def _raw_message(fetched) -> str | None:

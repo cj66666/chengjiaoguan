@@ -180,8 +180,22 @@ function initialState(sellerId) {
       },
     ],
     channels: [
-      { id: 901, channel_type: "site_form", name: "Website form", status: "connected", credentials_key_status: "sealed" },
-      { id: 902, channel_type: "email", name: "Sales inbox", status: "warning", credentials_key_status: "demo" },
+      {
+        id: 901,
+        channel_type: "site_form",
+        name: "Website form",
+        status: "connected",
+        credentials_key_status: "sealed",
+        operations: { inbound: "webhook", outbound: "none", poll_enabled: false },
+      },
+      {
+        id: 902,
+        channel_type: "email",
+        name: "Gmail Demo Inbox",
+        status: "connected",
+        credentials_key_status: "demo",
+        operations: { inbound: "imap_poll", outbound: "smtp", poll_enabled: true, mailbox: "INBOX" },
+      },
     ],
     notifications: [
       { id: 1001, title: "护栏触发", body: "ACME Trading 报价消息需要人工审批。", severity: "warning", status: "unread" },
@@ -251,6 +265,9 @@ async function mockRequest(state, method, path, body = {}) {
   if (method === "GET" && pathname === "/api/v1/ops/readiness") return readiness(state);
   if (method === "GET" && pathname === "/api/v1/settings") return clone(state.settings);
   if (method === "POST" && pathname === "/api/v1/workers/run-due") return runWorkers(state);
+
+  const channelPoll = pathname.match(/^\/api\/v1\/channels\/(\d+)\/poll-email$/);
+  if (method === "POST" && channelPoll) return pollEmailChannel(state, Number(channelPoll[1]));
 
   const approvalApprove = pathname.match(/^\/api\/v1\/approvals\/(\d+)\/approve$/);
   if (method === "POST" && approvalApprove) return approveApproval(state, Number(approvalApprove[1]));
@@ -407,18 +424,21 @@ function appendHumanMessage(state, conversationId, body) {
 }
 
 function runWorkers(state) {
+  const emailPoll = state.lastEmailPoll || { channel_account_id: 902, fetched: 0, ingested: 0, duplicates: 0, items: [] };
+  const agentInquiry = state.inquiries.find((item) => item.source_channel === "email") || state.inquiries[0];
+  const agentConversationId = agentInquiry?.conversation_id || (agentInquiry?.source_channel === "email" ? 1601 : 601);
   state.workers = {
     followups: { items: [], total: 0 },
     delivery_retries: { items: [], total: 0 },
     pricing_exchange_rate_refreshes: { items: [], total: 0 },
-    email_polls: { items: [{ status: "ok", channel_account_id: 902, fetched: 0, ingested: 0, duplicates: 0 }], total: 1 },
+    email_polls: { items: [{ status: "ok", ...emailPoll }], total: 1 },
     agent_runs: {
       items: [
         {
           status: "ok",
-          inquiry_id: state.inquiries[0]?.id,
-          conversation_id: 601,
-          inquiry_status: state.inquiries[0]?.status,
+          inquiry_id: agentInquiry?.id,
+          conversation_id: agentConversationId,
+          inquiry_status: agentInquiry?.status,
           requires_human_review: true,
           approval_id: state.approvals[0]?.id,
           quotation_id: state.quotations[0]?.id,
@@ -461,8 +481,89 @@ function updatePricingRule(state, ruleId, body) {
 
 function createChannel(state, body) {
   const channel = { id: nextId(state.channels), status: "connected", credentials_key_status: "demo", ...body };
+  if (channel.channel_type === "email") {
+    channel.operations = { inbound: "imap_poll", outbound: "smtp", poll_enabled: true, mailbox: body.credentials?.mailbox || "INBOX" };
+  }
   state.channels.unshift(channel);
   return clone(channel);
+}
+
+function pollEmailChannel(state, channelId) {
+  const channel = state.channels.find((item) => item.id === channelId);
+  if (!channel || channel.channel_type !== "email") return { channel_account_id: channelId, fetched: 0, ingested: 0, duplicates: 0, items: [] };
+  const existing = state.inquiries.find((item) => item.channel_message_id === "gmail-demo-price-001");
+  const duplicate = Boolean(existing);
+  const ids = duplicate ? existing.email_demo_ids : createEmailDemoInquiry(state, channelId);
+  const result = {
+    channel_account_id: channelId,
+    fetched: 1,
+    ingested: duplicate ? 0 : 1,
+    duplicates: duplicate ? 1 : 0,
+    items: [
+      {
+        uid: "gmail-demo-001",
+        inquiry_id: ids.inquiry_id,
+        conversation_id: ids.conversation_id,
+        message_id: ids.message_id,
+        customer_id: ids.customer_id,
+        duplicate,
+      },
+    ],
+  };
+  state.lastEmailPoll = result;
+  return clone(result);
+}
+
+function createEmailDemoInquiry(state, channelId) {
+  const customer = {
+    id: nextId(state.customers),
+    seller_id: state.sellerId,
+    name: "Sofia Garcia",
+    company: "Norte Import Group",
+    country: "ES",
+    email: "sofia.garcia@example-buyer.com",
+    status: "active",
+    grade: "B",
+  };
+  const inquiry = {
+    id: nextId(state.inquiries),
+    seller_id: state.sellerId,
+    customer_id: customer.id,
+    customer,
+    conversation_id: nextId([...state.messages.map((item) => ({ id: item.conversation_id })), { id: 1600 }]),
+    channel_message_id: "gmail-demo-price-001",
+    source_channel: "email",
+    raw_content: "Hello, we are searching for a customized desk light for a new office project. Estimated quantity is around 800-1500 pcs for the first order. Could you recommend suitable products and quote the price?",
+    summary: "Email · customized desk light · 800-1500 pcs · product recommendation needed.",
+    status: "new",
+    grade: "B",
+    received_at: nowIso(),
+  };
+  const conversation = { id: inquiry.conversation_id, channel: "email", status: "open" };
+  const message = {
+    id: nextId(state.messages),
+    conversation_id: inquiry.conversation_id,
+    sender_role: "customer",
+    channel_message_id: inquiry.channel_message_id,
+    content: inquiry.raw_content,
+    sent_at: inquiry.received_at,
+  };
+  customer.inquiries = [inquiry];
+  customer.conversations = [conversation];
+  customer.quotations = [];
+  customer.followups = [];
+  inquiry.email_demo_ids = { inquiry_id: inquiry.id, conversation_id: conversation.id, message_id: message.id, customer_id: customer.id };
+  state.customers.unshift(customer);
+  state.inquiries.unshift(inquiry);
+  state.messages.push(message);
+  state.notifications.unshift({
+    id: nextId(state.notifications),
+    title: "Email 询盘已入库",
+    body: "Gmail Demo Inbox 拉取到一封新的价格询问邮件。",
+    severity: "info",
+    status: "unread",
+  });
+  return inquiry.email_demo_ids;
 }
 
 function rotateChannel(state, channelId) {

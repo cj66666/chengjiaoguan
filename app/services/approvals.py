@@ -17,14 +17,25 @@ from sqlalchemy.orm import Session
 
 from app import models
 from app.services.approval_execution import execute_approval
+from app.services.inquiry_noise import noise_rank
 from app.services.notifications import notify_approval_requested, resolve_approval_notifications
 
 
 def list_approvals(session: Session, seller_id: int, *, status: str | None = "pending") -> list[models.Approval]:
-    statement = select(models.Approval).where(models.Approval.seller_id == seller_id)
+    statement = (
+        select(models.Approval)
+        .outerjoin(models.Inquiry, models.Inquiry.id == models.Approval.inquiry_id)
+        .outerjoin(models.Customer, models.Customer.id == models.Inquiry.customer_id)
+        .where(models.Approval.seller_id == seller_id)
+    )
     if status:
         statement = statement.where(models.Approval.status == status)
-    return session.scalars(statement.order_by(models.Approval.id.desc())).all()
+    return session.scalars(
+        statement.order_by(
+            noise_rank(models.Customer.email, models.Inquiry.raw_content).asc(),
+            models.Approval.id.desc(),
+        )
+    ).all()
 
 
 def request_handoff(

@@ -11,7 +11,7 @@
 """
 
 from app import models
-from app.services.email_polling import RawEmailMessage, StaticEmailInboxClient, poll_email_channel
+from app.services.email_polling import RawEmailMessage, StaticEmailInboxClient, _latest_unseen_uids, poll_email_channel
 
 
 def _raw_email(message_id: str, body: str = "Need 1200 LED desk lamps to US.") -> str:
@@ -95,3 +95,7 @@ def test_poll_email_channel_is_tenant_scoped(client, db_session):
 
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "channel_not_found"
+
+
+def test_latest_unseen_uids_prefers_newest_messages():
+    assert _latest_unseen_uids(b"101 102 103 104", 2) == ["104", "103"]

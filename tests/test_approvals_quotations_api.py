@@ -88,6 +88,48 @@ def test_approval_reject_marks_pending_item_rejected(client, db_session):
     assert approval.payload["reject_reason"] == "Owner will reply manually"
 
 
+def test_approvals_list_pushes_obvious_email_noise_after_business_items(client, db_session):
+    business_inquiry, business_conversation, _ = _seed_conversation(db_session)
+    business = agent_tools.request_handoff(
+        db_session,
+        1,
+        business_conversation.id,
+        "no_catalog_match",
+        "Buyer asks for 500 LED desk lamps shipped to US.",
+        suggestion="Review catalog fit before replying.",
+    )
+    noise_customer = models.Customer(seller_id=1, email="mailer-daemon@googlemail.com", status="active")
+    db_session.add(noise_customer)
+    db_session.flush()
+    noise_inquiry = models.Inquiry(
+        seller_id=1,
+        customer_id=noise_customer.id,
+        raw_content="Delivery incomplete. Message not delivered to this recipient.",
+        status="pending_approval",
+    )
+    db_session.add(noise_inquiry)
+    db_session.flush()
+    noise_conversation = models.Conversation(seller_id=1, customer_id=noise_customer.id, inquiry_id=noise_inquiry.id, channel="email")
+    db_session.add(noise_conversation)
+    db_session.flush()
+    noise = agent_tools.request_handoff(
+        db_session,
+        1,
+        noise_conversation.id,
+        "non_inquiry_message",
+        "Delivery incomplete notification.",
+        suggestion="Do not reply.",
+    )
+    db_session.commit()
+
+    listed = client.get("/api/v1/approvals")
+
+    assert listed.status_code == 200
+    ids = [item["id"] for item in listed.json()["items"]]
+    assert ids.index(business["approval_id"]) < ids.index(noise["approval_id"])
+    assert business_inquiry.id != noise_inquiry.id
+
+
 def test_quotation_detail_patch_and_send(client, db_session):
     inquiry, conversation, product = _seed_conversation(db_session)
     quote = agent_tools.calc_quote(db_session, 1, inquiry.id, [{"product_id": product.id, "quantity": 500}])

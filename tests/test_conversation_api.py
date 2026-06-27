@@ -64,6 +64,21 @@ def test_inquiries_list_prioritizes_high_value_grade(client, db_session):
     assert [item["grade"] for item in response.json()["items"][:2]] == ["A", "C"]
 
 
+def test_inquiries_list_prioritizes_actionable_recent_email(client, db_session):
+    old_responded, _, _ = _seed_inquiry(db_session, message_id="api-old", content="Need 5000 LED desk lamps to US.")
+    old_responded.grade = "A"
+    old_responded.status = "responded"
+    new_pending, _, _ = _seed_inquiry(db_session, message_id="api-new", content="Need 800 desk lamps to US.")
+    new_pending.grade = "B"
+    new_pending.status = "pending_approval"
+    db_session.commit()
+
+    response = client.get("/api/v1/inquiries")
+
+    assert response.status_code == 200
+    assert response.json()["items"][0]["id"] == new_pending.id
+
+
 def test_inquiry_api_is_tenant_scoped(client, db_session):
     inquiry, _, _ = _seed_inquiry(db_session)
 

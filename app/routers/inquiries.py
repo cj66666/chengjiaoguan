@@ -43,13 +43,24 @@ def list_inquiries(
     for condition in _inquiry_filters(status, grade, channel, q):
         query = query.where(condition)
         count_query = count_query.where(condition)
-    priority = case(
+    status_priority = case(
+        (models.Inquiry.status == "pending_approval", 0),
+        (models.Inquiry.status == "new", 1),
+        (models.Inquiry.status == "qualified", 2),
+        else_=3,
+    )
+    grade_priority = case(
         (models.Inquiry.grade == "A", 0),
         (models.Inquiry.grade == "B", 1),
         (models.Inquiry.grade == "C", 2),
         else_=3,
     )
-    query = query.order_by(priority.asc(), models.Inquiry.received_at.desc().nullslast(), models.Inquiry.id.desc())
+    query = query.order_by(
+        status_priority.asc(),
+        models.Inquiry.received_at.desc().nullslast(),
+        grade_priority.asc(),
+        models.Inquiry.id.desc(),
+    )
     total = session.scalar(count_query) or 0
     inquiries = session.scalars(query.offset((page - 1) * page_size).limit(page_size)).all()
     return {

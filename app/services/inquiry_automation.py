@@ -23,6 +23,7 @@ from app import models
 from app.agent.graph import run_closer_graph_result
 from app.agent.graph_domain.policy import GraphDecisionProvider
 from app.agent.types import CloserAgentOutput, CloserGraphState
+from app.services.inquiry_noise import NON_INQUIRY_KEYWORDS, SYSTEM_SENDER_KEYWORDS, not_ilike_any
 
 
 AUTO_AGENT_ACTION = "agent_auto_processed"
@@ -123,18 +124,21 @@ def _eligible_inquiries(session: Session, seller_id: int, limit: int) -> list[tu
     statement = (
         select(models.Inquiry, models.Conversation)
         .join(models.Conversation, models.Conversation.inquiry_id == models.Inquiry.id)
+        .join(models.Customer, models.Customer.id == models.Inquiry.customer_id)
         .where(models.Inquiry.seller_id == seller_id)
         .where(models.Inquiry.deleted_at.is_(None))
         .where(models.Inquiry.status.in_(ELIGIBLE_INQUIRY_STATUSES))
         .where(models.Conversation.seller_id == seller_id)
         .where(models.Conversation.status == "open")
         .where(models.Conversation.is_human_takeover.is_(False))
+        .where(*not_ilike_any(models.Customer.email, SYSTEM_SENDER_KEYWORDS))
+        .where(*not_ilike_any(models.Inquiry.raw_content, NON_INQUIRY_KEYWORDS))
         .where(~processed.exists())
         .where(~has_ai_message.exists())
         .where(~has_pending_approval.exists())
         .where(~has_ai_quote.exists())
         .where(~has_followup.exists())
-        .order_by(models.Inquiry.id.asc())
+        .order_by(models.Inquiry.received_at.desc(), models.Inquiry.id.desc())
         .limit(capped_limit)
     )
     return [(inquiry, conversation) for inquiry, conversation in session.execute(statement).all()]

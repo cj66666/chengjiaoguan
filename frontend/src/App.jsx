@@ -175,7 +175,7 @@ export default function App() {
     });
   }
 
-  async function runWorkers(query = "email_message_limit=2&agent_inquiry_limit=1") {
+  async function runWorkers(query = "email_message_limit=2&agent_inquiry_limit=1&followup_limit=0&delivery_retry_limit=0&pricing_exchange_rate_limit=0") {
     let result = null;
     await runAction("Workers 已运行", async () => {
       const workers = await api.post(`/api/v1/workers/run-due?${query}`);
@@ -229,10 +229,11 @@ export default function App() {
   }
 
   async function pollEmailChannel(channelId) {
-    await runAction("邮箱轮询已执行", async () => {
+    return runAction("邮箱轮询已执行", async () => {
       const poll = await api.post(`/api/v1/channels/${channelId}/poll-email?limit=5`);
       setDemo((current) => ({ ...(current || {}), email_poll: poll }));
       await loadAll();
+      return poll;
     });
   }
 
@@ -301,10 +302,12 @@ export default function App() {
     setError("");
     setNotice("");
     try {
-      await action();
+      const result = await action();
       setNotice(message);
+      return result;
     } catch (err) {
-      setError(err.message);
+      setError(friendlyErrorMessage(err));
+      return null;
     } finally {
       setLoading(false);
     }
@@ -449,6 +452,7 @@ export default function App() {
             saveSettings={saveSettings}
             markNotification={markNotification}
             runWorkers={runWorkers}
+            emailPoll={demo?.email_poll}
           />
         )}
       </main>
@@ -705,7 +709,10 @@ function Inbox({
               <span className="inquiry-copy">
                 <strong>{item.customer?.company || item.customer?.email || `Inquiry #${item.id}`}</strong>
                 <small>{[item.customer?.country, item.summary].filter(Boolean).join(" · ")}</small>
-                <em className={item.status === "pending_approval" ? "risk" : "ok"}>{statusLabel(item.status)}</em>
+                <span className="inquiry-tags">
+                  <em className="source-badge">{channelLabel(item.source_channel)}</em>
+                  <em className={item.status === "pending_approval" ? "risk" : "ok"}>{statusLabel(item.status)}</em>
+                </span>
               </span>
               <span className="inquiry-meta">
                 <small>{relativeTime(item.received_at)}</small>
@@ -733,8 +740,12 @@ function Inbox({
                   <h2>{selected.customer?.company || selected.customer?.email || `Inquiry #${selected.id}`}</h2>
                   {selected.customer?.country && <span className="country-chip">{selected.customer.country}</span>}
                   <span className={`grade grade-${String(selected.grade || "x").toLowerCase()}`}>{selected.grade || "-"}</span>
+                  <span className="source-badge">{channelLabel(selected.source_channel)}</span>
                 </div>
-                <p>{[selected.customer?.name, channelLabel(selected.source_channel), selected.customer?.country].filter(Boolean).join(" · ")}</p>
+                <p>{[selected.customer?.name, selected.customer?.country].filter(Boolean).join(" · ")}</p>
+                <div className="channel-note">
+                  来源：{channelLabel(selected.source_channel)} · 客户仍在{channelSurfaceLabel(selected.source_channel)}沟通，Closer 在商家侧统一处理
+                </div>
                 <div className="guard-status-line">
                   <ShieldCheck size={16} />
                   {selectedApproval ? "护栏触发 · 自动发送已暂停，等待你的决定" : "AI 自主处理中 · 暂无护栏拦截"}
@@ -827,9 +838,9 @@ function Inbox({
             <div className="composer-bar">
               <span className="pill badge-pri">
                 <Bot size={15} />
-                AI 自主处理中
+                {isHumanTakeover ? "人工接管中" : "AI 自主处理中"}
               </span>
-              <p>{conversationId ? (isHumanTakeover ? "已进入人工接管，可直接回复客户" : "如需亲自回复，点击上方「接管」") : "当前询盘还没有可接管会话"}</p>
+              <p>{conversationId ? (isHumanTakeover ? `已进入人工接管，回复会记录并投递回${channelSurfaceLabel(selected.source_channel)}` : "如需亲自回复，点击上方「接管」") : "当前询盘还没有可接管会话"}</p>
               <form className="composer-input" onSubmit={submitHumanMessage}>
                 <Paperclip size={20} />
                 <input
@@ -916,6 +927,14 @@ function channelLabel(channel) {
     email: "Email",
     site_form: "站点表单",
   }[channel] || channel || "渠道";
+}
+
+function channelSurfaceLabel(channel) {
+  return {
+    whatsapp: "WhatsApp",
+    email: "原邮箱",
+    site_form: "独立站表单",
+  }[channel] || "原渠道";
 }
 
 function statusLabel(status) {
@@ -1112,7 +1131,7 @@ function Approvals({ approvals, approveApproval, openQuotation, quoteDetail, sen
   );
 }
 
-function SettingsPanel({ readiness, notifications, channels, settings, createChannel, rotateChannel, pollEmailChannel, testChannelDelivery, saveSettings, markNotification, runWorkers }) {
+function SettingsPanel({ readiness, notifications, channels, settings, createChannel, rotateChannel, pollEmailChannel, testChannelDelivery, saveSettings, markNotification, runWorkers, emailPoll }) {
   const checks = readiness.checks || [];
   const [lastWorkers, setLastWorkers] = useState(null);
 
@@ -1141,7 +1160,7 @@ function SettingsPanel({ readiness, notifications, channels, settings, createCha
             )}
           />
         </Panel>
-        <ChannelConsole channels={channels} createChannel={createChannel} rotateChannel={rotateChannel} pollEmailChannel={pollEmailChannel} testChannelDelivery={testChannelDelivery} />
+        <ChannelConsole channels={channels} createChannel={createChannel} rotateChannel={rotateChannel} pollEmailChannel={pollEmailChannel} testChannelDelivery={testChannelDelivery} emailPoll={emailPoll} />
       </div>
       <div className="stack">
         <Panel title="通知与调度">
@@ -1175,6 +1194,10 @@ function SettingsPanel({ readiness, notifications, channels, settings, createCha
             <button onClick={() => runAndRememberWorkers("email_channel_limit=0&email_message_limit=0&agent_inquiry_limit=1&followup_limit=0&delivery_retry_limit=0&pricing_exchange_rate_limit=0")}>
               <Bot size={17} />
               处理 1 条询盘
+            </button>
+            <button onClick={() => runAndRememberWorkers()}>
+              <RefreshCw size={17} />
+              运行调度入口
             </button>
           </div>
           {lastWorkers && <StatusRows rows={workerSummaryRows(lastWorkers)} />}
@@ -1228,7 +1251,7 @@ function workerFailures(workers) {
   }, 0);
 }
 
-function ChannelConsole({ channels, createChannel, rotateChannel, pollEmailChannel, testChannelDelivery }) {
+function ChannelConsole({ channels, createChannel, rotateChannel, pollEmailChannel, testChannelDelivery, emailPoll }) {
   const [channelType, setChannelType] = useState("email");
   return (
     <Panel title="外部通道" subtitle="把邮箱、WhatsApp、站点表单接进同一个询盘队列">
@@ -1257,6 +1280,7 @@ function ChannelConsole({ channels, createChannel, rotateChannel, pollEmailChann
                 轮换
               </button>
             </div>
+            {channel.channel_type === "email" && emailPoll?.channel_account_id === channel.id && <EmailPollResult poll={emailPoll} />}
             {["email", "whatsapp"].includes(channel.channel_type) && (
               <ApiForm testId={`channel-${channel.id}-test-delivery`} onSubmit={(form) => testChannelDelivery(channel.id, form)} submitLabel="测试投递">
                 <div className="form-grid">
@@ -1287,6 +1311,39 @@ function ChannelConsole({ channels, createChannel, rotateChannel, pollEmailChann
   );
 }
 
+function EmailPollResult({ poll }) {
+  const items = poll.items || [];
+  const noUnread = Number(poll.fetched || 0) === 0;
+  return (
+    <div className={`email-poll-result ${noUnread ? "empty-poll" : ""}`} data-testid="email-poll-result">
+      <strong>最近一次邮箱轮询</strong>
+      <StatusRows
+        rows={[
+          ["fetched", poll.fetched ?? 0],
+          ["ingested", poll.ingested ?? 0],
+          ["duplicates", poll.duplicates ?? 0],
+          ["channel", poll.channel_account_id ?? "-"],
+        ]}
+      />
+      {noUnread ? (
+        <p>没有拉到未读邮件。请确认 Gmail 收件箱内有未读询价邮件，且不在垃圾邮件/促销分类。</p>
+      ) : (
+        <div className="poll-items">
+          {items.map((item, index) => (
+            <div className="poll-item" key={`${item.uid || "mail"}-${index}`}>
+              <span>UID {item.uid || "-"}</span>
+              <strong>{item.duplicate ? "duplicate" : "ingested"}</strong>
+              <small>
+                inquiry #{item.inquiry_id} · conversation #{item.conversation_id} · message #{item.message_id} · customer #{item.customer_id}
+              </small>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function EmailChannelFields() {
   return (
     <>
@@ -1311,6 +1368,21 @@ function EmailChannelFields() {
       </label>
     </>
   );
+}
+
+function friendlyErrorMessage(error) {
+  const message = error?.message || String(error || "");
+  const lower = message.toLowerCase();
+  if (lower.includes("authenticationfailed") || lower.includes("invalid credentials") || lower.includes("login failed") || lower.includes("application-specific password")) {
+    return "Gmail 登录失败。请确认 IMAP 已开启，并使用 Gmail 应用专用密码，不是普通登录密码。";
+  }
+  if (lower.includes("credential is required") || lower.includes("imap_host") || lower.includes("smtp_host") || lower.includes("username") || lower.includes("password")) {
+    return "邮箱通道凭据不完整，请检查 IMAP/SMTP 主机、账号和应用专用密码。";
+  }
+  if (lower.includes("failed to fetch") || lower.includes("networkerror") || lower.includes("timed out") || lower.includes("timeout") || lower.includes("getaddrinfo")) {
+    return "无法连接邮箱或后端服务。请确认后端正在运行、网络可用，Gmail IMAP/SMTP 主机和端口配置正确。";
+  }
+  return message;
 }
 
 function WhatsAppChannelFields() {
